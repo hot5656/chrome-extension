@@ -1,7 +1,7 @@
 {
-	"name": "My first extension",
+	"name": "YouTube dark mode",
 	"version": "1.0.0",
-	"description": "This is my very first coll extension",
+	"description": "This extension turn YouTube background to black",
 	"manifest_version": 3,
 	"background": {
 		"service_worker": "background.js"
