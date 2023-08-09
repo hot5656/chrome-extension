@@ -16,7 +16,8 @@
 		}
 	],
 	"permissions": [
-		"bookmarks"
+		"bookmarks",
+		"storage"
 	],
 	"icons": {
 		"16": "user.png",
