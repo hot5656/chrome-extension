@@ -1,0 +1,11 @@
+{
+	"appName": {
+		"message": "YouTube 深色模式"
+	},
+	"appDescription": {
+		"message": "此擴展將 YouTube 背景變成黑色"
+	},
+	"enableDarkModeText":{
+		"message": "深色模式"
+	}
+}

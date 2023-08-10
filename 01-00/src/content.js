@@ -1,7 +1,8 @@
 window.onload = () => {
 	const button = document.createElement('button');
 	button.id = 'darkModeButton';
-	button.textContent = "DO IT DACK";
+	// button.textContent = "DO IT DACK";
+	button.textContent =  chrome.i18n.getMessage("enableDarkModeText");
 
 	const input = document.createElement('input');
 	input.type = 'checkbox';
@@ -31,8 +32,8 @@ window.onload = () => {
 function checkSetting() {
 	chrome.storage.local.get(['enabled', 'color'], (result) => {
 		const isEnable = result.enabled
-		console.log(isEnable)
-		console.log(result.color)
+		// console.log(isEnable)
+		// console.log(result.color)
 
 		document.getElementById('darkSetting').checked = isEnable;
 		if (isEnable) {
@@ -47,7 +48,8 @@ function storeSetting() {
 	const setting = { enabled: isEnabled, color:'purple'} ;
 
 	chrome.storage.local.set(setting, () => {
-		console.log('store', setting);
+		// console.log('store', setting);
+		;
 	})
 	enableDarkMode(isEnabled);
 }

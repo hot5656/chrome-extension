@@ -1,6 +1,8 @@
+import * as message from "./backgroundMessaging.js"
+
 chrome.runtime.onInstalled.addListener((tab) => {
 	console.log(tab)
-	console.log('installed')
+	console.log('Extension installed')
 })
 
 chrome.bookmarks.onCreated.addListener(() => {
