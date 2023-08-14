@@ -14,7 +14,10 @@ window.onload = () => {
 	button.addEventListener('click', () => {
 		chrome.storage.local.get(['enabled'], (result) => {
 			const isEnable = !result.enabled;
-			document.getElementById('darkSetting').checked = isEnable;
+			// typescript fix
+			const settingCheckbox = document.getElementById('darkSetting') as HTMLInputElement;
+			// (document.getElementById('darkSetting') as HTMLInputElement).checked = isEnable;
+			settingCheckbox.checked = isEnable;
 			storeSetting();
 		})
 
@@ -35,6 +38,7 @@ function checkSetting() {
 		// console.log(isEnable)
 		// console.log(result.color)
 
+		// typescript fix
 		const settingCheckbox = document.getElementById('darkSetting') as HTMLInputElement;
 		settingCheckbox.checked = isEnable;
 		if (isEnable) {
@@ -57,6 +61,7 @@ function storeSetting() {
 }
 
 function enableDarkMode(flag) {
+	// typescript fix
 	const websiteBody = document.getElementsByTagName('ytd-app')[0] as HTMLElement;
 	if (flag) {
 		websiteBody.style.backgroundColor= 'black';
