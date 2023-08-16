@@ -1,6 +1,4 @@
-// import * as message from "./backgroundMessaging.js"
-// typescript fix
-importScripts("./backgroundMessaging.js");
+import * as message from "./backgroundMessaging.js"
 
 
 chrome.runtime.onInstalled.addListener((tab) => {

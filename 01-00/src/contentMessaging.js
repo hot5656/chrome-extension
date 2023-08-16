@@ -2,7 +2,10 @@
 
 // call window.onload twince ,show 2 "DO IT DARK" button
 // window.onload(testMessage());
-testMessage()
+// testMessage()
+setTimeout(() => {
+	testMessage();
+}, 300);
 
 function testMessage() {
 	chrome.runtime.sendMessage(

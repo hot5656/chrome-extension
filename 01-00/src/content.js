@@ -14,10 +14,8 @@ window.onload = () => {
 	button.addEventListener('click', () => {
 		chrome.storage.local.get(['enabled'], (result) => {
 			const isEnable = !result.enabled;
-			// typescript fix
-			const settingCheckbox = document.getElementById('darkSetting') as HTMLInputElement;
-			// (document.getElementById('darkSetting') as HTMLInputElement).checked = isEnable;
-			settingCheckbox.checked = isEnable;
+
+			document.getElementById('darkSetting').checked = isEnable;
 			storeSetting();
 		})
 
@@ -38,9 +36,7 @@ function checkSetting() {
 		// console.log(isEnable)
 		// console.log(result.color)
 
-		// typescript fix
-		const settingCheckbox = document.getElementById('darkSetting') as HTMLInputElement;
-		settingCheckbox.checked = isEnable;
+		document.getElementById('darkSetting').checked = isEnable;
 		if (isEnable) {
 			enableDarkMode(true);
 		}
@@ -49,8 +45,7 @@ function checkSetting() {
 
 // save dark mode to chrome storage
 function storeSetting() {
-	const settingCheckbox = document.getElementById('darkSetting') as HTMLInputElement;
-	const isEnabled = settingCheckbox.checked;
+	const isEnabled = document.getElementById('darkSetting').checked;
 	const setting = { enabled: isEnabled, color:'purple'} ;
 
 	chrome.storage.local.set(setting, () => {
@@ -61,13 +56,11 @@ function storeSetting() {
 }
 
 function enableDarkMode(flag) {
-	// typescript fix
-	const websiteBody = document.getElementsByTagName('ytd-app')[0] as HTMLElement;
 	if (flag) {
-		websiteBody.style.backgroundColor= 'black';
+		document.getElementsByTagName('ytd-app')[0].style.backgroundColor= 'black';
 	}
 	else {
-		websiteBody.style.backgroundColor= '';
+		document.getElementsByTagName('ytd-app')[0].style.backgroundColor= '';
 	}
 }
 
