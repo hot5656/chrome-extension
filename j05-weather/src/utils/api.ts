@@ -8,9 +8,9 @@ export interface OpenWeatherData {
     pressure: number
     temp: number
     temp_max: number
-    temmp_min: number
+    temp_min: number
   }
-  wether: {
+  weather: {
     description: string
     icon: string
     id: number
@@ -36,5 +36,3 @@ export async function fetchOpenWeatherData(
   const data: OpenWeatherData = await res.json()
   return data
 }
-
-// &units=metric
