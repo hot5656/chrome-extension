@@ -5,7 +5,7 @@ import { Add as AddIcon, Update } from '@mui/icons-material'
 import '@fontsource/roboto'
 import './popup.css'
 // mean import index
-import WeatherCard from './WeatherCard'
+import WeatherCard from '../components/WeatherCard'
 import {
   setStoredCities,
   getStoredCities,
