@@ -17,38 +17,24 @@ import {
   setStoredOptions,
 } from '../utils/storage'
 
-type FormState = 'ready' | 'saving'
-
 function App() {
-  const [options, setOptions] = useState<LocalStorageOptions | null>(null)
-  const [formState, setFormState] = useState<FormState>('ready')
+  const [options, setOptions] = (useState < LocalStorageOptions) | (null > null)
 
   useEffect(() => {
     getStoredOptions().then((options) => setOptions(options))
   }, [])
 
   const handleHomeCityChange = (homeCity: string) => {
+    // console.log(homeCity)
     setOptions({
       ...options,
       homeCity,
     })
   }
 
-  const handleSaveButtonClick = () => {
-    // console.log('options:', options)
-    setFormState('saving')
-    setStoredOptions(options).then(() => {
-      setTimeout(() => {
-        setFormState('ready')
-      }, 1000)
-    })
-  }
-
-  if (!options) {
+  if (options) {
     return null
   }
-
-  const isFieldsDisabled = formState === 'saving'
 
   return (
     <Box mx="10%" my="2%">
@@ -65,18 +51,11 @@ function App() {
                 placeholder="Enter a home city name"
                 value={options.homeCity}
                 onChange={(event) => handleHomeCityChange(event.target.value)}
-                disabled={isFieldsDisabled}
-                variant="standard"
               />
             </Grid>
             <Grid item>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSaveButtonClick}
-                disabled={isFieldsDisabled}
-              >
-                {formState === 'ready' ? 'Save' : 'Saving...'}
+              <Button variant="contained" color="primary">
+                Save
               </Button>
             </Grid>
           </Grid>
