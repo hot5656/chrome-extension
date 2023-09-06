@@ -5,13 +5,16 @@ import {
   Card,
   CardActions,
   CardContent,
+  Grid,
   Typography,
 } from '@mui/material'
 import {
+  getWeatherIconSrc,
   fetchOpenWeatherData,
   OpenWeatherData,
   OpenWeatherTempScale,
 } from '../../utils/api'
+import './WearthCard.css'
 
 const WeatherCardContainer: React.FC<{
   children: React.ReactNode
@@ -24,7 +27,7 @@ const WeatherCardContainer: React.FC<{
         <CardActions>
           {onDelete && (
             <Button color="secondary" onClick={onDelete}>
-              Delete
+              <Typography className="weatherCard-body">Delete</Typography>
             </Button>
           )}
         </CardActions>
@@ -55,7 +58,8 @@ const WeatherCard: React.FC<{
   if (cardState == 'loading' || cardState == 'error') {
     return (
       <WeatherCardContainer onDelete={onDelete}>
-        <Typography variant="body1">
+        <Typography className="weatherCrad-title">{city}</Typography>
+        <Typography className="weatherCard-body">
           {cardState == 'loading'
             ? 'Loading...'
             : 'Error: could not retrive weather data for this city.'}
@@ -63,16 +67,34 @@ const WeatherCard: React.FC<{
       </WeatherCardContainer>
     )
   }
-
+  {
+    /* <Grid container justifyContent="spacce-around"></Grid> */
+  }
   return (
     <WeatherCardContainer onDelete={onDelete}>
-      <Typography variant="h5">{weatherData.name}</Typography>
-      <Typography variant="body1">
-        {Math.round(weatherData.main.temp)}
-      </Typography>
-      <Typography variant="body1">
-        Feels like: {Math.round(weatherData.main.feels_like)}
-      </Typography>
+      <Grid container justifyContent="space-around">
+        <Grid item>
+          <Typography className="weatherCrad-title">
+            {weatherData.name}
+          </Typography>
+          <Typography className="weatherCard-temp">
+            {Math.round(weatherData.main.temp)}
+          </Typography>
+          <Typography variant="body1">
+            Feels like: {Math.round(weatherData.main.feels_like)}
+          </Typography>
+        </Grid>
+        <Grid item>
+          {weatherData.weather.length > 0 && (
+            <>
+              <img src={getWeatherIconSrc(weatherData.weather[0].icon)} />
+              <Typography className="weatherCard-body">
+                {weatherData.weather[0].main}
+              </Typography>
+            </>
+          )}
+        </Grid>
+      </Grid>
     </WeatherCardContainer>
   )
 }

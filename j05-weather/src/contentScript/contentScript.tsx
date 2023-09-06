@@ -3,15 +3,28 @@ import ReactDOM from 'react-dom/client'
 import { Card } from '@mui/material'
 import WeatherCard from '../components/WeatherCard'
 import { getStoredOptions, LocalStorageOptions } from '../utils/storage'
+import { Messages } from '../utils/messages'
 import './contentScript.css'
 
 const App: React.FC<{}> = () => {
   const [options, setOptions] = useState<LocalStorageOptions | null>(null)
-  const [isActive, setIsActive] = useState<boolean>(true)
+  const [isActive, setIsActive] = useState<boolean>(false)
 
   useEffect(() => {
-    getStoredOptions().then((options) => setOptions(options))
+    getStoredOptions().then((options) => {
+      setOptions(options)
+      setIsActive(options.hasAutoOverlay)
+    })
   }, [])
+
+  useEffect(() => {
+    chrome.runtime.onMessage.addListener((msg) => {
+      console.log('msg:', msg)
+      if (msg == Messages.TOGGLE_OVERLAY) {
+        setIsActive(!isActive)
+      }
+    })
+  }, [isActive])
 
   if (!options) {
     return null
