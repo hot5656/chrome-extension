@@ -59,7 +59,7 @@ module.exports = {
   ],
   resolve: {
     // 處理省略副檔名的檔案
-    extensions: ['.tsx', '.tx', '.js'],
+    extensions: ['.tsx', '.ts', '.js'],
   },
   // set output path
   output: {

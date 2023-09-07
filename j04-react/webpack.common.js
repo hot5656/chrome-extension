@@ -23,7 +23,7 @@ module.exports = {
       },
       {
         type: 'asset/resource',
-        test: /\.(jpg|jpeg|png|woff|woff2|eof|svg)$/,
+        test: /\.(jpg|jpeg|png|woff|woff2|eot|ttf|svg)$/,
       },
     ],
   },
@@ -52,7 +52,7 @@ module.exports = {
     ...getHTMLPlugins(['popup', 'options']),
   ],
   resolve: {
-    extensions: ['.tsx', '.tx', '.js'],
+    extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
     // filename: 'index.js',
