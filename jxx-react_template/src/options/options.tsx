@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './options.css'
 
-function App() {
+const App: React.FC<{}> = () => {
   return (
     <div>
       <img src="icon.png" />
