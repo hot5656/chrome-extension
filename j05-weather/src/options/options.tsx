@@ -20,7 +20,6 @@ import {
 
 type FormState = 'ready' | 'saving'
 
-// function App() {
 const App: React.FC<{}> = () => {
   const [options, setOptions] = useState<LocalStorageOptions | null>(null)
   const [formState, setFormState] = useState<FormState>('ready')
