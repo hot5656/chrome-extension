@@ -9,7 +9,7 @@ module.exports = {
     popup: path.resolve('src/popup/popup.tsx'),
     options: path.resolve('src/options/options.tsx'),
     background: path.resolve('src/background/background.ts'),
-    contentScript: path.resolve('src/contentScript/contentScript.ts'),
+    contentScript: path.resolve('src/contentScript/contentScript.tsx'),
   },
   module: {
     rules: [
@@ -74,7 +74,11 @@ module.exports = {
       // async：只處理動態引入的模塊
       // all：不論是動態還是非動態引入的模塊，同時進行優化打包
       // initial：把非動態模塊打包，動態模塊進行優化打包
-      chunks: 'all',
+      // chunks: 'all',
+      // 因 contentScript 不能 share Recat module, 所以不執行 chunks(優化) %?%
+      chunks(chunk) {
+        return chunk.name !== 'contentScript'
+      },
     },
   },
 }

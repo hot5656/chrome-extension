@@ -1,7 +1,7 @@
 {
 	"name": "react-extension",
 	"version": "1.0.0",
-	"description": "Chrome extension in React!",
+	"description": "Chrome extension for React-App!",
 	"scripts": {
 		"start": "webpack --watch --progress --config webpack.dev.js",
 		"build": "webpack --watch --progress --config webpack.prod.js"
