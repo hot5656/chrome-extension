@@ -1,7 +1,7 @@
 {
-	"name": "react-extension",
+	"name": "weather-extension",
 	"version": "1.0.0",
-	"description": "Chrome extension in React!",
+	"description": "Chrome extension for Weather!",
 	"scripts": {
 		"start": "webpack --watch --progress --config webpack.dev.js",
 		"build": "webpack --watch --progress --config webpack.prod.js"
@@ -9,6 +9,7 @@
 	"author": "Robert",
 	"license": "ISC",
 	"devDependencies": {
+		"@mui/icons-material": "^5.14.8",
 		"@types/chrome": "^0.0.244",
 		"@types/react": "^18.2.21",
 		"@types/react-dom": "^18.2.7",
@@ -24,5 +25,11 @@
 		"webpack": "^5.88.2",
 		"webpack-cli": "^5.1.4",
 		"webpack-merge": "^5.9.0"
+	},
+	"dependencies": {
+		"@emotion/react": "^11.11.1",
+		"@emotion/styled": "^11.11.0",
+		"@fontsource/roboto": "^5.0.8",
+		"@mui/material": "^5.14.8"
 	}
 }
