@@ -69,8 +69,14 @@ const App: React.FC<{}> = () => {
       },
       (tabs) => {
         if (tabs.length > 0) {
-          // console.log('Messages.TOGGLE_OVERLAY =>', Messages.TOGGLE_OVERLAY)
-          chrome.tabs.sendMessage(tabs[0].id, Messages.TOGGLE_OVERLAY)
+          // console.log('tabs =>', tabs)
+          // send when url = https://* %?%
+          // 若未設定 在 chrome://extensions/ 或 blank tab 會有問題
+          // need set tabs at "permissions" %?%
+          // 未設定抓不到 url
+          if (tabs[0].url.match('https://*')) {
+            chrome.tabs.sendMessage(tabs[0].id, Messages.TOGGLE_OVERLAY)
+          }
         }
       }
     )
