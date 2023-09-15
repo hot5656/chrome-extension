@@ -1,0 +1,36 @@
+{
+	"manifest_version": 3,
+	"name": "AdBlock Extension",
+	"description": "Chrome Extension for AdBlock",
+	"version": "1.0.0",
+	"icons": {
+		"16": "icon.png",
+		"48": "icon.png",
+		"128": "icon.png"
+	},
+	"permissions": [
+		"declarativeNetRequest"
+	],
+	"declarative_net_request": {
+		"rule_resources": [
+			{
+				"id": "ruleset_1",
+				"enabled": false,
+				"path": "rules_1.json"
+			}
+		]
+	},
+	"background": {
+		"service_worker": "background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"<all_urls>"
+			],
+			"js": [
+				"contentScript.js"
+			]
+		}
+	]
+}
