@@ -1,0 +1,42 @@
+{
+	"name": "YouTube Double Subtitle",
+	"manifest_version": 3,
+	"version": "1.0.0",
+	"description": "Double Subtitle",
+	"icons": {
+		"128": "images/icon160.png"
+	},
+	"action": {
+		"default_title": "YouTube Double Subtitle"
+	},
+	"permissions": [
+		"tabs",
+		"storage"
+	],
+	"background": {
+		"service_worker": "js/background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"https://www.youtube.com/*"
+			],
+			"js": [
+				"js/content.js"
+			],
+			"run_at": "document_start",
+			"all_frames": true
+		}
+	],
+	"web_accessible_resources": [
+		{
+			"resources": [
+				"js/injected.js",
+				"js/xhook.min.js"
+			],
+			"matches": [
+				"https://www.youtube.com/*"
+			]
+		}
+	]
+}
