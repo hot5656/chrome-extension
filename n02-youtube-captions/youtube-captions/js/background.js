@@ -2,6 +2,7 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log('background installed')
   chrome.storage.sync.set({
     doubleTitle: true,
+    simpleChinese: true,
   })
 })
 
@@ -27,4 +28,18 @@ chrome.action.onClicked.addListener(() => {
     // reload tabs
     chrome.tabs.reload()
   })
+})
+
+chrome.storage.onChanged.addListener(function (changes, areaName) {
+  console.log('changes', changes)
+  console.log('areaName', areaName) // sync
+  for (let key in changes) {
+    let storageChange = changes[key]
+    console.log(
+      'Key "%s" changed. ' + 'Old value was "%s", new value is "%s".',
+      key,
+      storageChange.oldValue,
+      storageChange.newValue
+    )
+  }
 })

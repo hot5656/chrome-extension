@@ -7,7 +7,8 @@
 		"128": "images/icon160.png"
 	},
 	"action": {
-		"default_title": "YouTube Double Subtitle"
+		"default_title": "YouTube Double Subtitle",
+		"default_popup": "popup/popup.html"
 	},
 	"permissions": [
 		"tabs",
