@@ -43,3 +43,9 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
     )
   }
 })
+
+// back wait message, then response
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log(message)
+  sendResponse({ message: 'Response from background JS' })
+})

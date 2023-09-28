@@ -29,3 +29,11 @@ chrome.storage.sync.get(['doubleTitle'], (storage) => {
     }
   }
 })
+
+// content send message(it is always send to background)
+chrome.runtime.sendMessage(
+  { message: 'hi, message from content script' },
+  (response) => {
+    console.log(response.message)
+  }
+)
