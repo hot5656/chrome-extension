@@ -1,16 +1,5 @@
-// import xhook from 'xhook'
-
 chrome.storage.sync.get(['doubleTitle'], (storage) => {
   console.log('window.location.host', window.location.host)
-
-  //  add languageDiv
-  // {
-  //   const languageDiv = document.createElement('div')
-
-  //   languageDiv.setAttribute('data-language', 'zh-Hans')
-  //   languageDiv.id = 'language-show'
-  //   document.body.appendChild(languageDiv)
-  // }
 
   // change document.domain to window.location.host %?%
   if (
@@ -44,35 +33,51 @@ chrome.storage.sync.get(['doubleTitle'], (storage) => {
 })
 
 // content send message(it is always send to background)
-chrome.runtime.sendMessage(
-  { message: 'hi, message from content script' },
-  (response) => {
-    console.log(response.message)
-  }
-)
+// chrome.runtime.sendMessage(
+//   { message: 'hi, message from content script' },
+//   (response) => {
+//     console.log(response.message)
+//   }
+// )
 
+// when all page load complete, set data-language, and get langeage from chrome storge
 window.addEventListener('load', function () {
   let languageDiv = document.createElement('div')
 
   languageDiv.setAttribute('data-language', 'zh-Hans')
   languageDiv.id = 'language-show'
-  console.log('languageDiv', languageDiv)
-  console.log('document.body', document.body)
+  // console.log('languageDiv', languageDiv)
+  // console.log('document.body', document.body)
   document.body.appendChild(languageDiv)
 
-  chrome.storage.sync.get(['simpleChinese'], (res) => {
+  chrome.storage.sync.get(['simpleChinese', 'languageType'], (res) => {
     // if undefine or null return flase
     const isSimpleChinese = res.simpleChinese ?? false
+    const languageType = res.languageType ?? 'zh-Hans'
 
-    languageDiv.setAttribute(
-      'data-language',
-      // isSimpleChinese ? 'zh-Hans' : 'ja'
-      isSimpleChinese ? 'zh-Hans' : 'zh-Hant'
-    )
+    languageDiv.setAttribute('data-language', languageType)
 
-    console.log(
-      'content data-language :',
-      isSimpleChinese ? 'zh-Hans' : 'zh-Hant'
-    )
+    // languageDiv.setAttribute(
+    //   'data-language',
+    //   // isSimpleChinese ? 'zh-Hans' : 'ja'
+    //   isSimpleChinese ? 'zh-Hans' : 'zh-Hant'
+    // )
+
+    // console.log(
+    //   'content data-language :',
+    //   isSimpleChinese ? 'zh-Hans' : 'zh-Hant'
+    // )
   })
+})
+
+// Robert(2023/10/06) : popup send message to content script for change language
+chrome.runtime.onMessage.addListener((message, sender) => {
+  const languageDiv = document.getElementById('language-show')
+  // languageDiv.setAttribute('data-language', message.language_mode)
+  languageDiv.setAttribute('data-language', message.languageType)
+
+  // console.log('message', message)
+  // console.log('sender', sender)
+  console.log('language_mode : ', message.language_mode)
+  console.log('languageType : ', message.languageType)
 })

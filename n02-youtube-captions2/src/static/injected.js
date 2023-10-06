@@ -23,19 +23,10 @@ const mergerSegs = function (segs, event, map) {
 // sned http request, save data to map
 // 本程式使用時 userLang : undefined
 const setMap = function (userLang, url) {
-  // get language
-  // const languageDiv = document.getElementById('language-show')
-  // console.log('   data-language:', languageDiv.getAttribute('data-language'))
-
-  // send 同步
-  // let xhr = new XMLHttpRequest()
-  // xhr.open('GET', userLang ? userLang.baseUrl : `${url}&tlang=zh-Hans`, false)
-  // xhr.send()
-
   let language_code = 'zh-Hans'
 
+  // get language
   try {
-    // get language
     const languageDiv = document.getElementById('language-show')
     language_code = languageDiv.getAttribute('data-language')
     console.log('   data-language:', language_code)
@@ -55,12 +46,10 @@ const setMap = function (userLang, url) {
 
   // 同步收資料, 存入 map
   let map = new Map()
-  // console.log('xhr.response :　', xhr.response)
-  // console.log('typeof xhr.response :', typeof xhr.response)
 
   // some time receive html response, not parse
   const isHtmlString = xhr.response.includes('<html>')
-  console.log('xhr.response.includes("<html>" :', isHtmlString)
+  // console.log('xhr.response.includes("<html>" :', isHtmlString)
   if (!isHtmlString) {
     JSON.parse(xhr.response).events.forEach((event) => {
       // 若有 segs 則存於 map
@@ -139,16 +128,7 @@ let getResult = function (response, map) {
   return JSON.stringify(resJson)
 }
 
-// window.addEventListener('load', function () {
-//   let languageDiv = document.createElement('div')
-
-//   languageDiv.setAttribute('data-language', 'zh-Hans')
-//   languageDiv.id = 'language-show'
-//   // console.log('languageDiv', languageDiv)
-//   // console.log('document.body', document.body)
-//   document.body.appendChild(languageDiv)
-// })
-
+// when all page load complete, add xhook
 window.addEventListener('load', function () {
   console.log('xhook.after...')
   xhook.after(function (request, response) {

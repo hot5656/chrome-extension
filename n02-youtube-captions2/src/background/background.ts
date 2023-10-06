@@ -3,6 +3,7 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.sync.set({
     doubleTitle: true,
     simpleChinese: true,
+    languageType: 'zh-Hans',
   })
 })
 
@@ -45,7 +46,7 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
 })
 
 // back wait message, then response
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log(message)
-  sendResponse({ message: 'Response from background JS' })
-})
+// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+//   console.log(message)
+//   sendResponse({ message: 'Response from background JS' })
+// })
