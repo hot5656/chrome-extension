@@ -1,12 +1,12 @@
 chrome.storage.sync.get(['doubleTitle'], (storage) => {
-  console.log('window.location.host', window.location.host)
+  // console.log('window.location.host', window.location.host)
 
   // change document.domain to window.location.host %?%
   if (
     storage.doubleTitle &&
     ['www.youtube.com'].includes(window.location.host)
   ) {
-    console.log('found youtube-react')
+    // console.log('found youtube-react')
 
     // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
     // set path
@@ -64,5 +64,5 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 
   // console.log('message', message)
   // console.log('sender', sender)
-  console.log('languageType : ', message.languageType)
+  // console.log('languageType : ', message.languageType)
 })

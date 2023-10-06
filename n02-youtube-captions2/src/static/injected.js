@@ -29,7 +29,7 @@ const setMap = function (userLang, url) {
   try {
     const languageDiv = document.getElementById('language-show')
     language_code = languageDiv.getAttribute('data-language')
-    console.log('   data-language:', language_code)
+    // console.log('   data-language:', language_code)
   } catch (e) {
     console.log('event:', e)
     console.log('   data-language: not found')
@@ -130,21 +130,20 @@ let getResult = function (response, map) {
 
 // when all page load complete, add xhook
 window.addEventListener('load', function () {
-  console.log('xhook.after...')
+  // console.log('xhook.after...')
   xhook.after(function (request, response) {
     let url = request.url
 
     // console.log('url:', url)
     if (url.includes('/api/timedtext')) {
-      const zhReg = /^zh-\w+/
       const params = new URLSearchParams(url)
       let lang = (params.get('lang') || '').toLocaleLowerCase()
       let tlang = (params.get('tlang') || '').toLocaleLowerCase()
 
-      // 若不含 zh-*, 才處理(加 zh-cn)
       // lang 原語言, tlang 翻譯語言
-      console.log('lang:', lang, 'tlang:', tlang)
-      if (!zhReg.test(lang) && !zhReg.test(tlang)) {
+      // console.log('lang:', lang, 'tlang:', tlang)
+
+      if (lang === 'en' && tlang === '') {
         let map = setMap(undefined, url)
         response.text = getResult(response, map)
       }

@@ -50,34 +50,11 @@ const App: React.FC<{}> = () => {
     )
   })
 
-  useEffect(() => {
-    chrome.storage.sync.get(['languageType'], (res) => {
-      console.log('storage languageType:', res.languageType)
-    })
-
-    // send message from current tab %?%
-    chrome.tabs.query(
-      {
-        active: true,
-        currentWindow: true,
-      },
-      (tabs) => {
-        // Robert(2023/10/06) : popup send message to content script for change language
-        if (tabs.length > 0) {
-          // console.log('tabs =>', tabs)
-          // send when url = https://* %?%
-          // 若未設定 在 chrome://extensions/ 或 blank tab 會有問題
-          // need set tabs at "permissions" %?%
-          // 未設定抓不到 url
-          if (tabs[0].url.match('https://www.youtube.com/*')) {
-            chrome.tabs.sendMessage(tabs[0].id, {
-              languageType: languageType,
-            })
-          }
-        }
-      }
-    )
-  }, [])
+  // useEffect(() => {
+  //   chrome.storage.sync.get(['languageType'], (res) => {
+  //     console.log('storage languageType:', res.languageType)
+  //   })
+  // }, [])
 
   const handleSelectLanguageClick = (event: SelectChangeEvent) => {
     chrome.storage.sync.set({
@@ -124,8 +101,8 @@ function showLanguage(type) {
     languageName = 'Chinese Simplified'
   } else if (type === 'zh-Hant') {
     languageName = 'Chinese Traditional'
-  } else if (type === 'zh-Hans') {
-    languageName = 'ja'
+  } else if (type === 'ja') {
+    languageName = 'Japanese'
   } else if (type === 'zh-ko') {
     languageName = 'Korean'
   }
