@@ -2,7 +2,6 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log('background installed')
   chrome.storage.sync.set({
     doubleTitle: true,
-    simpleChinese: true,
     languageType: 'zh-Hans',
   })
 })

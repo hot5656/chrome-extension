@@ -50,34 +50,19 @@ window.addEventListener('load', function () {
   // console.log('document.body', document.body)
   document.body.appendChild(languageDiv)
 
-  chrome.storage.sync.get(['simpleChinese', 'languageType'], (res) => {
-    // if undefine or null return flase
-    const isSimpleChinese = res.simpleChinese ?? false
+  chrome.storage.sync.get(['languageType'], (res) => {
     const languageType = res.languageType ?? 'zh-Hans'
 
     languageDiv.setAttribute('data-language', languageType)
-
-    // languageDiv.setAttribute(
-    //   'data-language',
-    //   // isSimpleChinese ? 'zh-Hans' : 'ja'
-    //   isSimpleChinese ? 'zh-Hans' : 'zh-Hant'
-    // )
-
-    // console.log(
-    //   'content data-language :',
-    //   isSimpleChinese ? 'zh-Hans' : 'zh-Hant'
-    // )
   })
 })
 
 // Robert(2023/10/06) : popup send message to content script for change language
 chrome.runtime.onMessage.addListener((message, sender) => {
   const languageDiv = document.getElementById('language-show')
-  // languageDiv.setAttribute('data-language', message.language_mode)
   languageDiv.setAttribute('data-language', message.languageType)
 
   // console.log('message', message)
   // console.log('sender', sender)
-  console.log('language_mode : ', message.language_mode)
   console.log('languageType : ', message.languageType)
 })
