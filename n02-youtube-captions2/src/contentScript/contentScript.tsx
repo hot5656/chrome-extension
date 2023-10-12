@@ -10,7 +10,8 @@ chrome.storage.sync.get(['doubleTitle'], (storage) => {
 
     // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
     // set path
-    let xHook = chrome.runtime.getURL('xhook.min.js')
+    // Robert(2023/10/12) : change from xhook to ajax-hook
+    let xHook = chrome.runtime.getURL('ajaxhook.js')
 
     // not inject JS
     if (!document.head.querySelector(`script[src='${xHook}']`)) {

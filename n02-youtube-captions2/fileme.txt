@@ -1,1 +1,3 @@
 // Robert(2023/10/06) : popup send message to content script for change language
+// Robert(2023/10/12) : change from xhook to ajax-hook
+	-- the xhook use at Udemy has some problem

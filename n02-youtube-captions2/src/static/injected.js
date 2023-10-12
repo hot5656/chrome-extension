@@ -107,7 +107,8 @@ const processEvents = function (events) {
 }
 
 let getResult = function (response, map) {
-  let resJson = JSON.parse(response.text)
+  // Robert(2023/10/12) : change from xhook to ajax-hook
+  let resJson = JSON.parse(response)
   // 英文 segs array 文字接在一起
   resJson.events = processEvents(resJson.events)
 
@@ -130,23 +131,38 @@ let getResult = function (response, map) {
 
 // when all page load complete, add xhook
 window.addEventListener('load', function () {
-  // console.log('xhook.after...')
-  xhook.after(function (request, response) {
-    let url = request.url
+  console.log('load......')
 
-    // console.log('url:', url)
-    if (url.includes('/api/timedtext')) {
-      const params = new URLSearchParams(url)
-      let lang = (params.get('lang') || '').toLocaleLowerCase()
-      let tlang = (params.get('tlang') || '').toLocaleLowerCase()
-
-      // lang 原語言, tlang 翻譯語言
-      // console.log('lang:', lang, 'tlang:', tlang)
-
-      if (lang === 'en' && tlang === '') {
-        let map = setMap(undefined, url)
-        response.text = getResult(response, map)
+  // Robert(2023/10/12) : change from xhook to ajax-hook
+  ah.proxy({
+    //請求發起前進入
+    onRequest: (config, handler) => {
+      if (config.url.includes('/api/timedtext')) {
+        console.log('--------------------------------------')
+        console.log(config.url)
       }
-    }
+      handler.next(config)
+    },
+    //請求發生錯誤時進入，例如超時；注意，不包括http狀態碼錯誤，如404仍然會認為請求成功
+    onError: (err, handler) => {
+      console.log(err.type)
+      handler.next(err)
+    },
+    //請求成功後進入
+    onResponse: (response, handler) => {
+      if (response.config.url.includes('/api/timedtext')) {
+        const params = new URLSearchParams(response.config.url)
+        let lang = (params.get('lang') || '').toLocaleLowerCase()
+        let tlang = (params.get('tlang') || '').toLocaleLowerCase()
+
+        // lang 原語言, tlang 翻譯語言
+        console.log('lang:', lang, 'tlang:', tlang)
+        if (lang === 'en' && tlang === '') {
+          let map = setMap(undefined, response.config.url)
+          response.response = getResult(response.response, map)
+        }
+      }
+      handler.next(response)
+    },
   })
 })
