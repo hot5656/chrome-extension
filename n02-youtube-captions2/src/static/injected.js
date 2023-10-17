@@ -109,9 +109,9 @@ const processEvents = function (events) {
 let getResult = function (response, map) {
   // Robert(2023/10/12) : change from xhook to ajax-hook
   let resJson = JSON.parse(response)
-  console.log('-------------------')
-  console.log(resJson)
-  console.log('-------------------')
+  // console.log('-------------------')
+  // console.log(resJson)
+  // console.log('-------------------')
 
   // 英文 segs array 文字接在一起
   resJson.events = processEvents(resJson.events)
@@ -141,10 +141,10 @@ window.addEventListener('load', function () {
   ah.proxy({
     //請求發起前進入
     onRequest: (config, handler) => {
-      if (config.url.includes('/api/timedtext')) {
-        console.log('--------------------------------------')
-        console.log(config.url)
-      }
+      // if (config.url.includes('/api/timedtext')) {
+      //   console.log('--------------------------------------')
+      //   console.log(config.url)
+      // }
       handler.next(config)
     },
     //請求發生錯誤時進入，例如超時；注意，不包括http狀態碼錯誤，如404仍然會認為請求成功
@@ -160,7 +160,7 @@ window.addEventListener('load', function () {
         let tlang = (params.get('tlang') || '').toLocaleLowerCase()
 
         // lang 原語言, tlang 翻譯語言
-        console.log('lang:', lang, 'tlang:', tlang)
+        // console.log('lang:', lang, 'tlang:', tlang)
         if (lang === 'en' && tlang === '') {
           let map = setMap(undefined, response.config.url)
           response.response = getResult(response.response, map)

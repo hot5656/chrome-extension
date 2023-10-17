@@ -6,6 +6,17 @@ const setMap = function (response) {
   const lines = response.split('\n')
   let i = 1
   let newItem = false
+  let language_code = 'zh-Hans'
+
+  // get language
+  try {
+    const languageDiv = document.getElementById('language-show')
+    language_code = languageDiv.getAttribute('data-language')
+    // console.log('   data-language:', language_code)
+  } catch (e) {
+    console.log('event:', e)
+    console.log('   data-language: not found')
+  }
 
   lines.forEach((element, index) => {
     let newWords = ''
@@ -13,8 +24,7 @@ const setMap = function (response) {
       let xhr = new XMLHttpRequest()
       xhr.open(
         'GET',
-        // `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-Hans&dt=t&q=${element}`,
-        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-Hant&dt=t&q=${element}`,
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${language_code}&dt=t&q=${element}`,
         false
       )
       xhr.send()
@@ -50,9 +60,9 @@ let getResult = function (map, response) {
 
     if (element.includes('-->')) {
       newItem = true
-      if (i % 10 == 0) {
-        console.log(element + '\n')
-      }
+      // if (i % 10 == 0) {
+      //   console.log(element + '\n')
+      // }
     } else {
       newItem = false
     }
@@ -70,10 +80,10 @@ let getResult = function (map, response) {
 ah.proxy({
   //請求發起前進入
   onRequest: (config, handler) => {
-    if (config.url.includes(url_subtitle)) {
-      console.log('--------------------------------------')
-      console.log(config.url)
-    }
+    // if (config.url.includes(url_subtitle)) {
+    //   console.log('--------------------------------------')
+    //   console.log(config.url)
+    // }
     handler.next(config)
   },
   //請求發生錯誤時進入，例如超時；注意，不包括http狀態碼錯誤，如404仍然會認為請求成功
