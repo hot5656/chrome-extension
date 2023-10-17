@@ -7,7 +7,8 @@ chrome.storage.sync.get(['doubleTitle'], (storage) => {
 
     // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
     // set path
-    let xHook = chrome.runtime.getURL('xhook.js')
+    // let xHook = chrome.runtime.getURL('xhook.js')
+    let xHook = chrome.runtime.getURL('ajaxhook.js')
 
     // not inject JS
     if (!document.head.querySelector(`script[src='${xHook}']`)) {
@@ -23,7 +24,7 @@ chrome.storage.sync.get(['doubleTitle'], (storage) => {
         // 防止再次載入相同的腳本時重複執行該事件處理程序
         this.onload = null
         // load injected.js
-        // injectJs(chrome.runtime.getURL('injected.js'))
+        injectJs(chrome.runtime.getURL('injected.js'))
       }
     }
   }

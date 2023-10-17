@@ -37,7 +37,7 @@
 		{
 			"resources": [
 				"injected.js",
-				"xhook.js"
+				"ajaxhook.js"
 			],
 			"matches": [
 				"https://www.udemy.com/*"
