@@ -1,4 +1,5 @@
-const url_subtitle = 'vtt-c.udemycdn.com'
+// const url_subtitle = 'vtt-c.udemycdn.com'
+const url_subtitle = 'vtt-'
 
 // sned http request, save data to map
 const setMap = function (response) {
@@ -24,7 +25,8 @@ const setMap = function (response) {
       let xhr = new XMLHttpRequest()
       xhr.open(
         'GET',
-        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${language_code}&dt=t&q=${element}`,
+        // `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${language_code}&dt=t&q=${element}`,
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${language_code}&dt=t&q=${element}`,
         false
       )
       xhr.send()
