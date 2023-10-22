@@ -1,0 +1,47 @@
+{
+	"manifest_version": 3,
+	"name": "Youtube Double Subtitle #2",
+	"description": "Double Subtitle",
+	"version": "1.0.0",
+	"icons": {
+		"16": "icon.png",
+		"48": "icon.png",
+		"128": "icon.png"
+	},
+	"action": {
+		"default_popup": "popup.html",
+		"default_title": "Youtube Double Subtitle #2",
+		"default_icon": "icon.png"
+	},
+	"permissions": [
+		"tabs",
+		"storage"
+	],
+	"options_page": "options.html",
+	"background": {
+		"service_worker": "background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"https://www.youtube.com/*"
+			],
+			"js": [
+				"contentScript.js"
+			],
+			"run_at": "document_start",
+			"all_frames": true
+		}
+	],
+	"web_accessible_resources": [
+		{
+			"resources": [
+				"injected.js",
+				"ajaxhook.js"
+			],
+			"matches": [
+				"https://www.youtube.com/*"
+			]
+		}
+	]
+}
