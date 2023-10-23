@@ -18,12 +18,13 @@ import {
 import './popup.css'
 
 const App: React.FC<{}> = () => {
-  const [languageType, setLanguageType] = useState<string>('zh-Hans')
+  const [languageTypeYoutube2, setlanguageTypeYoutube2] =
+    useState<string>('zh-Hant')
 
   // when open popup show
-  chrome.storage.sync.get(['languageType'], (res) => {
-    const languageType = res.languageType ?? 'zh-Hans'
-    setLanguageType(res.languageType)
+  chrome.storage.sync.get(['languageTypeYoutube2'], (res) => {
+    const languageTypeYoutube2 = res.languageTypeYoutube2 ?? 'zh-Hant'
+    setlanguageTypeYoutube2(res.languageTypeYoutube2)
 
     // send message from current tab %?%
     chrome.tabs.query(
@@ -40,9 +41,9 @@ const App: React.FC<{}> = () => {
           // need set tabs at "permissions" %?%
           // 未設定抓不到 url
           if (tabs[0].url.match('https://www.youtube.com/*')) {
-            console.log('languageType match: ', languageType)
+            console.log('languageTypeYoutube2 match: ', languageTypeYoutube2)
             chrome.tabs.sendMessage(tabs[0].id, {
-              languageType: languageType,
+              languageTypeYoutube2: languageTypeYoutube2,
             })
           }
         }
@@ -51,30 +52,30 @@ const App: React.FC<{}> = () => {
   })
 
   // useEffect(() => {
-  //   chrome.storage.sync.get(['languageType'], (res) => {
-  //     console.log('storage languageType:', res.languageType)
+  //   chrome.storage.sync.get(['languageTypeYoutube2'], (res) => {
+  //     console.log('storage languageTypeYoutube2:', res.languageTypeYoutube2)
   //   })
   // }, [])
 
   const handleSelectLanguageClick = (event: SelectChangeEvent) => {
     chrome.storage.sync.set({
-      languageType: event.target.value,
+      languageTypeYoutube2: event.target.value,
     })
-    setLanguageType(event.target.value)
-    console.log('languageType :', event.target.value)
+    setlanguageTypeYoutube2(event.target.value)
+    console.log('languageTypeYoutube2 :', event.target.value)
   }
 
   return (
     <Box>
-      <Typography variant="h4">Youtube Double Subtitle</Typography>
-      <Typography variant="h5">{showLanguage(languageType)}</Typography>
+      <Typography variant="h4">Youtube Double Subtitle #2</Typography>
+      <Typography variant="h5">{showLanguage(languageTypeYoutube2)}</Typography>
       <Box my={'16px'}>
         <FormControl fullWidth>
           <InputLabel id="demo-simple-select-label">Language</InputLabel>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            value={languageType}
+            value={languageTypeYoutube2}
             label="Language"
             onChange={handleSelectLanguageClick}
           >

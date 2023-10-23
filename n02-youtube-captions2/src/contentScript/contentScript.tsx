@@ -11,10 +11,10 @@ chrome.storage.sync.get(['doubleTitle'], (storage) => {
     // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
     // set path
     // Robert(2023/10/12) : change from xhook to ajax-hook
-    let xHook = chrome.runtime.getURL('ajaxhook.js')
+    let ajaxHook = chrome.runtime.getURL('ajaxhook.js')
 
     // not inject JS
-    if (!document.head.querySelector(`script[src='${xHook}']`)) {
+    if (!document.head.querySelector(`script[src='${ajaxHook}']`)) {
       function injectJs(src) {
         let script = document.createElement('script')
         script.src = src
@@ -22,8 +22,8 @@ chrome.storage.sync.get(['doubleTitle'], (storage) => {
         return script
       }
 
-      // load xhook.min.js
-      injectJs(xHook).onload = function () {
+      // load ajaxHook
+      injectJs(ajaxHook).onload = function () {
         // 防止再次載入相同的腳本時重複執行該事件處理程序
         this.onload = null
         // load injected.js

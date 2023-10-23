@@ -1,27 +1,27 @@
 chrome.runtime.onInstalled.addListener(() => {
   console.log('background installed')
   chrome.storage.sync.set({
-    doubleTitle: true,
-    languageType: 'zh-Hans',
+    doubleTitleUdemy: true,
+    languageTypeUdemy: 'zh-Hant',
   })
 })
 
 chrome.action.onClicked.addListener(() => {
-  chrome.storage.sync.get(['doubleTitle'], (res) => {
+  chrome.storage.sync.get(['doubleTitleUdemy'], (res) => {
     chrome.storage.sync.set(
       {
-        doubleTitle: !res.doubleTitle,
+        doubleTitleUdemy: !res.doubleTitleUdemy,
       },
       () => {
         chrome.action.setIcon({
           // %?% path 最前面要加 /
-          path: `${!res.doubleTitle ? 'icon160' : 'icon160_off'}.png`,
+          path: `${!res.doubleTitleUdemy ? 'icon160' : 'icon160_off'}.png`,
         })
       }
     )
 
     // show result
-    chrome.storage.sync.get(['doubleTitle'], (res) => {
+    chrome.storage.sync.get(['doubleTitleUdemy'], (res) => {
       console.log('chrome.storage.sync', res)
     })
 

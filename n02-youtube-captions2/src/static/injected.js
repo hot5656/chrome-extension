@@ -133,7 +133,7 @@ let getResult = function (response, map) {
   return JSON.stringify(resJson)
 }
 
-// when all page load complete, add xhook
+// when all page load complete, add ajaxHook
 window.addEventListener('load', function () {
   console.log('load......')
 

@@ -7,7 +7,7 @@ const setMap = function (response) {
   const lines = response.split('\n')
   let i = 1
   let newItem = false
-  let language_code = 'zh-Hans'
+  let language_code = 'zh-Hant'
 
   // get language
   try {
@@ -74,7 +74,6 @@ let getResult = function (map, response) {
   return response
 }
 
-// when all page load complete, add xhook
 // window.addEventListener('load', function () {
 //   console.log('load......')
 // })

@@ -18,12 +18,12 @@ import {
 import './popup.css'
 
 const App: React.FC<{}> = () => {
-  const [languageType, setLanguageType] = useState<string>('zh-Hans')
+  const [languageTypeUdemy, setlanguageTypeUdemy] = useState<string>('zh-Hant')
 
   // when open popup show
-  chrome.storage.sync.get(['languageType'], (res) => {
-    const languageType = res.languageType ?? 'zh-Hans'
-    setLanguageType(res.languageType)
+  chrome.storage.sync.get(['languageTypeUdemy'], (res) => {
+    const languageTypeUdemy = res.languageTypeUdemy ?? 'zh-Hant'
+    setlanguageTypeUdemy(res.languageTypeUdemy)
 
     // send message from current tab %?%
     chrome.tabs.query(
@@ -40,9 +40,9 @@ const App: React.FC<{}> = () => {
           // need set tabs at "permissions" %?%
           // 未設定抓不到 url
           if (tabs[0].url.match('https://www.udemy.com/*')) {
-            console.log('languageType match: ', languageType)
+            console.log('languageTypeUdemy match: ', languageTypeUdemy)
             chrome.tabs.sendMessage(tabs[0].id, {
-              languageType: languageType,
+              languageTypeUdemy: languageTypeUdemy,
             })
           }
         }
@@ -51,30 +51,30 @@ const App: React.FC<{}> = () => {
   })
 
   // useEffect(() => {
-  //   chrome.storage.sync.get(['languageType'], (res) => {
-  //     console.log('storage languageType:', res.languageType)
+  //   chrome.storage.sync.get(['languageTypeUdemy'], (res) => {
+  //     console.log('storage languageTypeUdemy:', res.languageTypeUdemy)
   //   })
   // }, [])
 
   const handleSelectLanguageClick = (event: SelectChangeEvent) => {
     chrome.storage.sync.set({
-      languageType: event.target.value,
+      languageTypeUdemy: event.target.value,
     })
-    setLanguageType(event.target.value)
-    console.log('languageType :', event.target.value)
+    setlanguageTypeUdemy(event.target.value)
+    console.log('languageTypeUdemy :', event.target.value)
   }
 
   return (
     <Box>
       <Typography variant="h4">Udemy Double Title</Typography>
-      <Typography variant="h5">{showLanguage(languageType)}</Typography>
+      <Typography variant="h5">{showLanguage(languageTypeUdemy)}</Typography>
       <Box my={'16px'}>
         <FormControl fullWidth>
           <InputLabel id="demo-simple-select-label">Language</InputLabel>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            value={languageType}
+            value={languageTypeUdemy}
             label="Language"
             onChange={handleSelectLanguageClick}
           >
