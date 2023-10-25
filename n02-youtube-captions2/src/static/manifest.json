@@ -14,6 +14,7 @@
 		"default_icon": "icon.png"
 	},
 	"permissions": [
+		"activeTab",
 		"tabs",
 		"storage"
 	],
@@ -29,7 +30,7 @@
 			"js": [
 				"contentScript.js"
 			],
-			"run_at": "document_start",
+			"run_at": "document_end",
 			"all_frames": true
 		}
 	],
@@ -37,6 +38,7 @@
 		{
 			"resources": [
 				"injected.js",
+				"injected_online.js",
 				"ajaxhook.js"
 			],
 			"matches": [

@@ -135,7 +135,7 @@ let getResult = function (response, map) {
 
 // when all page load complete, add ajaxHook
 window.addEventListener('load', function () {
-  console.log('load......')
+  // console.log('load......injected.js')
 
   // Robert(2023/10/12) : change from xhook to ajax-hook
   ah.proxy({

@@ -17,64 +17,117 @@ import {
 } from '@mui/material'
 import './popup.css'
 
+const TRANSLATE_OFF = 'Off'
+
 const App: React.FC<{}> = () => {
-  const [languageType, setLanguageType] = useState<string>('zh-Hans')
+  const [languageTypeYoutube, setlanguageTypeYoutube] =
+    useState<string>('zh-Hans')
+  const [translateMode, setTranslateMode] = useState<string>('Youtube')
 
   // when open popup show
-  chrome.storage.sync.get(['languageType'], (res) => {
-    const languageType = res.languageType ?? 'zh-Hans'
-    setLanguageType(res.languageType)
+  chrome.storage.sync.get(
+    ['languageTypeYoutube', 'translateMode', 'doubleTitleYoutube'],
+    (res) => {
+      const languageTypeYoutube = res.languageTypeYoutube ?? 'zh-Hans'
+      setlanguageTypeYoutube(res.languageTypeYoutube)
 
-    // send message from current tab %?%
-    chrome.tabs.query(
-      {
-        active: true,
-        currentWindow: true,
-      },
-      (tabs) => {
-        // Robert(2023/10/06) : popup send message to content script for change language
-        if (tabs.length > 0) {
-          // console.log('tabs =>', tabs)
-          // send when url = https://* %?%
-          // 若未設定 在 chrome://extensions/ 或 blank tab 會有問題
-          // need set tabs at "permissions" %?%
-          // 未設定抓不到 url
-          if (tabs[0].url.match('https://www.youtube.com/*')) {
-            console.log('languageType match: ', languageType)
-            chrome.tabs.sendMessage(tabs[0].id, {
-              languageType: languageType,
-            })
+      if (res.doubleTitleYoutube) {
+        setTranslateMode(res.translateMode)
+      } else {
+        setTranslateMode(TRANSLATE_OFF)
+      }
+
+      // send to background.js
+      const newIconPath = `${
+        res.doubleTitleYoutube ? 'icon' : 'icon160_off'
+      }.png` // Specify the path to the new icon
+      chrome.runtime.sendMessage({ changeIcon: true, newIconPath: newIconPath })
+
+      // send message from current tab %?%
+      chrome.tabs.query(
+        {
+          active: true,
+          currentWindow: true,
+        },
+        (tabs) => {
+          // Robert(2023/10/06) : popup send message to content script for change language
+          if (tabs.length > 0) {
+            // console.log('tabs =>', tabs)
+            // send when url = https://* %?%
+            // 若未設定 在 chrome://extensions/ 或 blank tab 會有問題
+            // need set tabs at "permissions" %?%
+            // 未設定抓不到 url
+            if (tabs[0].url.match('https://www.youtube.com/*')) {
+              // console.log('languageTypeYoutube match: ', languageTypeYoutube)
+              chrome.tabs.sendMessage(tabs[0].id, {
+                languageTypeYoutube: languageTypeYoutube,
+              })
+            }
           }
         }
-      }
-    )
-  })
+      )
+    }
+  )
 
   // useEffect(() => {
-  //   chrome.storage.sync.get(['languageType'], (res) => {
-  //     console.log('storage languageType:', res.languageType)
+  //   chrome.storage.sync.get(['languageTypeYoutube'], (res) => {
+  //     console.log('storage languageTypeYoutube:', res.languageTypeYoutube)
   //   })
   // }, [])
 
+  const handleSelectTranslateModeClick = (event: SelectChangeEvent) => {
+    if (event.target.value === TRANSLATE_OFF) {
+      chrome.storage.sync.set({
+        doubleTitleYoutube: false,
+      })
+    } else {
+      chrome.storage.sync.set({
+        doubleTitleYoutube: true,
+        translateMode: event.target.value,
+      })
+    }
+    setTranslateMode(event.target.value)
+    // console.log('translateMode :', event.target.value)
+  }
+
   const handleSelectLanguageClick = (event: SelectChangeEvent) => {
     chrome.storage.sync.set({
-      languageType: event.target.value,
+      languageTypeYoutube: event.target.value,
     })
-    setLanguageType(event.target.value)
-    console.log('languageType :', event.target.value)
+    setlanguageTypeYoutube(event.target.value)
+    // console.log('languageTypeYoutube :', event.target.value)
   }
 
   return (
     <Box>
       <Typography variant="h4">Youtube Double Title</Typography>
-      <Typography variant="h5">{showLanguage(languageType)}</Typography>
+      <Typography variant="h5">{translateMode}</Typography>
+      <Typography variant="h5">{showLanguage(languageTypeYoutube)}</Typography>
       <Box my={'16px'}>
         <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Language</InputLabel>
+          <InputLabel id="translate-mode-select-label">
+            Translate Mode
+          </InputLabel>
           <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={languageType}
+            labelId="translate-mode-select-label"
+            id="translate-mode-select"
+            value={translateMode}
+            label="Translate Mode"
+            onChange={handleSelectTranslateModeClick}
+          >
+            <MenuItem value={TRANSLATE_OFF}>{TRANSLATE_OFF}</MenuItem>
+            <MenuItem value={'Youtube'}>Youtube</MenuItem>
+            <MenuItem value={'OnLine'}>OnLine</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+      <Box my={'16px'}>
+        <FormControl fullWidth>
+          <InputLabel id="language-select-label">Language</InputLabel>
+          <Select
+            labelId="language-select-label"
+            id="language-select"
+            value={languageTypeYoutube}
             label="Language"
             onChange={handleSelectLanguageClick}
           >
@@ -103,7 +156,7 @@ function showLanguage(type) {
     languageName = 'Chinese Traditional'
   } else if (type === 'ja') {
     languageName = 'Japanese'
-  } else if (type === 'zh-ko') {
+  } else if (type === 'ko') {
     languageName = 'Korean'
   }
 

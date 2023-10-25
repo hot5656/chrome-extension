@@ -8,6 +8,9 @@ chrome.storage.sync.get(['doubleTitleYoutube2'], (storage) => {
   ) {
     console.log('found youtube-react')
 
+    // add run chrome extension label
+    addLabel()
+
     // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
     // set path
     let ajaxHook = chrome.runtime.getURL('ajaxhook.js')
@@ -25,12 +28,44 @@ chrome.storage.sync.get(['doubleTitleYoutube2'], (storage) => {
       injectJs(ajaxHook).onload = function () {
         // 防止再次載入相同的腳本時重複執行該事件處理程序
         this.onload = null
-        // load injected.js
+        // load injected.js(Youtube double subtitle #1 same name have some problem)
         injectJs(chrome.runtime.getURL('injected.js'))
       }
     }
+
+    // check youtube double subtitle #1 not run
+    // chrome.storage.sync.get(['doubleTitle'], (storage1) => {
+    //   let doubleTitleYoutube1 = false
+
+    //   if (chrome.runtime.lastError) {
+    //     // Handle the case where 'doubleTitleYoutube2' does not exist
+    //     console.log('Item does not exist in storage')
+    //   } else {
+    //     // 'doubleTitleYoutube2' exists, and its value is in result.doubleTitleYoutube2
+    //     console.log('Item exists:', storage1.doubleTitle)
+    //   }
+
+    //   // console.log(storage1)
+    //   // if (!chrome.runtime.lastError) {
+    //   //   doubleTitleYoutube1 = storage1.doubleTitle
+    //   // }
+    //   // // const doubleTitleYoutube1 = storage1.doubleTitle ?? false
+    //   // console.log('doubleTitleYoutube1:', doubleTitleYoutube1)
+
+    //   if (!doubleTitleYoutube1) {
+    //   }
+    // })
   }
 })
+
+function addLabel() {
+  let buttonsHead = document.querySelector('#end.style-scope.ytd-masthead')
+  // console.log(buttonsHead)
+
+  const button = document.createElement('button')
+  button.innerText = 'Youtube #2'
+  buttonsHead.append(button)
+}
 
 // content send message(it is always send to background)
 // chrome.runtime.sendMessage(
@@ -65,7 +100,6 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 
   chrome.storage.sync.get(['languageTypeYoutube2'], (res) => {
     const languageTypeYoutube2 = res.languageTypeYoutube2 ?? 'zh-Hant'
-
     languageDiv.setAttribute('data-language', languageTypeYoutube2)
   })
 }

@@ -15,7 +15,7 @@ chrome.action.onClicked.addListener(() => {
       () => {
         chrome.action.setIcon({
           // %?% path 最前面要加 /
-          path: `${!res.doubleTitleYoutube2 ? 'icon160' : 'icon160_off'}.png`,
+          path: `${!res.doubleTitleYoutube2 ? 'icon' : 'icon160_off'}.png`,
         })
       }
     )
