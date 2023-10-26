@@ -64,6 +64,12 @@ let getResult = function (response) {
     ) {
       let newWords = ''
       let xhr = new XMLHttpRequest()
+      // fix % translate error
+      let originalWords = event.segs[0].utf8
+      if (event.segs[0].utf8.includes('%')) {
+        event.segs[0].utf8 = event.segs[0].utf8.replace(/%/g, 'percent')
+      }
+
       xhr.open(
         'GET',
         `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${language_code}&dt=t&q=${event.segs[0].utf8}`,
@@ -74,7 +80,7 @@ let getResult = function (response) {
       if (xhr.status === 200) {
         let data = JSON.parse(xhr.responseText)
         newWords = data[0][0][0]
-        event.segs[0].utf8 = newWords + '\n' + event.segs[0].utf8
+        event.segs[0].utf8 = newWords + '\n' + originalWords
       } else {
         throw new Error('Network response was not ok')
       }

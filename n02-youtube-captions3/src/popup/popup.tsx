@@ -104,7 +104,7 @@ function showLanguage(type) {
     languageName = 'Chinese Traditional'
   } else if (type === 'ja') {
     languageName = 'Japanese'
-  } else if (type === 'zh-ko') {
+  } else if (type === 'ko') {
     languageName = 'Korean'
   }
 
