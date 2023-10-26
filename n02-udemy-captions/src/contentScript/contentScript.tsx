@@ -6,7 +6,7 @@ chrome.storage.sync.get(['doubleTitleUdemy'], (storage) => {
     storage.doubleTitleUdemy &&
     ['www.udemy.com'].includes(window.location.host)
   ) {
-    console.log('found udemy-react')
+    console.log('found udemy....')
 
     // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
     // set path

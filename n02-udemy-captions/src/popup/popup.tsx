@@ -17,13 +17,22 @@ import {
 } from '@mui/material'
 import './popup.css'
 
+const TRANSLATE_OFF = 'Off'
+const TRANSLATE_ON = 'On'
+
 const App: React.FC<{}> = () => {
   const [languageTypeUdemy, setlanguageTypeUdemy] = useState<string>('zh-Hant')
+  const [translateMode, setTranslateMode] = useState<string>(TRANSLATE_OFF)
 
   // when open popup show
-  chrome.storage.sync.get(['languageTypeUdemy'], (res) => {
+  chrome.storage.sync.get(['languageTypeUdemy', 'doubleTitleUdemy'], (res) => {
     const languageTypeUdemy = res.languageTypeUdemy ?? 'zh-Hant'
     setlanguageTypeUdemy(res.languageTypeUdemy)
+    setTranslateMode(res.doubleTitleUdemy ? TRANSLATE_ON : TRANSLATE_OFF)
+
+    // send to background.js
+    const newIconPath = `${res.doubleTitleUdemy ? 'icon' : 'icon160_off'}.png` // Specify the path to the new icon
+    chrome.runtime.sendMessage({ changeIcon: true, newIconPath: newIconPath })
 
     // send message from current tab %?%
     chrome.tabs.query(
@@ -56,24 +65,56 @@ const App: React.FC<{}> = () => {
   //   })
   // }, [])
 
+  const handleSelectTranslateModeClick = (event: SelectChangeEvent) => {
+    if (event.target.value === TRANSLATE_OFF) {
+      chrome.storage.sync.set({
+        doubleTitleUdemy: false,
+      })
+    } else {
+      chrome.storage.sync.set({
+        doubleTitleUdemy: true,
+      })
+    }
+    setTranslateMode(event.target.value)
+    // console.log('translateMode :', event.target.value)
+  }
+
   const handleSelectLanguageClick = (event: SelectChangeEvent) => {
     chrome.storage.sync.set({
       languageTypeUdemy: event.target.value,
     })
     setlanguageTypeUdemy(event.target.value)
-    console.log('languageTypeUdemy :', event.target.value)
+    // console.log('languageTypeUdemy :', event.target.value)
   }
 
   return (
     <Box>
-      <Typography variant="h4">Udemy Double Title</Typography>
-      <Typography variant="h5">{showLanguage(languageTypeUdemy)}</Typography>
+      {/* <Typography variant="h4">Udemy Double Title</Typography>
+      <Typography variant="h5">{translateMode}</Typography>
+      <Typography variant="h5">{showLanguage(languageTypeUdemy)}</Typography> */}
       <Box my={'16px'}>
         <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Language</InputLabel>
+          <InputLabel id="translate-mode-select-label">
+            Translate Mode
+          </InputLabel>
           <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
+            labelId="translate-mode-select-label"
+            id="translate-mode-select"
+            value={translateMode}
+            label="Translate Mode"
+            onChange={handleSelectTranslateModeClick}
+          >
+            <MenuItem value={TRANSLATE_ON}>{TRANSLATE_ON}</MenuItem>
+            <MenuItem value={TRANSLATE_OFF}>{TRANSLATE_OFF}</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+      <Box my={'16px'}>
+        <FormControl fullWidth>
+          <InputLabel id="language-select-label">Language</InputLabel>
+          <Select
+            labelId="language-select-label"
+            id="language-select"
             value={languageTypeUdemy}
             label="Language"
             onChange={handleSelectLanguageClick}
@@ -103,7 +144,7 @@ function showLanguage(type) {
     languageName = 'Chinese Traditional'
   } else if (type === 'ja') {
     languageName = 'Japanese'
-  } else if (type === 'zh-ko') {
+  } else if (type === 'ko') {
     languageName = 'Korean'
   }
 

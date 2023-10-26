@@ -14,6 +14,7 @@
 		"default_icon": "icon.png"
 	},
 	"permissions": [
+		"activeTab",
 		"tabs",
 		"storage"
 	],

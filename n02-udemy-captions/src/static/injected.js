@@ -21,6 +21,11 @@ const setMap = function (response) {
 
   lines.forEach((element, index) => {
     let newWords = ''
+    // fix % translate error
+    if (element.includes('%')) {
+      element = element.replace(/%/g, 'percent')
+    }
+
     if (newItem) {
       let xhr = new XMLHttpRequest()
       xhr.open(
@@ -34,6 +39,8 @@ const setMap = function (response) {
       if (xhr.status === 200) {
         let data = JSON.parse(xhr.responseText)
         newWords = data[0][0][0]
+        // console.log(element + '\n')
+        // console.log(newWords + '\n')
         map.push(newWords)
       } else {
         throw new Error('Network response was not ok')
@@ -75,7 +82,7 @@ let getResult = function (map, response) {
 }
 
 // window.addEventListener('load', function () {
-//   console.log('load......')
+//   console.log('load......injected.js')
 // })
 
 ah.proxy({
