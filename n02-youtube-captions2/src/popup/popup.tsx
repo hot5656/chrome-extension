@@ -100,9 +100,9 @@ const App: React.FC<{}> = () => {
 
   return (
     <Box>
-      <Typography variant="h4">Youtube Double Title</Typography>
+      {/* <Typography variant="h4">Youtube Double Title</Typography>
       <Typography variant="h5">{translateMode}</Typography>
-      <Typography variant="h5">{showLanguage(languageTypeYoutube)}</Typography>
+      <Typography variant="h5">{showLanguage(languageTypeYoutube)}</Typography> */}
       <Box my={'16px'}>
         <FormControl fullWidth>
           <InputLabel id="translate-mode-select-label">
