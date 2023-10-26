@@ -16,7 +16,7 @@ chrome.runtime.onInstalled.addListener(() => {
 //       () => {
 //         chrome.action.setIcon({
 //           // %?% path 最前面要加 /
-//           path: `${!res.doubleTitleYoutube ? 'icon' : 'icon160_off'}.png`,
+//           path: `${!res.doubleTitleYoutube ? 'icon' : 'icon_off'}.png`,
 //         })
 //       }
 //     )

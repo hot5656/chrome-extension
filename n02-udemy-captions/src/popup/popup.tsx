@@ -31,7 +31,7 @@ const App: React.FC<{}> = () => {
     setTranslateMode(res.doubleTitleUdemy ? TRANSLATE_ON : TRANSLATE_OFF)
 
     // send to background.js
-    const newIconPath = `${res.doubleTitleUdemy ? 'icon' : 'icon160_off'}.png` // Specify the path to the new icon
+    const newIconPath = `${res.doubleTitleUdemy ? 'icon' : 'icon_off'}.png` // Specify the path to the new icon
     chrome.runtime.sendMessage({ changeIcon: true, newIconPath: newIconPath })
 
     // send message from current tab %?%
