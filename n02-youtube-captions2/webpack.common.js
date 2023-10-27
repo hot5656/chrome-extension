@@ -81,6 +81,9 @@ module.exports = {
       },
     },
   },
+  performance: {
+    hints: false,
+  },
 }
 
 // change call HtmlPlugin by function
