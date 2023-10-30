@@ -36,6 +36,8 @@ chrome.storage.sync.get(['doubleTitleYoutube', 'translateMode'], (storage) => {
 
         // load ajaxHook
         injectJs(ajaxHook).onload = function () {
+          // console.log('injectJs : ', injectFile)
+
           // 防止再次載入相同的腳本時重複執行該事件處理程序
           this.onload = null
           // load injected.js

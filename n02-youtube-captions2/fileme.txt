@@ -1,3 +1,5 @@
 // Robert(2023/10/06) : popup send message to content script for change language
 // Robert(2023/10/12) : change from xhook to ajax-hook
 	-- the xhook use at Udemy has some problem
+// Robert(2023/10/30) : change to just care https://www.youtube.com/watch
+// Robert(2023/10/30) : support original language, not only english

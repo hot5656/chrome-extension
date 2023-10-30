@@ -161,7 +161,8 @@ window.addEventListener('load', function () {
 
         // lang 原語言, tlang 翻譯語言
         // console.log('lang:', lang, 'tlang:', tlang)
-        if (lang === 'en' && tlang === '') {
+        // Robert(2023/10/30) : support original language, not only english
+        if (lang != '' && tlang === '') {
           let map = setMap(undefined, response.config.url)
           response.response = getResult(response.response, map)
         }

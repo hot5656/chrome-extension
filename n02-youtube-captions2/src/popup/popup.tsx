@@ -55,7 +55,8 @@ const App: React.FC<{}> = () => {
             // 若未設定 在 chrome://extensions/ 或 blank tab 會有問題
             // need set tabs at "permissions" %?%
             // 未設定抓不到 url
-            if (tabs[0].url.match('https://www.youtube.com/*')) {
+            // Robert(2023/10/30) : change to just care https://www.youtube.com/watch
+            if (tabs[0].url.match('https://www.youtube.com/watch*')) {
               // console.log('languageTypeYoutube match: ', languageTypeYoutube)
               chrome.tabs.sendMessage(tabs[0].id, {
                 languageTypeYoutube: languageTypeYoutube,
