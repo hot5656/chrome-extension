@@ -107,8 +107,7 @@ const processEvents = function (events) {
 }
 
 let getResult = function (response, map) {
-  // Robert(2023/10/12) : change from xhook to ajax-hook
-  let resJson = JSON.parse(response)
+  let resJson = JSON.parse(response.text)
   // console.log('-------------------')
   // console.log(resJson)
   // console.log('-------------------')
@@ -133,41 +132,21 @@ let getResult = function (response, map) {
   return JSON.stringify(resJson)
 }
 
-// when all page load complete, add ajaxHook
-window.addEventListener('load', function () {
-  // console.log('load......injected.js')
+xhook.after(function (request, response) {
+  let url = request.url
 
-  // Robert(2023/10/12) : change from xhook to ajax-hook
-  ah.proxy({
-    //請求發起前進入
-    onRequest: (config, handler) => {
-      // if (config.url.includes('/api/timedtext')) {
-      //   console.log('--------------------------------------')
-      //   console.log(config.url)
-      // }
-      handler.next(config)
-    },
-    //請求發生錯誤時進入，例如超時；注意，不包括http狀態碼錯誤，如404仍然會認為請求成功
-    onError: (err, handler) => {
-      console.log(err.type)
-      handler.next(err)
-    },
-    //請求成功後進入
-    onResponse: (response, handler) => {
-      if (response.config.url.includes('/api/timedtext')) {
-        const params = new URLSearchParams(response.config.url)
-        let lang = (params.get('lang') || '').toLocaleLowerCase()
-        let tlang = (params.get('tlang') || '').toLocaleLowerCase()
+  // console.log('url:', url)
+  if (url.includes('/api/timedtext')) {
+    const params = new URLSearchParams(url)
+    let lang = (params.get('lang') || '').toLocaleLowerCase()
+    let tlang = (params.get('tlang') || '').toLocaleLowerCase()
 
-        // lang 原語言, tlang 翻譯語言
-        // console.log('lang:', lang, 'tlang:', tlang)
-        // Robert(2023/10/30) : support original language, not only english
-        if (lang != '' && tlang === '') {
-          let map = setMap(undefined, response.config.url)
-          response.response = getResult(response.response, map)
-        }
-      }
-      handler.next(response)
-    },
-  })
+    // lang 原語言, tlang 翻譯語言
+    // console.log('lang:', lang, 'tlang:', tlang)
+    // Robert(2023/10/30) : support original language, not only english
+    if (lang != '' && tlang === '') {
+      let map = setMap(undefined, url)
+      response.text = getResult(response, map)
+    }
+  }
 })

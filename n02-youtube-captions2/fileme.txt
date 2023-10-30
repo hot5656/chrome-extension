@@ -3,3 +3,5 @@
 	-- the xhook use at Udemy has some problem
 // Robert(2023/10/30) : change to just care https://www.youtube.com/watch
 // Robert(2023/10/30) : support original language, not only english
+// Robert(2023/10/30) : change from ajax-hook to xhook
+	-- ajax-hook run at Brave have seome problem(Youtube)

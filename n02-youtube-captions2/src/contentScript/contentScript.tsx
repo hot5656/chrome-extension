@@ -22,11 +22,10 @@ chrome.storage.sync.get(['doubleTitleYoutube', 'translateMode'], (storage) => {
 
       // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
       // set path
-      // Robert(2023/10/12) : change from xhook to ajax-hook
-      let ajaxHook = chrome.runtime.getURL('ajaxhook.js')
+      let xHook = chrome.runtime.getURL('xhook.js')
 
       // not inject JS
-      if (!document.head.querySelector(`script[src='${ajaxHook}']`)) {
+      if (!document.head.querySelector(`script[src='${xHook}']`)) {
         function injectJs(src) {
           let script = document.createElement('script')
           script.src = src
@@ -34,8 +33,8 @@ chrome.storage.sync.get(['doubleTitleYoutube', 'translateMode'], (storage) => {
           return script
         }
 
-        // load ajaxHook
-        injectJs(ajaxHook).onload = function () {
+        // load xHook
+        injectJs(xHook).onload = function () {
           // console.log('injectJs : ', injectFile)
 
           // 防止再次載入相同的腳本時重複執行該事件處理程序

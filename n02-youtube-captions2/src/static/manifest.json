@@ -39,7 +39,7 @@
 			"resources": [
 				"injected.js",
 				"injected_online.js",
-				"ajaxhook.js"
+				"xhook.js"
 			],
 			"matches": [
 				"https://www.youtube.com/*"

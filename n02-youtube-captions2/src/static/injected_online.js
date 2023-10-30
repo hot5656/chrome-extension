@@ -40,7 +40,7 @@ const processEvents = function (events) {
 }
 
 let getResult = function (response) {
-  let resJson = JSON.parse(response)
+  let resJson = JSON.parse(response.text)
   let language_code = 'zh-Hans'
 
   // get language
@@ -99,32 +99,20 @@ let getResult = function (response) {
 //   console.log('load......injected_online.js')
 // })
 
-ah.proxy({
-  //請求發起前進入
-  onRequest: (config, handler) => {
-    if (config.url.includes(url_subtitle)) {
-      // console.log('--------------------------------------')
-      // console.log(config.url)
-    }
-    handler.next(config)
-  },
-  //請求發生錯誤時進入，例如超時；注意，不包括http狀態碼錯誤，如404仍然會認為請求成功
-  onError: (err, handler) => {
-    console.log(err.type)
-    handler.next(err)
-  },
-  //請求成功後進入
-  onResponse: (response, handler) => {
-    if (response.config.url.includes(url_subtitle)) {
-      const params = new URLSearchParams(response.config.url)
-      let lang = (params.get('lang') || '').toLocaleLowerCase()
-      // console.log('lang=', lang)
-      // console.log(response.config.url)
+xhook.after(function (request, response) {
+  let url = request.url
 
-      if (lang != '') {
-        response.response = getResult(response.response)
-      }
+  // console.log('url:', url)
+  if (url.includes(url_subtitle)) {
+    const params = new URLSearchParams(url)
+    let lang = (params.get('lang') || '').toLocaleLowerCase()
+    let tlang = (params.get('tlang') || '').toLocaleLowerCase()
+
+    // lang 原語言, tlang 翻譯語言
+    // console.log('lang:', lang, 'tlang:', tlang)
+    if (lang != '') {
+      // let map = setMap(undefined, url)
+      response.text = getResult(response)
     }
-    handler.next(response)
-  },
+  }
 })
