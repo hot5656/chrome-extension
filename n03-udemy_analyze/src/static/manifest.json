@@ -1,0 +1,34 @@
+{
+	"manifest_version": 3,
+	"name": "Udemy Analyze Extension",
+	"description": "Chrome Extension for Udemy Analyze",
+	"version": "1.0.0",
+	"icons": {
+		"16": "icon.png",
+		"48": "icon.png",
+		"128": "icon.png"
+	},
+	"action": {
+		"default_popup": "popup.html",
+		"default_title": "Udemy Analyze Extension",
+		"default_icon": "icon.png"
+	},
+	"permissions": [
+		"downloads"
+	],
+	"options_page": "options.html",
+	"background": {
+		"service_worker": "background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"https://www.udemy.com/home/my-courses/*"
+			],
+			"js": [
+				"contentScript.js"
+			],
+			"run_at": "document_end"
+		}
+	]
+}
