@@ -1,11 +1,11 @@
 let pageIndex = 0
-const MAX_PAGE = 3
+const MAX_PAGE = 5
 
 window.addEventListener('load', function () {
-  console.log('load.....1')
-  console.log('window.location.host', window.location.host)
-  console.log('window.location', window.location)
-  console.log('load.....2')
+  // console.log('load.....1')
+  // console.log('window.location.host', window.location.host)
+  // console.log('window.location', window.location)
+  // console.log('load.....2')
   pageIndex = 0
 
   processPage(pageIndex)
@@ -37,15 +37,30 @@ function getCourses() {
 }
 
 function clickNextButton() {
+  let next = true
+
   const nextButton = document.querySelector(
     '.pagination-module--next--1CIKT'
   ) as HTMLElement | null
-  console.log('nextButton', nextButton)
-  if (nextButton) {
-    nextButton?.click()
-  } else {
-    console.log('No "Next" button found or end of pagination reached.')
+
+  next = !JSON.parse(nextButton.getAttribute('aria-disabled'))
+
+  // console.log(
+  //   'nextButton',
+  //   nextButton,
+  //   nextButton.getAttribute('aria-disabled'),
+  //   typeof nextButton.getAttribute('aria-disabled')
+  // )
+
+  if (next) {
+    if (nextButton) {
+      nextButton?.click()
+    } else {
+      console.log('No "Next" button found or end of pagination reached.')
+    }
   }
+
+  return next
 }
 
 function sendCourseMessage(index) {
@@ -60,15 +75,30 @@ function sendCourseMessage(index) {
   return courses.length
 }
 
+function sendCourseMessageLast() {
+  chrome.runtime.sendMessage({
+    message: 'course',
+    courses: [],
+    pageIndex: -1,
+  })
+}
+
 function processPage(index) {
   setTimeout(() => {
     let listLength = sendCourseMessage(pageIndex)
 
-    if (pageIndex < MAX_PAGE - 1) {
-      if (listLength != 0) {
-        pageIndex = pageIndex + 1
-        clickNextButton()
+    if (listLength != 0) {
+      // if (pageIndex < MAX_PAGE - 1) {
+      pageIndex = pageIndex + 1
+      if (clickNextButton()) {
+        processPage(index)
+      } else {
+        sendCourseMessageLast()
       }
+      // } else {
+      //   sendCourseMessageLast()
+      // }
+    } else {
       processPage(index)
     }
   }, 2000)
