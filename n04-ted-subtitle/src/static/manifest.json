@@ -1,0 +1,34 @@
+{
+	"manifest_version": 3,
+	"name": "Ted Extract Subtitle Extension",
+	"description": "Chrome Extension for Ted Extract Subtitle",
+	"version": "1.0.0",
+	"icons": {
+		"16": "icon.png",
+		"48": "icon.png",
+		"128": "icon.png"
+	},
+	"action": {
+		"default_popup": "popup.html",
+		"default_title": "Ted Extract Subtitle Extension",
+		"default_icon": "icon.png"
+	},
+	"permissions": [
+		"downloads"
+	],
+	"options_page": "options.html",
+	"background": {
+		"service_worker": "background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"https://www.ted.com/talks*"
+			],
+			"js": [
+				"contentScript.js"
+			],
+			"run_at": "document_end"
+		}
+	]
+}
