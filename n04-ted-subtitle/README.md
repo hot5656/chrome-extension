@@ -1,8 +1,7 @@
 # Ted Double Subtitle Generator
 
-# Waiting
+    Press button generate dual subtitle(support add offset time)
 
-- popup window add trigger command to generator double subtitle
-- popup window add time offset for subtitle
+- url must https://www.ted.com/talks*
 
 # Reference

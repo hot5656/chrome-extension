@@ -4,6 +4,9 @@ console.log('Ted Extract Subtitle running!')
 // when all page load complete, set data-language, and get langeage from chrome storge
 window.addEventListener('load', function () {
   console.log('load...')
+})
+
+function triggerGenerateSubtitle(offsetMs) {
   let titleUrl = document
     .querySelector('#comments div')
     .getAttribute('data-post-url')
@@ -13,19 +16,20 @@ window.addEventListener('load', function () {
   const talkId = document
     .querySelector('#comments div')
     .getAttribute('data-post-id')
-  console.log(talkId)
-  console.log(title)
+  // console.log(talkId)
+  // console.log(title)
   let dualSubtitle = add2ndSubtitle(getTedSubtitle(talkId))
-  console.log(dualSubtitle)
+  // console.log(dualSubtitle)
 
   // send subtitle to background.js
   chrome.runtime.sendMessage({
     message: 'subtitle',
     title: title,
     idTalk: talkId,
+    offsetMs: offsetMs,
     subtitle: dualSubtitle,
   })
-})
+}
 
 function getTedSubtitle(id) {
   let xhr = new XMLHttpRequest()
@@ -76,3 +80,10 @@ function add2ndSubtitle(subtitles) {
 
   return subtitles
 }
+
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (message.message === 'generate subtitle') {
+    // console.log('Message received in content script:', message)
+    triggerGenerateSubtitle(message.offsetMs)
+  }
+})

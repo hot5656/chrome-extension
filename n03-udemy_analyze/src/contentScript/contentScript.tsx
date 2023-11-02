@@ -2,13 +2,7 @@ let pageIndex = 0
 const MAX_PAGE = 5
 
 window.addEventListener('load', function () {
-  // console.log('load.....1')
-  // console.log('window.location.host', window.location.host)
-  // console.log('window.location', window.location)
-  // console.log('load.....2')
-  pageIndex = 0
-
-  processPage(pageIndex)
+  console.log('load...')
 })
 
 function getCourses() {
@@ -32,7 +26,7 @@ function getCourses() {
     }
   }
 
-  console.log(courses)
+  // console.log(courses)
   return courses
 }
 
@@ -44,13 +38,6 @@ function clickNextButton() {
   ) as HTMLElement | null
 
   next = !JSON.parse(nextButton.getAttribute('aria-disabled'))
-
-  // console.log(
-  //   'nextButton',
-  //   nextButton,
-  //   nextButton.getAttribute('aria-disabled'),
-  //   typeof nextButton.getAttribute('aria-disabled')
-  // )
 
   if (next) {
     if (nextButton) {
@@ -103,3 +90,11 @@ function processPage(index) {
     }
   }, 2000)
 }
+
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (message.message === 'my courses') {
+    // console.log('Message received in content script:', message)
+    pageIndex = 0
+    processPage(pageIndex)
+  }
+})

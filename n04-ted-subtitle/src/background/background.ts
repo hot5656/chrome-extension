@@ -1,5 +1,5 @@
 // lucy_mcbath_my_quest_to_end_the_horror_of_gun_violence_in_the_us_119527
-const offMs = 3500
+let offMs = 3500
 
 // console.log('Background Script')
 // TODO: background script
@@ -8,22 +8,24 @@ chrome.runtime.onInstalled.addListener(() => {
 })
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  // console.log('chrome.runtime.onMessage....')
-  // console.log(request)
-  // Create the formatted date string
-
   if (request.message === 'subtitle') {
     let content = ''
-    console.log(request.title)
-    console.log(request.idTalk)
+    // console.log(request.title)
+    // console.log(request.idTalk)
     console.log(request.subtitle)
+    // console.log(request.offsetMs)
+    offMs = request.offsetMs
+    if (request.subtitle.length > 0) {
+      if (parseInt(request.subtitle[0].startTime) + offMs < 0) {
+        offMs = parseInt(request.subtitle[0].startTime) * -1
+      }
+    }
 
     request.subtitle.forEach(function (item, index) {
       let itemData = ''
       let timeStart = parseInt(item.startTime, 10) + offMs
       let timeEnd =
         parseInt(item.startTime, 10) + parseInt(item.duration, 10) + offMs
-      // console.log(msToTime(timeStart), ' --> ', msToTime(timeEnd))
       itemData =
         (index + 1).toString() +
         '\n' +
@@ -36,11 +38,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       content = content + itemData
       // console.log(itemData)
     })
-    // request.subtitle.forEach(funtion (item) {
-    // 	console.log(item)
-    // })
 
-    saveFile(`${request.title}_${request.idTalk}.srt`, content)
+    let offsetMsStr = offMs < 0 ? 'n' + String(offMs * -1) : String(offMs)
+    saveFile(`${request.title}_${request.idTalk}_${offsetMsStr}.srt`, content)
   }
 })
 
@@ -83,7 +83,7 @@ function saveFile(fileName, content) {
           if (chrome.runtime.lastError) {
             console.error(chrome.runtime.lastError)
           } else {
-            console.log('Download initiated with ID:', downloadId)
+            // console.log('Download initiated with ID:', downloadId)
           }
         }
       )
