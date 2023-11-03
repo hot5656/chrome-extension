@@ -359,8 +359,12 @@ const App3: React.FC<{}> = () => {
 
       {/* Video Player */}
       <video id="videoPlayer" controls>
-        <source
+        {/* <source
           src="2023v-the-way-we-work-season-06-sharmi-surianarain-001-0348221e-598a-4c8f-aaa0-5000k.mp4"
+          type="video/mp4"
+        /> */}
+        <source
+          src="https://py.tedcdn.com/consus/projects/00/66/56/001/products/downloads/2023v-the-way-we-work-season-06-sharmi-surianarain-001-0348221e-598a-4c8f-aaa0-d76bd17676d2-download-5000k.mp4"
           type="video/mp4"
         />
         <track
