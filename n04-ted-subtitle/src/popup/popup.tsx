@@ -1,259 +1,57 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { Box, Button, TextField } from '@mui/material'
+import { Box, Button, TextField, Typography } from '@mui/material'
 import './popup.css'
 
-// 1st video is ok
 const App: React.FC<{}> = () => {
   const [offsetMsInput, setOffsetMsInput] = useState<string>('0')
   const [isButtonDisabled, setButtonDisabled] = useState<boolean>(false)
+  const [selectedSubtitle, setSelectedSubtitle] = useState<File | null>(null)
+  const [talkId, setTalkId] = useState<string>('')
+  const [videoUrl, setVideoUrl] = useState<string>('')
+  const [subtitle, setSubtitle] = useState<string>('')
 
-  const handleGenerateSubtitle = () => {
-    console.log('handleGenerateSubtitle', offsetMsInput)
+  console.log('------> 1.')
+  getTalkId()
+  console.log('------> 2.')
 
+  function getTalkId() {
+    console.log('------> 3.')
     chrome.tabs.query(
       {
         active: true,
         currentWindow: true,
       },
       (tabs) => {
+        console.log('------> 4.')
+        console.log(tabs)
         if (tabs.length > 0) {
+          console.log(tabs[0].url)
           if (tabs[0].url.match('https://www.ted.com/talks*')) {
-            chrome.tabs.sendMessage(tabs[0].id, {
-              message: 'generate subtitle',
-              offsetMs: parseInt(offsetMsInput, 10),
-            })
-
-            setButtonDisabled(true)
-            setTimeout(() => {
-              setButtonDisabled(false)
-            }, 5000)
-
-            console.log('send message...')
+            console.log('------> 5.')
+            chrome.tabs.sendMessage(
+              tabs[0].id,
+              {
+                message: 'get talkId',
+              },
+              (response) => {
+                console.log(response.talkId)
+                if (response.subtitle !== '') {
+                  gVideoSubtitle = response.subtitle
+                }
+                if (response.videoUrl !== '') {
+                  gVideoUrl = response.videoUrl
+                }
+                setTalkId(response.talkId)
+                setVideoUrl(response.videoUrl)
+                setSubtitle(response.subtitle)
+              }
+            )
           }
         }
       }
     )
   }
-
-  return (
-    <Box>
-      <Box mx="8px" my="16px">
-        <TextField
-          id="outlined-number"
-          label="offset ms"
-          type="number"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          defaultValue={0}
-          onChange={(event) => setOffsetMsInput(event.target.value)}
-          style={{ width: '190px' }}
-        />
-      </Box>
-      <Box mx="8px" my="16px">
-        <Button
-          variant="contained"
-          onClick={handleGenerateSubtitle}
-          style={{ width: '190px' }}
-          disabled={isButtonDisabled}
-        >
-          Generate Subtitle
-        </Button>
-      </Box>
-    </Box>
-  )
-}
-
-// subtitle is ok
-const App2: React.FC<{}> = () => {
-  const [offsetMsInput, setOffsetMsInput] = useState<string>('0')
-  const [isButtonDisabled, setButtonDisabled] = useState<boolean>(false)
-
-  const handleGenerateSubtitle = () => {
-    console.log('handleGenerateSubtitle', offsetMsInput)
-
-    chrome.tabs.query(
-      {
-        active: true,
-        currentWindow: true,
-      },
-      (tabs) => {
-        if (tabs.length > 0) {
-          if (tabs[0].url.match('https://www.ted.com/talks*')) {
-            chrome.tabs.sendMessage(tabs[0].id, {
-              message: 'generate subtitle',
-              offsetMs: parseInt(offsetMsInput, 10),
-            })
-
-            setButtonDisabled(true)
-            setTimeout(() => {
-              setButtonDisabled(false)
-            }, 5000)
-
-            console.log('send message...')
-          }
-        }
-      }
-    )
-  }
-
-  const toggleSubtitles = () => {
-    const videoPlayer = document.getElementById(
-      'videoPlayer'
-    ) as HTMLVideoElement
-    const subtitleTrack = videoPlayer.textTracks[0] // Assumes the subtitle track is the first track
-
-    if (subtitleTrack.mode === 'showing') {
-      subtitleTrack.mode = 'hidden' // Hide subtitles
-    } else {
-      subtitleTrack.mode = 'showing' // Show subtitles
-    }
-  }
-
-  return (
-    <Box>
-      <Box mx="8px" my="16px">
-        <TextField
-          id="outlined-number"
-          label="offset ms"
-          type="number"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          defaultValue={0}
-          onChange={(event) => setOffsetMsInput(event.target.value)}
-          style={{ width: '190px' }}
-        />
-      </Box>
-      <Box mx="8px" my="16px">
-        <Button
-          variant="contained"
-          onClick={handleGenerateSubtitle}
-          style={{ width: '190px' }}
-          disabled={isButtonDisabled}
-        >
-          Generate Subtitle
-        </Button>
-      </Box>
-
-      {/* Video Player */}
-      <video id="videoPlayer" controls>
-        <source
-          src="2023v-the-way-we-work-season-06-sharmi-surianarain-001-0348221e-598a-4c8f-aaa0-5000k.mp4"
-          type="video/mp4"
-        />
-        <track
-          src="sharmi_surianarain_caregiving_is_real_work_let_s_treat_it_that_way_117219_0.vtt"
-          kind="subtitles"
-          label="English"
-          default
-        />
-        Your browser does not support the video tag.
-      </video>
-    </Box>
-  )
-}
-
-const Appx: React.FC<{}> = () => {
-  const [offsetMsInput, setOffsetMsInput] = useState<string>('0')
-  const [isButtonDisabled, setButtonDisabled] = useState<boolean>(false)
-  const [selectedSubtitle, setSelectedSubtitle] = useState<File | null>(null)
-
-  const handleGenerateSubtitle = () => {
-    // Your existing code for generating subtitles
-  }
-
-  const toggleSubtitles = () => {
-    const videoPlayer = document.getElementById(
-      'videoPlayer'
-    ) as HTMLVideoElement
-    const subtitleTrack = videoPlayer.textTracks[0] // Assumes the subtitle track is the first track
-
-    if (subtitleTrack.mode === 'showing') {
-      subtitleTrack.mode = 'hidden' // Hide subtitles
-    } else {
-      subtitleTrack.mode = 'showing' // Show subtitles
-    }
-    // // Check if a subtitle file has been selected
-    // if (selectedSubtitle) {
-    //   const subtitleUrl = URL.createObjectURL(selectedSubtitle)
-    //   subtitleTrack.src = subtitleUrl
-    // }
-  }
-
-  const handleSubtitleFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = event.target.files
-    if (files && files.length > 0) {
-      setSelectedSubtitle(files[0])
-    }
-  }
-
-  return (
-    <Box>
-      <Box mx="8px" my="16px">
-        <TextField
-          id="outlined-number"
-          label="offset ms"
-          type="number"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          defaultValue={0}
-          onChange={(event) => setOffsetMsInput(event.target.value)}
-          style={{ width: '190px' }}
-        />
-      </Box>
-      <Box mx="8px" my="16px">
-        <Button
-          variant="contained"
-          onClick={handleGenerateSubtitle}
-          style={{ width: '190px' }}
-          disabled={isButtonDisabled}
-        >
-          Generate Subtitle
-        </Button>
-      </Box>
-
-      {/* Video Player */}
-      <video id="videoPlayer" controls>
-        <source
-          src="2023v-the-way-we-work-season-06-sharmi-surianarain-001-0348221e-598a-4c8f-aaa0-5000k.mp4"
-          type="video/mp4"
-        />
-        <track
-          src="sharmi_surianarain_caregiving_is_real_work_let_s_treat_it_that_way_117219_0.vtt"
-          kind="subtitles"
-          label="English"
-          default
-        />
-        Your browser does not support the video tag.
-      </video>
-
-      <Box mx="8px" my="16px">
-        <input type="file" accept=".vtt" onChange={handleSubtitleFileChange} />
-      </Box>
-
-      <Box mx="8px" my="16px">
-        <Button
-          variant="contained"
-          onClick={toggleSubtitles}
-          style={{ width: '190px' }}
-          disabled={isButtonDisabled}
-        >
-          Toggle Subtitles
-        </Button>
-      </Box>
-    </Box>
-  )
-}
-
-const App3: React.FC<{}> = () => {
-  const [offsetMsInput, setOffsetMsInput] = useState<string>('0')
-  const [isButtonDisabled, setButtonDisabled] = useState<boolean>(false)
-  const [selectedSubtitle, setSelectedSubtitle] = useState<File | null>(null)
 
   const handleGenerateSubtitle = () => {
     console.log('handleGenerateSubtitle', offsetMsInput)
@@ -313,6 +111,125 @@ const App3: React.FC<{}> = () => {
     seekBySeconds(5)
   }
 
+  const handleLoadVideo = () => {
+    // const subtitleTrack = videoPlayer.textTracks[0] // Assumes the subtitle track is the first track
+    // const trackElement = document.querySelector(
+    //   'track[kind="subtitles"]'
+    // ) as HTMLTrackElement
+
+    // if (subtitle !== '') {
+    //   // trackElement.src = subtitle
+    //   setSelectedSubtitle(subtitle)
+    // }
+
+    // const videoPlayerTarck = document.getElementById(
+    //   'videoPlayer'
+    // ) as HTMLVideoElement
+    // const subtitleTrack = videoPlayerTarck.textTracks[0] // Assumes the subtitle track is the first track
+    // const subtitleUrl = URL.createObjectURL(selectedSubtitle)
+    // const trackElement = document.querySelector(
+    //   'track[kind="subtitles"]'
+    // ) as HTMLTrackElement
+
+    // if (subtitle !== '') {
+    //   trackElement.src = subtitle
+    // }
+
+    // const videoPlayer = document.getElementById(
+    //   'videoPlayer'
+    // ) as HTMLSourceElement
+    // const videoUrlInput = document.getElementById('videoUrlInput')
+    // const loadVideoButton = document.getElementById('loadVideoButton')
+    // if (videoUrl !== '') {
+    //   videoPlayer.src = videoUrl
+    // }
+
+    // // const videoPlayer = document.getElementById('videoPlayer');
+    // const subtitleTrack = document.getElementById(
+    //   'subtitleTrack'
+    // ) as HTMLTrackElement
+    // const changeSubtitleButton = document.getElementById('changeSubtitleButton')
+    // if (subtitle !== '') {
+    //   subtitleTrack.src = 'subtitle'
+    // }
+
+    // const videoPlayer = document.getElementById(
+    //   'videoPlayer'
+    // ) as HTMLVideoElement
+    // const videoUrlInput = document.getElementById(
+    //   'videoUrlInput'
+    // ) as HTMLInputElement
+    // const loadVideoButton = document.getElementById(
+    //   'loadVideoButton'
+    // ) as HTMLButtonElement
+    // const subtitleTrack = document.getElementById(
+    //   'subtitleTrack'
+    // ) as HTMLTrackElement
+    // const changeSubtitleButton = document.getElementById(
+    //   'changeSubtitleButton'
+    // ) as HTMLButtonElement
+
+    // // Load the video
+    // const videoUrl = videoUrlInput.value
+    // if (videoUrl !== '') {
+    //   videoPlayer.src = videoUrl
+    // }
+
+    // // Change the subtitle
+    // // const newSubtitleUrl = 'URL_TO_NEW_SUBTITLE.vtt'; // Replace with the URL of the new subtitle file
+    // if (subtitle !== '') {
+    //   subtitleTrack.src = subtitle
+    // }
+
+    const changeVideoAndSubtitleButton = document.getElementById(
+      'changeVideoAndSubtitleButton'
+    )
+    // changeVideoAndSubtitleButton.addEventListener('click', () => {
+    const videoPlayer = document.getElementById(
+      'videoPlayer'
+    ) as HTMLSourceElement
+    // const newVideoSrc = 'URL_TO_NEW_VIDEO.mp4' // Replace with the URL of the new video
+    const subtitleTrack = document.getElementById(
+      'subtitleTrack'
+    ) as HTMLTrackElement
+    // const newSubtitleSrc = 'URL_TO_NEW_SUBTITLE.vtt' // Replace with the URL of the new subtitle
+
+    // Change the subtitle source
+    if (subtitle !== '') {
+      fetch(subtitle, {
+        mode: 'cors',
+      })
+        .then((response) => response.text())
+        .then((text) => {
+          // const track = document.createElement('track')
+          // track.kind = 'subtitles'
+          // track.srclang = 'en'
+          // track.label = 'English'
+
+          const blob = new Blob([text], { type: 'text/vtt' })
+          const url = URL.createObjectURL(blob)
+          // track.src = url
+          subtitleTrack.src = url
+
+          // const video = document.querySelector('video')
+          // video.appendChild(track)
+        })
+    }
+
+    // Change the video source
+    if (videoUrl !== '') {
+      const sourceElement = document.querySelector(
+        'source[type="video/mp4"]'
+      ) as HTMLSourceElement
+      sourceElement.src = videoUrl
+      videoPlayer.src = videoUrl
+    }
+
+    console.log('===========================')
+    console.log('subtitle:', subtitle)
+    console.log('===========================')
+  }
+
   // Load the selected subtitle when the component mounts
   React.useEffect(() => {
     if (selectedSubtitle) {
@@ -333,6 +250,9 @@ const App3: React.FC<{}> = () => {
 
   return (
     <Box>
+      <Typography variant="h5">talkdI : {talkId}</Typography>
+      <Typography variant="h5">videoUrl : {videoUrl}</Typography>
+      <Typography variant="h5">subtitle : {subtitle}</Typography>
       <Box mx="8px" my="16px">
         <TextField
           id="outlined-number"
@@ -367,12 +287,26 @@ const App3: React.FC<{}> = () => {
           src="https://py.tedcdn.com/consus/projects/00/66/56/001/products/downloads/2023v-the-way-we-work-season-06-sharmi-surianarain-001-0348221e-598a-4c8f-aaa0-d76bd17676d2-download-5000k.mp4"
           type="video/mp4"
         />
-        <track
+        {/* <track
           src="sharmi_surianarain_caregiving_is_real_work_let_s_treat_it_that_way_117219_0.vtt"
           kind="subtitles"
           label="English"
           default
-        />
+        /> */}
+        {/* <track
+          src="https://hls.ted.com/project_masters/8805/subtitles/en/full.vtt?intro_master_id=2346"
+          kind="subtitles"
+          label="English"
+          default
+        /> */}
+        {/* <track
+          default
+          src="https://hls.ted.com/project_masters/8805/subtitles/en/full.vtt?intro_master_id=2346"
+          kind="subtitles"
+          srcLang="en"
+          label="English"
+        ></track> */}
+        {/* <track default src="subtitles.vtt" kind="subtitles" srclang="en" label="English"></track> */}
         Your browser does not support the video tag.
       </video>
 
@@ -410,6 +344,18 @@ const App3: React.FC<{}> = () => {
           R5s
         </Button>
       </Box>
+      <Box mx="8px" my="16px">
+        <input
+          type="text"
+          id="videoUrlInput"
+          placeholder="Enter the MP4 video URL"
+        />
+      </Box>
+      <Box mx="8px" my="16px">
+        <Button id="loadVideoButton" onClick={handleLoadVideo}>
+          Load Video
+        </Button>
+      </Box>
     </Box>
   )
 }
@@ -418,7 +364,7 @@ const rootElement = document.createElement('div')
 document.body.appendChild(rootElement)
 const root = ReactDOM.createRoot(rootElement)
 
-root.render(<App3 />)
+root.render(<App />)
 
 // Function to seek by a specified number of seconds
 function seekBySeconds(seconds) {
@@ -437,3 +383,61 @@ function seekBySeconds(seconds) {
     )
   }
 }
+
+function setVideoSubtitle(subtitle) {
+  const videoPlayer = document.getElementById('videoPlayer') as HTMLVideoElement
+  // const subtitleTrack = videoPlayer.textTracks[0] // Assumes the subtitle track is the first track
+  const trackElement = document.querySelector(
+    'track[kind="subtitles"]'
+  ) as HTMLTrackElement
+
+  if (trackElement) {
+    trackElement.src = subtitle
+  }
+}
+
+function setVideoMp4(url) {
+  const videoPlayer = document.getElementById('videoPlayer') as HTMLVideoElement
+  // const subtitleTrack = videoPlayer.textTracks[0] // Assumes the subtitle track is the first track
+  const sourceElement = document.querySelector(
+    'source[type="video/mp4"]'
+  ) as HTMLSourceElement
+
+  if (sourceElement) {
+    sourceElement.src = url
+  }
+}
+
+let gVideoUrl = ''
+let gVideoSubtitle = ''
+// const videoPlayer = document.getElementById('videoPlayer') as HTMLVideoElement
+
+// videoPlayer.addEventListener('loadeddata', () => {
+//   // Modify video source and subtitle here
+//   if (gVideoSubtitle !== '') {
+//     setVideoSubtitle(gVideoSubtitle) // Use setVideoSubtitle to set the subtitle
+//   }
+//   if (gVideoUrl !== '') {
+//     setVideoMp4(gVideoUrl) // Use setVideoMp4 to set the video source
+//     videoPlayer.load()
+//   }
+// })
+
+fetch('https://hls.ted.com/project_masters/8695/subtitles/en/full.vtt', {
+  mode: 'cors',
+})
+  .then((response) => response.text())
+  .then((text) => {
+    const track = document.createElement('track')
+    track.kind = 'subtitles'
+    track.srclang = 'en'
+    track.label = 'English'
+    track.id = 'subtitleTrack'
+
+    const blob = new Blob([text], { type: 'text/vtt' })
+    const url = URL.createObjectURL(blob)
+    track.src = url
+
+    const video = document.querySelector('video')
+    video.appendChild(track)
+  })
