@@ -1,1 +1,4 @@
 // Robert(2023/10/06) : popup send message to content script for change language
+	udemy-double_subtitle-extension-v1.0.0.zip
+// Robert(2023/11/06) :  送錯更新,重送
+	udemy-double_subtitle-extension-v1.1.1.zip

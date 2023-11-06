@@ -3,3 +3,4 @@ dist/
 read script/
 react-example/
 js-test/
+*.zip

@@ -1,51 +1,56 @@
-chrome.storage.sync.get(['doubleTitleYoutube', 'translateMode'], (storage) => {
-  // console.log('window.location.host', window.location.host)
-  // console.log(storage)
-  // console.log('storage.doubleTitleYoutube:', storage.doubleTitleYoutube)
-  // console.log('window.location.host:', window.location.host)
+function loadHook() {
+  chrome.storage.sync.get(
+    ['doubleTitleYoutube', 'translateMode'],
+    (storage) => {
+      // console.log('window.location.host', window.location.host)
+      // console.log(storage)
+      // console.log('storage.doubleTitleYoutube:', storage.doubleTitleYoutube)
+      // console.log('window.location.host:', window.location.host)
 
-  // change document.domain to window.location.host %?%
-  if (
-    storage.doubleTitleYoutube &&
-    ['www.youtube.com'].includes(window.location.host)
-  ) {
-    console.log('found youtube.....')
-    if (storage.doubleTitleYoutube) {
-      let injectFile = 'injected.js'
+      // change document.domain to window.location.host %?%
+      if (
+        storage.doubleTitleYoutube &&
+        ['www.youtube.com'].includes(window.location.host)
+      ) {
+        console.log('found youtube.....')
+        if (storage.doubleTitleYoutube) {
+          let injectFile = 'injected.js'
 
-      // add run chrome extension label
-      addLabel(storage.translateMode + 'Translate')
+          // add run chrome extension label
+          addLabel(storage.translateMode + 'Translate')
 
-      if (storage.translateMode != 'Youtube') {
-        injectFile = 'injected_online.js'
-      }
+          if (storage.translateMode != 'Youtube') {
+            injectFile = 'injected_online.js'
+          }
 
-      // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
-      // set path
-      let xHook = chrome.runtime.getURL('xhook.js')
+          // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
+          // set path
+          let xHook = chrome.runtime.getURL('xhook.js')
 
-      // not inject JS
-      if (!document.head.querySelector(`script[src='${xHook}']`)) {
-        function injectJs(src) {
-          let script = document.createElement('script')
-          script.src = src
-          document.head.appendChild(script)
-          return script
-        }
+          // not inject JS
+          if (!document.head.querySelector(`script[src='${xHook}']`)) {
+            function injectJs(src) {
+              let script = document.createElement('script')
+              script.src = src
+              document.head.appendChild(script)
+              return script
+            }
 
-        // load xHook
-        injectJs(xHook).onload = function () {
-          // console.log('injectJs : ', injectFile)
+            // load xHook
+            injectJs(xHook).onload = function () {
+              // console.log('injectJs : ', injectFile)
 
-          // 防止再次載入相同的腳本時重複執行該事件處理程序
-          this.onload = null
-          // load injected.js
-          injectJs(chrome.runtime.getURL(injectFile))
+              // 防止再次載入相同的腳本時重複執行該事件處理程序
+              this.onload = null
+              // load injected.js
+              injectJs(chrome.runtime.getURL(injectFile))
+            }
+          }
         }
       }
     }
-  }
-})
+  )
+}
 
 function addLabel(label) {
   let buttonsHead = document.querySelector('#end.style-scope.ytd-masthead')
@@ -80,6 +85,9 @@ window.addEventListener('load', function () {
 
     languageDiv.setAttribute('data-language', languageTypeYoutube)
   })
+
+  // load hook
+  loadHook()
 })
 
 // Robert(2023/10/06) : popup send message to content script for change language
