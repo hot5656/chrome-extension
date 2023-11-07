@@ -41,7 +41,77 @@ window.addEventListener('load', function () {
   // const json = JSON.parse(raw)
   // talkId = document.querySelector('#comments div').getAttribute('data-post-id')
   // talkId = data.props.pageProps.videoData.id
+
+  // {
+  //   const videoPlayer = document.querySelector('video')
+  //   console.log('videoPlayer --> ', videoPlayer)
+
+  //   const track = document.createElement('track')
+  //   track.kind = 'subtitles'
+  //   track.label = 'Dual'
+  //   track.src = 'https://hls.ted.com/project_masters/8727/subtitles/en/full.vtt'
+  //   track.srclang = 'zh'
+  //   videoPlayer.appendChild(track)
+
+  //   const dualTrack = videoPlayer.querySelector(
+  //     '[label="Dual"]'
+  //   ) as HTMLTrackElement
+
+  //   if (dualTrack) {
+  //     dualTrack.track.mode = 'showing'
+  //   }
+  // }
+  {
+    // Create an input element
+    const fileInput = document.createElement('input')
+    fileInput.type = 'file'
+    fileInput.accept = '.vtt'
+
+    // Attach an event listener to handle file selection
+    fileInput.addEventListener('change', handleSubtitleFileChange)
+
+    const headElement = document.querySelector('header')
+    // Append the input element to the document or a specific container
+    headElement.appendChild(fileInput)
+
+    const mainElement = document.querySelector(
+      'main#maincontent'
+    ) as HTMLElement
+    // mainElement.classList.replace('pt-14', 'pt-28')
+    mainElement.style.paddingTop = '7rem'
+  }
 })
+
+// Event handler to handle file selection
+function handleSubtitleFileChange(event) {
+  const selectedFile = event.target.files[0]
+
+  if (selectedFile) {
+    // Handle the selected file, e.g., read its contents
+    const reader = new FileReader()
+
+    reader.onload = function (e) {
+      const vttData = e.target.result
+      console.log('---------------------------------------')
+      console.log(event.target.files[0])
+      const subtitleUrl = URL.createObjectURL(event.target.files[0])
+      console.log('subtitleUrl:', subtitleUrl)
+      // console.log(vttData)
+      console.log('---------------------------------------')
+
+      const trackElement = document.querySelector(
+        'track[kind="subtitles"]'
+      ) as HTMLTrackElement
+      trackElement.src = subtitleUrl
+      console.log(trackElement)
+
+      // Now you can use vttData, which contains the content of the selected .vtt file
+      // You can then proceed to update your video's subtitles as needed
+    }
+
+    reader.readAsText(selectedFile)
+  }
+}
 
 function triggerGenerateSubtitle(offsetMs) {
   let titleUrl = document
@@ -146,5 +216,11 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
       videoUrl: playerData ? playerData.resources.h264[0].file : '',
       subtitle: vtt ? vtt : '',
     })
+  } else if (message.message === 'local subtitle') {
+    const trackElement = document.querySelector(
+      'track[kind="subtitles"]'
+    ) as HTMLTrackElement
+    trackElement.src = message.url
+    console.log('send local subtitle : ', message.url)
   }
 })

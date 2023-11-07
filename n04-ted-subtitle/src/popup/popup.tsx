@@ -36,12 +36,6 @@ const App: React.FC<{}> = () => {
               },
               (response) => {
                 console.log(response.talkId)
-                if (response.subtitle !== '') {
-                  gVideoSubtitle = response.subtitle
-                }
-                if (response.videoUrl !== '') {
-                  gVideoUrl = response.videoUrl
-                }
                 setTalkId(response.talkId)
                 setVideoUrl(response.videoUrl)
                 setSubtitle(response.subtitle)
@@ -81,25 +75,16 @@ const App: React.FC<{}> = () => {
     )
   }
 
-  // const toggleSubtitles = () => {
-  //   const videoPlayer = document.getElementById(
-  //     'videoPlayer'
-  //   ) as HTMLVideoElement
-  //   const subtitleTrack = videoPlayer.textTracks[0] // Assumes the subtitle track is the first track
-
-  //   if (subtitleTrack.mode === 'showing') {
-  //     subtitleTrack.mode = 'hidden' // Hide subtitles
-  //   } else {
-  //     subtitleTrack.mode = 'showing' // Show subtitles
-  //   }
-  // }
-
   const handleSubtitleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const files = event.target.files
     if (files && files.length > 0) {
-      setSelectedSubtitle(files[0])
+      // setSelectedSubtitle(files[0])
+      console.log('local subtitle:', files[0].name)
+      const subtitleUrl = URL.createObjectURL(files[0])
+      console.log('subtitleUrl:', subtitleUrl)
+      sendLocalSubtitle(subtitleUrl)
     }
   }
 
@@ -112,75 +97,6 @@ const App: React.FC<{}> = () => {
   }
 
   const handleLoadVideo = () => {
-    // const subtitleTrack = videoPlayer.textTracks[0] // Assumes the subtitle track is the first track
-    // const trackElement = document.querySelector(
-    //   'track[kind="subtitles"]'
-    // ) as HTMLTrackElement
-
-    // if (subtitle !== '') {
-    //   // trackElement.src = subtitle
-    //   setSelectedSubtitle(subtitle)
-    // }
-
-    // const videoPlayerTarck = document.getElementById(
-    //   'videoPlayer'
-    // ) as HTMLVideoElement
-    // const subtitleTrack = videoPlayerTarck.textTracks[0] // Assumes the subtitle track is the first track
-    // const subtitleUrl = URL.createObjectURL(selectedSubtitle)
-    // const trackElement = document.querySelector(
-    //   'track[kind="subtitles"]'
-    // ) as HTMLTrackElement
-
-    // if (subtitle !== '') {
-    //   trackElement.src = subtitle
-    // }
-
-    // const videoPlayer = document.getElementById(
-    //   'videoPlayer'
-    // ) as HTMLSourceElement
-    // const videoUrlInput = document.getElementById('videoUrlInput')
-    // const loadVideoButton = document.getElementById('loadVideoButton')
-    // if (videoUrl !== '') {
-    //   videoPlayer.src = videoUrl
-    // }
-
-    // // const videoPlayer = document.getElementById('videoPlayer');
-    // const subtitleTrack = document.getElementById(
-    //   'subtitleTrack'
-    // ) as HTMLTrackElement
-    // const changeSubtitleButton = document.getElementById('changeSubtitleButton')
-    // if (subtitle !== '') {
-    //   subtitleTrack.src = 'subtitle'
-    // }
-
-    // const videoPlayer = document.getElementById(
-    //   'videoPlayer'
-    // ) as HTMLVideoElement
-    // const videoUrlInput = document.getElementById(
-    //   'videoUrlInput'
-    // ) as HTMLInputElement
-    // const loadVideoButton = document.getElementById(
-    //   'loadVideoButton'
-    // ) as HTMLButtonElement
-    // const subtitleTrack = document.getElementById(
-    //   'subtitleTrack'
-    // ) as HTMLTrackElement
-    // const changeSubtitleButton = document.getElementById(
-    //   'changeSubtitleButton'
-    // ) as HTMLButtonElement
-
-    // // Load the video
-    // const videoUrl = videoUrlInput.value
-    // if (videoUrl !== '') {
-    //   videoPlayer.src = videoUrl
-    // }
-
-    // // Change the subtitle
-    // // const newSubtitleUrl = 'URL_TO_NEW_SUBTITLE.vtt'; // Replace with the URL of the new subtitle file
-    // if (subtitle !== '') {
-    //   subtitleTrack.src = subtitle
-    // }
-
     const changeVideoAndSubtitleButton = document.getElementById(
       'changeVideoAndSubtitleButton'
     )
@@ -192,29 +108,6 @@ const App: React.FC<{}> = () => {
     const subtitleTrack = document.getElementById(
       'subtitleTrack'
     ) as HTMLTrackElement
-    // const newSubtitleSrc = 'URL_TO_NEW_SUBTITLE.vtt' // Replace with the URL of the new subtitle
-
-    // Change the subtitle source
-    if (subtitle !== '') {
-      fetch(subtitle, {
-        mode: 'cors',
-      })
-        .then((response) => response.text())
-        .then((text) => {
-          // const track = document.createElement('track')
-          // track.kind = 'subtitles'
-          // track.srclang = 'en'
-          // track.label = 'English'
-
-          const blob = new Blob([text], { type: 'text/vtt' })
-          const url = URL.createObjectURL(blob)
-          // track.src = url
-          subtitleTrack.src = url
-
-          // const video = document.querySelector('video')
-          // video.appendChild(track)
-        })
-    }
 
     // Change the video source
     if (videoUrl !== '') {
@@ -222,7 +115,7 @@ const App: React.FC<{}> = () => {
         'source[type="video/mp4"]'
       ) as HTMLSourceElement
       sourceElement.src = videoUrl
-      videoPlayer.src = videoUrl
+      // videoPlayer.src = videoUrl
     }
 
     console.log('===========================')
@@ -278,52 +171,17 @@ const App: React.FC<{}> = () => {
       </Box>
 
       {/* Video Player */}
-      <video id="videoPlayer" controls>
-        {/* <source
-          src="2023v-the-way-we-work-season-06-sharmi-surianarain-001-0348221e-598a-4c8f-aaa0-5000k.mp4"
-          type="video/mp4"
-        /> */}
+      {/* <video id="videoPlayer" controls>
         <source
           src="https://py.tedcdn.com/consus/projects/00/66/56/001/products/downloads/2023v-the-way-we-work-season-06-sharmi-surianarain-001-0348221e-598a-4c8f-aaa0-d76bd17676d2-download-5000k.mp4"
           type="video/mp4"
         />
-        {/* <track
-          src="sharmi_surianarain_caregiving_is_real_work_let_s_treat_it_that_way_117219_0.vtt"
-          kind="subtitles"
-          label="English"
-          default
-        /> */}
-        {/* <track
-          src="https://hls.ted.com/project_masters/8805/subtitles/en/full.vtt?intro_master_id=2346"
-          kind="subtitles"
-          label="English"
-          default
-        /> */}
-        {/* <track
-          default
-          src="https://hls.ted.com/project_masters/8805/subtitles/en/full.vtt?intro_master_id=2346"
-          kind="subtitles"
-          srcLang="en"
-          label="English"
-        ></track> */}
-        {/* <track default src="subtitles.vtt" kind="subtitles" srclang="en" label="English"></track> */}
         Your browser does not support the video tag.
-      </video>
+      </video> */}
 
       <Box mx="8px" my="16px">
         <input type="file" accept=".vtt" onChange={handleSubtitleFileChange} />
       </Box>
-      {/* 
-      <Box mx="8px" my="16px">
-        <Button
-          variant="contained"
-          onClick={toggleSubtitles}
-          style={{ width: '190px' }}
-          disabled={isButtonDisabled}
-        >
-          Toggle Subtitles
-        </Button>
-      </Box> */}
       <Box mx="8px" my="16px">
         <Button
           id="backwardButton"
@@ -408,21 +266,6 @@ function setVideoMp4(url) {
   }
 }
 
-let gVideoUrl = ''
-let gVideoSubtitle = ''
-// const videoPlayer = document.getElementById('videoPlayer') as HTMLVideoElement
-
-// videoPlayer.addEventListener('loadeddata', () => {
-//   // Modify video source and subtitle here
-//   if (gVideoSubtitle !== '') {
-//     setVideoSubtitle(gVideoSubtitle) // Use setVideoSubtitle to set the subtitle
-//   }
-//   if (gVideoUrl !== '') {
-//     setVideoMp4(gVideoUrl) // Use setVideoMp4 to set the video source
-//     videoPlayer.load()
-//   }
-// })
-
 fetch('https://hls.ted.com/project_masters/8695/subtitles/en/full.vtt', {
   mode: 'cors',
 })
@@ -441,3 +284,24 @@ fetch('https://hls.ted.com/project_masters/8695/subtitles/en/full.vtt', {
     const video = document.querySelector('video')
     video.appendChild(track)
   })
+
+function sendLocalSubtitle(url) {
+  chrome.tabs.query(
+    {
+      active: true,
+      currentWindow: true,
+    },
+    (tabs) => {
+      if (tabs.length > 0) {
+        if (tabs[0].url.match('https://www.ted.com/talks*')) {
+          chrome.tabs.sendMessage(tabs[0].id, {
+            message: 'local subtitle',
+            url: url,
+          })
+
+          console.log('send local subtitle : ', url)
+        }
+      }
+    }
+  )
+}
