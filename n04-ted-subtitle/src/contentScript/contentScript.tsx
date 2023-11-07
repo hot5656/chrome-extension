@@ -1,25 +1,32 @@
 let talkId = ''
+let titleUrl = []
 let raw = null
 let data = null
 let playerData = null
 let vtt = null
+let vttStartMs = 0
 
-raw = document.querySelector('#__NEXT_DATA__').textContent
-if (raw) {
-  data = JSON.parse(raw)
-  if (data) {
-    playerData = JSON.parse(data.props.pageProps.videoData.playerData)
-  }
-}
-
-console.log('talkId get :', data.props.pageProps.videoData.id)
-console.log(document.querySelector('video'))
 // TODO: content script
 console.log('Ted Extract Subtitle running!')
 
 // when all page load complete, set data-language, and get langeage from chrome storge
 window.addEventListener('load', function () {
   console.log('load...')
+
+  raw = document.querySelector('#__NEXT_DATA__').textContent
+  if (raw) {
+    data = JSON.parse(raw)
+    console.log('data:', data)
+    if (data) {
+      playerData = JSON.parse(data.props.pageProps.videoData.playerData)
+      console.log('playerData:', playerData)
+      talkId = data.props.pageProps.videoData.id
+      titleUrl = playerData.canonical.split('/')
+    }
+  }
+
+  console.log('talkId get :', data.props.pageProps.videoData.id)
+  console.log(document.querySelector('video'))
   // console.log(document.querySelectorAll('#__NEXT_DATA__')[0].text)
 
   // const raw = document.querySelector('#__NEXT_DATA__').textContent
@@ -36,6 +43,8 @@ window.addEventListener('load', function () {
   }
   console.log(playerData.resources.h264[0].file)
   console.log(vtt)
+
+  vttStartMs = getVttOffsetMs(vtt)
   // console.log(data.props.pageProps.videoData.playerData['file'])
   // console.log('----------3')
   // const json = JSON.parse(raw)
@@ -114,20 +123,23 @@ function handleSubtitleFileChange(event) {
 }
 
 function triggerGenerateSubtitle(offsetMs) {
-  let titleUrl = document
-    .querySelector('#comments div')
-    .getAttribute('data-post-url')
-    .split('/')
-  let title = titleUrl[titleUrl.length - 1]
+  // let titleUrl = document
+  //   .querySelector('#comments div')
+  //   .getAttribute('data-post-url')
+  //   .split('/')
+  let title = titleUrl.length != 0 ? titleUrl[titleUrl.length - 1] : ''
 
   // const talkId = document
   //   .querySelector('#comments div')
   //   .getAttribute('data-post-id')
 
-  // console.log(talkId)
-  // console.log(title)
+  console.log(offsetMs)
+  console.log(talkId)
+  console.log(title)
+
+  // add2ndSubtitle(getTedSubtitle(talkId))
   let dualSubtitle = add2ndSubtitle(getTedSubtitle(talkId))
-  // console.log(dualSubtitle)
+  console.log(dualSubtitle)
 
   // send subtitle to background.js
   chrome.runtime.sendMessage({
@@ -136,6 +148,7 @@ function triggerGenerateSubtitle(offsetMs) {
     idTalk: talkId,
     offsetMs: offsetMs,
     subtitle: dualSubtitle,
+    vttStartMs: vttStartMs,
   })
 }
 
@@ -149,15 +162,39 @@ function getTedSubtitle(id) {
   if (xhr.status === 200) {
     let data = JSON.parse(xhr.responseText)
     subtitles = data.captions
-    // console.log(data.captions)
+    console.log(data.captions)
   } else {
     throw new Error('Network response was not ok')
   }
   return subtitles
 }
 
+function getVttOffsetMs(vtt) {
+  let xhr = new XMLHttpRequest()
+  let vttMs = 0
+
+  xhr.open('GET', vtt, false)
+  xhr.send()
+
+  if (xhr.status === 200) {
+    // let data = JSON.parse(xhr.responseText)
+    // subtitles = data.captions
+    // console.log('vtt response -->', xhr.responseText)
+    let lines = xhr.responseText.split('\n')
+    if (lines.length >= 3) {
+      vttMs = Number(lines[2].replace(/\./g, '').split('-->')[0].split(':')[2])
+      console.log(vttMs)
+    }
+  } else {
+    throw new Error('Network response was not ok')
+  }
+  return vttMs
+}
+
 function add2ndSubtitle(subtitles) {
+  // return 'xx'
   let language_code = 'zh-Hant'
+
   subtitles.forEach(function (title, index) {
     let newWords = ''
     let originalWords = title.content
@@ -190,8 +227,9 @@ function add2ndSubtitle(subtitles) {
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  console.log(message)
   if (message.message === 'generate subtitle') {
-    // console.log('Message received in content script:', message)
+    console.log('Message received in content script:', message)
     triggerGenerateSubtitle(message.offsetMs)
   } else if (message.message === 'get talkId') {
     console.log('get talkId:', message)

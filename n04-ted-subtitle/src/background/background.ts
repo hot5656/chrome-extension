@@ -1,5 +1,5 @@
 // lucy_mcbath_my_quest_to_end_the_horror_of_gun_violence_in_the_us_119527
-let offMs = 3500
+// let offMs = 3500
 // sharmi_surianarain_caregiving_is_real_work_let_s_treat_it_that_way
 
 // console.log('Background Script')
@@ -11,22 +11,28 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === 'subtitle') {
     let content = ''
+    console.log(request)
     // console.log(request.title)
     // console.log(request.idTalk)
-    console.log(request.subtitle)
+    // console.log(request.subtitle)
     // console.log(request.offsetMs)
-    offMs = request.offsetMs
-    if (request.subtitle.length > 0) {
-      if (parseInt(request.subtitle[0].startTime) + offMs < 0) {
-        offMs = parseInt(request.subtitle[0].startTime) * -1
-      }
-    }
-
+    // console.log(request.vttStartMs)
+    // offMs = request.offsetMs
+    // if (request.subtitle.length > 0) {
+    //   if (parseInt(request.subtitle[0].startTime) + offMs < 0) {
+    //     offMs = parseInt(request.subtitle[0].startTime) * -1
+    //   }
+    // }
+    let subtitle1stMs = Number(request.subtitle[0].startTime)
     request.subtitle.forEach(function (item, index) {
       let itemData = ''
-      let timeStart = parseInt(item.startTime, 10) + offMs
+      let timeStart =
+        parseInt(item.startTime, 10) + request.vttStartMs - subtitle1stMs
       let timeEnd =
-        parseInt(item.startTime, 10) + parseInt(item.duration, 10) + offMs
+        parseInt(item.startTime, 10) +
+        parseInt(item.duration, 10) +
+        request.vttStartMs -
+        subtitle1stMs
       itemData =
         (index + 1).toString() +
         '\n' +
@@ -40,8 +46,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       // console.log(itemData)
     })
 
-    let offsetMsStr = offMs < 0 ? 'n' + String(offMs * -1) : String(offMs)
-    saveFile(`${request.title}_${request.idTalk}_${offsetMsStr}.srt`, content)
+    // let offsetMsStr = offMs < 0 ? 'n' + String(offMs * -1) : String(offMs)
+    // saveFile(`${request.title}_${request.idTalk}_${offsetMsStr}.srt`, content)
+
+    saveFile(`${request.title}_${request.idTalk}.srt`, content)
   }
 })
 
