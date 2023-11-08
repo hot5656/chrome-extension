@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { Box, Button, TextField } from '@mui/material'
+import { Box, Button, TextField, Typography } from '@mui/material'
 import './popup.css'
 
 const App: React.FC<{}> = () => {
   const [isButtonDisabled, setButtonDisabled] = useState<boolean>(false)
+  const [responseMessage, setResponseMessage] = useState<string>('')
 
   const handleGenerateSubtitle = () => {
     console.log('handleGenerateSubtitle')
@@ -18,14 +19,30 @@ const App: React.FC<{}> = () => {
         console.log(tabs)
         if (tabs.length > 0) {
           if (tabs[0].url.match('https://www.ted.com/talks*')) {
-            chrome.tabs.sendMessage(tabs[0].id, {
-              message: 'generate subtitle',
-            })
+            chrome.tabs.sendMessage(
+              tabs[0].id,
+              {
+                message: 'generate subtitle',
+              },
+              (response) => {
+                if (response) {
+                  console.log('response:', response)
+                } else {
+                  console.log('no response....')
+                }
 
-            setButtonDisabled(true)
-            setTimeout(() => {
-              setButtonDisabled(false)
-            }, 5000)
+                if (response.talkId === '') {
+                  setResponseMessage('Wait sometime then try ... ')
+                } else {
+                  setResponseMessage('')
+
+                  setButtonDisabled(true)
+                  setTimeout(() => {
+                    setButtonDisabled(false)
+                  }, 5000)
+                }
+              }
+            )
 
             console.log('send message...')
           }
@@ -46,6 +63,7 @@ const App: React.FC<{}> = () => {
           Generate Subtitle
         </Button>
       </Box>
+      <Typography variant="body1">{responseMessage}</Typography>
     </Box>
   )
 }
