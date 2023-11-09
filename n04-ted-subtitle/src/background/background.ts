@@ -1,6 +1,9 @@
 chrome.runtime.onInstalled.addListener(() => {
-  // TODO: on installed function
   console.log('background install...')
+  chrome.storage.sync.set({
+    doubleTitleTed: true,
+    languageTypeTed: 'zh-Hant',
+  })
 })
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
@@ -29,7 +32,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       content = content + itemData
     })
 
-    saveFile(`${request.title}_${request.idTalk}.vtt`, content)
+    saveFile(
+      `${request.title}_${request.idTalk}_${request.languageType}.vtt`,
+      content
+    )
   }
 })
 

@@ -1,18 +1,17 @@
 // contentScript.js
-// npm i --save-dev react-modal
 
 // Include React (make sure it's bundled and available in your extension)
 import React, { useState, useEffect, useRef } from 'react'
 // import ReactDOM from 'react-dom'
 import ReactDOM from 'react-dom/client'
-import Modal from 'react-modal'
 
 let talkId = ''
 let titleUrl = []
 let videoUrl = ''
 let vttUrl = ''
 let vttStartMs = 0
-let countString = 'Counter:'
+let countString = 'Download Count:'
+let languageType = 'zh-Hant'
 
 // Your React component
 function App() {
@@ -44,12 +43,20 @@ function App() {
     // console.log('downcounter(useEffect):', downcounter)
     if (subtitlesIndex.current != 0) {
       if (subtitlesIndex.current < subtitlesLength.current) {
-        console.log('subtitlesIndex.current:', subtitlesIndex.current)
+        // console.log('subtitlesIndex.current:', subtitlesIndex.current)
         add2ndSubtitle()
       }
     }
 
     if (loadComplete.current) {
+      // get vttUrl
+      if (document.querySelector('video track')) {
+        vttUrl = document.querySelector('video track').getAttribute('src')
+        console.log(vttUrl)
+      }
+      // get vtt start ms
+      vttStartMs = getVttOffsetMs(vttUrl)
+
       // send subtitle to background.js
       let title = titleUrl.length != 0 ? titleUrl[titleUrl.length - 1] : ''
       chrome.runtime.sendMessage({
@@ -58,9 +65,11 @@ function App() {
         idTalk: talkId,
         subtitle: subtitles.current,
         vttStartMs: vttStartMs,
+        languageType: languageType,
       })
 
       loadComplete.current = false
+      subtitlesIndex.current = 0
     }
   }, [downcounter])
 
@@ -86,14 +95,7 @@ function App() {
         }
       }
     }
-    // get vttUrl
-    if (document.querySelector('video track')) {
-      vttUrl = document.querySelector('video track').getAttribute('src')
-    }
     console.log('talkId get :', talkId)
-
-    // get vtt start ms
-    vttStartMs = getVttOffsetMs(vttUrl)
   }
 
   function showCurrentTime() {
@@ -154,7 +156,7 @@ function App() {
       let data = JSON.parse(xhr.responseText)
       subtitles.current = data.captions
       subtitlesLength.current = data.captions.length
-      console.log(subtitles)
+      // console.log(subtitles)
     } else {
       throw new Error('Network response was not ok')
     }
@@ -188,7 +190,7 @@ function App() {
   }
 
   function add2ndSubtitle() {
-    let language_code = 'zh-Hant'
+    // let language_code = 'zh-Hant'
     let count = subtitlesIndex.current
     let length = subtitlesLength.current
 
@@ -219,7 +221,7 @@ function App() {
 
       xhr.open(
         'GET',
-        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${language_code}&dt=t&q=${subtitles.current[count].content}`,
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${languageType}&dt=t&q=${subtitles.current[count].content}`,
         false
       )
       xhr.send()
@@ -231,8 +233,7 @@ function App() {
         count = count + 1
         subtitlesIndex.current = count
         if (count % 10 == 1) {
-          // updateCountDown(length - count)
-          console.log(`${count - 1}:`, subtitles.current[count - 1].content)
+          // console.log(`${count - 1}:`, subtitles.current[count - 1].content)
           break
         }
       } else {
@@ -252,10 +253,8 @@ function App() {
   }
 
   function handleGenerateSubtitle() {
-    let index = 100
     let title = titleUrl.length != 0 ? titleUrl[titleUrl.length - 1] : ''
     getTedSubtitle(talkId)
-    console.log(subtitles.current)
     add2ndSubtitle()
   }
 
@@ -280,6 +279,7 @@ root.render(<App />)
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (message.message === 'generate subtitle') {
+    languageType = message.languageType
     sendResponse({ talkId: talkId })
     console.log('Message received in content script:', message)
     if (talkId !== '') {
