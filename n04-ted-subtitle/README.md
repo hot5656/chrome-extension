@@ -1,6 +1,6 @@
-# Ted Double Subtitle Generator
+# Ted Dual Subtitles
 
-    Press button generate dual subtitle(support add offset time)
+    Press button generate dual subtitle and load subtitles
 
 - url must https://www.ted.com/talks*
 

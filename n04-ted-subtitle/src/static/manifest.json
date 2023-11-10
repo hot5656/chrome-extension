@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
-	"name": "Ted Extract Subtitle Extension",
-	"description": "Chrome Extension for Ted Extract Subtitle",
+	"name": "Ted Dual Subtitles",
+	"description": "Chrome Extension for Ted Dual Subtitles",
 	"version": "1.0.0",
 	"icons": {
 		"16": "icon.png",
@@ -10,7 +10,7 @@
 	},
 	"action": {
 		"default_popup": "popup.html",
-		"default_title": "Ted Extract Subtitle Extension",
+		"default_title": "Ted Dual Subtitles",
 		"default_icon": "icon.png"
 	},
 	"permissions": [
@@ -18,7 +18,6 @@
 		"tabs",
 		"downloads"
 	],
-	"options_page": "options.html",
 	"background": {
 		"service_worker": "background.js"
 	},

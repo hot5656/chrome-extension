@@ -80,7 +80,7 @@ function getHTMLPlugins(chunks) {
   return chunks.map(
     (chunk) =>
       new HtmlPlugin({
-        title: 'Ted Extract Subtitle Extension',
+        title: 'Ted Dual Subtitles',
         filename: `${chunk}.html`,
         chunks: [chunk],
       })

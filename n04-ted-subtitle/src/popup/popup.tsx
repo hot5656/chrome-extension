@@ -34,7 +34,11 @@ const App: React.FC<{}> = () => {
       (tabs) => {
         console.log(tabs)
         if (tabs.length > 0) {
-          if (tabs[0].url.match('https://www.ted.com/talks*')) {
+          console.log(tabs[0].url)
+          if (
+            tabs[0].url !== 'https://www.ted.com/talks' &&
+            tabs[0].url.match('https://www.ted.com/talks/*')
+          ) {
             chrome.tabs.sendMessage(
               tabs[0].id,
               {
@@ -49,7 +53,9 @@ const App: React.FC<{}> = () => {
                 }
 
                 if (response.talkId === '') {
-                  setResponseMessage('Wait sometime then try ... ')
+                  setResponseMessage('Wait Sometime then try ...')
+                } else if (response.vttUrl === '') {
+                  setResponseMessage('No Subtitle Support ...')
                 } else {
                   setResponseMessage('')
 
@@ -62,6 +68,8 @@ const App: React.FC<{}> = () => {
             )
 
             console.log('send message...')
+          } else {
+            setResponseMessage('Not the Correct Website ...')
           }
         }
       }

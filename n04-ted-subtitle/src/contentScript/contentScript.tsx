@@ -20,6 +20,7 @@ function App() {
   let playerData = null
   const [downcounter, setDowncounter] = useState<number>(0)
   const [downcounterTemp, setDowncounterTemp] = useState<number>(-1)
+  const [talkIdState, setTalkIdState] = useState<string>('')
   const subtitles = useRef([])
   const subtitlesLength = useRef(0)
   const subtitlesIndex = useRef(0)
@@ -49,13 +50,13 @@ function App() {
     }
 
     if (loadComplete.current) {
-      // get vttUrl
-      if (document.querySelector('video track')) {
-        vttUrl = document.querySelector('video track').getAttribute('src')
-        console.log(vttUrl)
-      }
-      // get vtt start ms
-      vttStartMs = getVttOffsetMs(vttUrl)
+      // // get vttUrl
+      // if (document.querySelector('video track')) {
+      //   vttUrl = document.querySelector('video track').getAttribute('src')
+      //   console.log(vttUrl)
+      // }
+      // // get vtt start ms
+      // vttStartMs = getVttOffsetMs(vttUrl)
 
       // send subtitle to background.js
       let title = titleUrl.length != 0 ? titleUrl[titleUrl.length - 1] : ''
@@ -90,6 +91,7 @@ function App() {
           playerData = JSON.parse(data.props.pageProps.videoData.playerData)
           // console.log('playerData:', playerData)
           talkId = data.props.pageProps.videoData.id
+          setTalkIdState(talkId)
           titleUrl = playerData.canonical.split('/')
           videoUrl = playerData.resources.h264[0].file
         }
@@ -123,15 +125,22 @@ function App() {
         const vttData = e.target.result
         const subtitleUrl = URL.createObjectURL(event.target.files[0])
 
+        console.log('subtitleUrl:', subtitleUrl)
         let trackElement = document.querySelector(
           'track[srclang="en"]'
         ) as HTMLTrackElement
-        if (!trackElement) {
+        if (trackElement) {
+          trackElement.src = subtitleUrl
+          console.log('trackElement:', trackElement)
+        } else {
           trackElement = document.querySelector(
             'track[kind="subtitles"]'
           ) as HTMLTrackElement
+          if (trackElement) {
+            trackElement.src = subtitleUrl
+            console.log('trackElement:', trackElement)
+          }
         }
-        trackElement.src = subtitleUrl
 
         // Now you can use vttData, which contains the content of the selected .vtt file
         // You can then proceed to update your video's subtitles as needed
@@ -164,29 +173,6 @@ function App() {
     // let subtitlelines = subtitles.length
 
     setDowncounter(subtitles.current.length)
-  }
-
-  function getVttOffsetMs(vtt) {
-    let xhr = new XMLHttpRequest()
-    let vttMs = 0
-
-    if (vttUrl !== '') {
-      xhr.open('GET', vtt, false)
-      xhr.send()
-
-      if (xhr.status === 200) {
-        let lines = xhr.responseText.split('\n')
-        if (lines.length >= 3) {
-          vttMs = Number(
-            lines[2].replace(/\./g, '').split('-->')[0].split(':')[2]
-          )
-          console.log('vttStartMs :', vttMs)
-        }
-      } else {
-        throw new Error('Network response was not ok')
-      }
-    }
-    return vttMs
   }
 
   function add2ndSubtitle() {
@@ -259,20 +245,34 @@ function App() {
   }
 
   return (
-    <div id="insert-div">
-      <button id="generate-subtitle" onClick={handleGenerateSubtitle}></button>
-      <div id="load-countdown" style={subDivStyle}>
-        {countString}
-        {downcounter}
-      </div>
-      <input type="file" accept=".vtt" onChange={handleSubtitleFileChange} />
-    </div>
+    <>
+      {talkIdState != '' && (
+        <div id="insert-div">
+          <button
+            id="generate-subtitle"
+            onClick={handleGenerateSubtitle}
+          ></button>
+          <div id="load-countdown" style={subDivStyle}>
+            {countString}
+            {downcounter}
+          </div>
+          <input
+            type="file"
+            accept=".vtt"
+            onChange={handleSubtitleFileChange}
+          />
+        </div>
+      )}
+    </>
   )
 }
 
-const headElemnet = document.querySelector('header')
+// const headElemnet = document.querySelector('header')
+const headElemnet = document.querySelector('#__next div')
 const rootElement = document.createElement('div')
-headElemnet.appendChild(rootElement)
+// headElemnet.appendChild(rootElement)
+const firstChild = headElemnet.firstChild
+headElemnet.insertBefore(rootElement, firstChild)
 const root = ReactDOM.createRoot(rootElement)
 
 root.render(<App />)
@@ -280,9 +280,10 @@ root.render(<App />)
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (message.message === 'generate subtitle') {
     languageType = message.languageType
-    sendResponse({ talkId: talkId })
+    getVttUrl()
+    sendResponse({ talkId: talkId, vttUrl: vttUrl })
     console.log('Message received in content script:', message)
-    if (talkId !== '') {
+    if (talkId !== '' && vttUrl !== '') {
       const buttonElement = document.getElementById('generate-subtitle')
 
       if (buttonElement) {
@@ -291,3 +292,36 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
   }
 })
+
+function getVttUrl() {
+  // get vttUrl
+  if (document.querySelector('video track')) {
+    vttUrl = document.querySelector('video track').getAttribute('src')
+    // get vtt start ms
+    vttStartMs = getVttOffsetMs(vttUrl)
+    console.log(vttUrl)
+  }
+}
+
+function getVttOffsetMs(vtt) {
+  let xhr = new XMLHttpRequest()
+  let vttMs = 0
+
+  if (vttUrl !== '') {
+    xhr.open('GET', vtt, false)
+    xhr.send()
+
+    if (xhr.status === 200) {
+      let lines = xhr.responseText.split('\n')
+      if (lines.length >= 3) {
+        vttMs = Number(
+          lines[2].replace(/\./g, '').split('-->')[0].split(':')[2]
+        )
+        console.log('vttStartMs :', vttMs)
+      }
+    } else {
+      throw new Error('Network response was not ok')
+    }
+  }
+  return vttMs
+}

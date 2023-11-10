@@ -1,7 +1,7 @@
 {
-	"name": "ted-extract-subtitle-extension",
+	"name": "ted-dual-subtitle-extension",
 	"version": "1.0.0",
-	"description": "Chrome extension for ted extract subtitle!",
+	"description": "Chrome extension for ted dual subtitle!",
 	"scripts": {
 		"start": "webpack --watch --progress --config webpack.dev.js",
 		"build": "webpack --watch --progress --config webpack.prod.js"
