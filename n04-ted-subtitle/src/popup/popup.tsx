@@ -214,7 +214,7 @@ const App: React.FC<{}> = () => {
           Generate Dual Subtitle
         </Button>
       </Box>
-      <Box mx="8px" my="16px">
+      {/* <Box mx="8px" my="16px">
         <Button
           variant="contained"
           onClick={handleDownloadEnglishSubtitle}
@@ -222,7 +222,7 @@ const App: React.FC<{}> = () => {
         >
           Download English Subtitle
         </Button>
-      </Box>
+      </Box> */}
       <Typography variant="body1">{responseMessage}</Typography>
     </Box>
   )

@@ -1,3 +1,8 @@
 // Robert(2023/11/07) : change download subtitle to .vtt 
 // Robert(2023/11/11) : remove options
 	ted-dual_subtitles-v1.0.0.zip
+// Robert(2023/11/12) : add subtitle font size control
+// Robert(2023/11/12) : add download english subtitle
+// Robert(2023/11/12) : add options page - upload subtitle
+// Robert(2023/11/12) : mask download english subtitle
+// Robert(2023/11/12) : mask options page - upload subtitle
