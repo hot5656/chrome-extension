@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom/client'
 
 let talkId = ''
 let titleUrl = []
-let videoUrl = ''
+// let videoUrl = ''
 let vttUrl = ''
 let vttStartMs = 0
 let countString = 'Download Count:'
@@ -50,18 +50,10 @@ function App() {
     }
 
     if (loadComplete.current) {
-      // // get vttUrl
-      // if (document.querySelector('video track')) {
-      //   vttUrl = document.querySelector('video track').getAttribute('src')
-      //   console.log(vttUrl)
-      // }
-      // // get vtt start ms
-      // vttStartMs = getVttOffsetMs(vttUrl)
-
       // send subtitle to background.js
       let title = titleUrl.length != 0 ? titleUrl[titleUrl.length - 1] : ''
       chrome.runtime.sendMessage({
-        message: 'subtitle',
+        message: 'dual subtitle',
         title: title,
         idTalk: talkId,
         subtitle: subtitles.current,
@@ -93,7 +85,7 @@ function App() {
           talkId = data.props.pageProps.videoData.id
           setTalkIdState(talkId)
           titleUrl = playerData.canonical.split('/')
-          videoUrl = playerData.resources.h264[0].file
+          // videoUrl = playerData.resources.h264[0].file
         }
       }
     }
@@ -152,7 +144,6 @@ function App() {
 
   function getTedSubtitle(id) {
     let xhr = new XMLHttpRequest()
-    // let subtitles = []
 
     xhr.open(
       'GET',
@@ -191,19 +182,6 @@ function App() {
           count
         ].content.replace(/%/g, 'percent')
       }
-
-      // console.log(subtitles.current[count].content)
-      // console.log('-------------------->1')
-      // console.log(subtitles.current)
-      // console.log('-------------------->2')
-      // console.log(
-      //   `count=${count} typeof ${subtitles.current[count]}`,
-      //   subtitles.current[count]
-      // )
-      // console.log('-------------------->3')
-      // console.log(`count=${count}`, subtitles.current[count].content)
-      // console.log('-------------------->4')
-      // console.log(`count=${count}`)
 
       xhr.open(
         'GET',
@@ -244,6 +222,31 @@ function App() {
     add2ndSubtitle()
   }
 
+  function handleDownloadEnglishSubtitle() {
+    // let title = titleUrl.length != 0 ? titleUrl[titleUrl.length - 1] : ''
+    // getTedSubtitle(talkId)
+    // console.log(subtitles.current)
+    let xhr = new XMLHttpRequest()
+    if (vttUrl !== '') {
+      xhr.open('GET', vttUrl, false)
+      xhr.send()
+
+      if (xhr.status === 200) {
+        let title = titleUrl.length != 0 ? titleUrl[titleUrl.length - 1] : ''
+        // console.log(xhr.responseText)
+
+        chrome.runtime.sendMessage({
+          message: 'english subtitle',
+          title: title,
+          idTalk: talkId,
+          subtitle: xhr.responseText,
+        })
+      } else {
+        throw new Error('Network response was not ok')
+      }
+    }
+  }
+
   return (
     <>
       {talkIdState != '' && (
@@ -251,6 +254,10 @@ function App() {
           <button
             id="generate-subtitle"
             onClick={handleGenerateSubtitle}
+          ></button>
+          <button
+            id="download-english-subtitle"
+            onClick={handleDownloadEnglishSubtitle}
           ></button>
           <div id="load-countdown" style={subDivStyle}>
             {countString}
@@ -267,10 +274,8 @@ function App() {
   )
 }
 
-// const headElemnet = document.querySelector('header')
 const headElemnet = document.querySelector('#__next div')
 const rootElement = document.createElement('div')
-// headElemnet.appendChild(rootElement)
 const firstChild = headElemnet.firstChild
 headElemnet.insertBefore(rootElement, firstChild)
 const root = ReactDOM.createRoot(rootElement)
@@ -289,6 +294,27 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
       if (buttonElement) {
         buttonElement.click()
       }
+    }
+  } else if (message.message === 'download english subtitle') {
+    getVttUrl()
+    sendResponse({ talkId: talkId, vttUrl: vttUrl })
+    console.log('Message received in content script:', message)
+    if (talkId !== '' && vttUrl !== '') {
+      const buttonElement = document.getElementById('download-english-subtitle')
+      if (buttonElement) {
+        buttonElement.click()
+      }
+    }
+  } else if (message.message === 'update fontsize') {
+    const videoElement = document.querySelector('#video')
+    let fontSize = message.fontSize
+
+    videoElement.classList.remove('video-24')
+    videoElement.classList.remove('video-32')
+    videoElement.classList.remove('video-40')
+    if (fontSize !== 'video-16') {
+      videoElement.classList.add(fontSize)
+      // console.log('--- add class --->', fontSize)
     }
   }
 })
@@ -325,3 +351,20 @@ function getVttOffsetMs(vtt) {
   }
   return vttMs
 }
+
+window.addEventListener('load', function () {
+  // console.log("window.addEventListener('load')...")
+
+  const videoElement = document.querySelector('#video')
+  if (videoElement) {
+    chrome.storage.sync.get(['fontSizeTed'], (res) => {
+      const fontSize = res.fontSizeTed ?? 'video-16'
+      if (res.fontSizeTed) {
+        if (res.fontSizeTed !== 'video-16') {
+          videoElement.classList.add(res.fontSizeTed)
+          console.log('--- add class --->', res.fontSizeTed)
+        }
+      }
+    })
+  }
+})

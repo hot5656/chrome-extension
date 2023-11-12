@@ -3,11 +3,12 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.sync.set({
     doubleTitleTed: true,
     languageTypeTed: 'zh-Hant',
+    fontSizeTed: 'video-16',
   })
 })
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request.message === 'subtitle') {
+  if (request.message === 'dual subtitle') {
     let content = 'WEBVTT\n\n'
     let subtitle1stMs = Number(request.subtitle[0].startTime)
 
@@ -36,6 +37,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       `${request.title}_${request.idTalk}_${request.languageType}.vtt`,
       content
     )
+  } else if (request.message === 'english subtitle') {
+    console.log(request)
+    saveFile(`${request.title}_${request.idTalk}_en.vtt`, request.subtitle)
   }
 })
 

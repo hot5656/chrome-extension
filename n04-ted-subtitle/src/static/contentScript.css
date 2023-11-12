@@ -1,0 +1,19 @@
+.video-24 .text-tui-base {
+  font-size: 1.5rem;
+}
+
+.video-32 .text-tui-base {
+  font-size: 2rem;
+}
+
+.video-40 .text-tui-base {
+  font-size: 2.5rem;
+}
+
+#video .max-w-\[560px\] {
+  max-width: 960px;
+}
+
+body {
+  background-color: pink;
+}

@@ -18,6 +18,7 @@
 		"tabs",
 		"downloads"
 	],
+	"options_page": "options.html",
 	"background": {
 		"service_worker": "background.js"
 	},
@@ -28,6 +29,9 @@
 			],
 			"js": [
 				"contentScript.js"
+			],
+			"css": [
+				"contentScript.css"
 			],
 			"run_at": "document_end"
 		}
