@@ -6,3 +6,4 @@
 // Robert(2023/11/12) : add options page - upload subtitle
 // Robert(2023/11/12) : mask download english subtitle
 // Robert(2023/11/12) : mask options page - upload subtitle
+	ted-dual_subtitles-v1.0.1.zip
