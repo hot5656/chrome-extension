@@ -14,6 +14,20 @@
   max-width: 960px;
 }
 
-body {
+#insert-div {
   background-color: pink;
+}
+
+#insert-subtitle {
+  overflow-y: scroll;
+  max-width: 960px;
+  border: black 1px solid;
+  margin: 56px auto 0;
+  padding: 10px;
+  max-height: 600px;
+  display: none;
+}
+
+#insert-subtitle pre {
+  margin-top: -30px;
 }

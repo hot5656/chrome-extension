@@ -11,7 +11,7 @@
 	"devDependencies": {
 		"@types/chrome": "^0.0.244",
 		"@types/react": "^18.2.21",
-		"@types/react-dom": "^18.2.7",
+		"@types/react-dom": "^18.2.15",
 		"clean-webpack-plugin": "^4.0.0",
 		"copy-webpack-plugin": "^11.0.0",
 		"css-loader": "^6.8.1",

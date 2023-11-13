@@ -126,6 +126,53 @@ const App: React.FC<{}> = () => {
     )
   }
 
+  const handleShowEnglishSubtitle = () => {
+    console.log('handleShowEnglishSubtitle')
+
+    chrome.tabs.query(
+      {
+        active: true,
+        currentWindow: true,
+      },
+      (tabs) => {
+        console.log(tabs)
+        if (tabs.length > 0) {
+          console.log(tabs[0].url)
+          if (
+            tabs[0].url !== 'https://www.ted.com/talks' &&
+            tabs[0].url.match('https://www.ted.com/talks/*')
+          ) {
+            chrome.tabs.sendMessage(
+              tabs[0].id,
+              {
+                message: 'show english subtitle',
+              },
+              (response) => {
+                if (response) {
+                  console.log('response:', response)
+                } else {
+                  console.log('no response....')
+                }
+
+                if (response.talkId === '') {
+                  setResponseMessage('Wait Sometime then try ...')
+                } else if (response.vttUrl === '') {
+                  setResponseMessage('No Subtitle Support ...')
+                } else {
+                  setResponseMessage('')
+                }
+              }
+            )
+
+            console.log('send message...')
+          } else {
+            setResponseMessage('Not the Correct Website ...')
+          }
+        }
+      }
+    )
+  }
+
   const handleSelectFontsizeClick = (event: SelectChangeEvent) => {
     chrome.storage.sync.set({
       fontSizeTed: event.target.value,
@@ -223,6 +270,15 @@ const App: React.FC<{}> = () => {
           Download English Subtitle
         </Button>
       </Box> */}
+      <Box mx="8px" my="16px">
+        <Button
+          variant="contained"
+          onClick={handleShowEnglishSubtitle}
+          style={{ width: '190px' }}
+        >
+          Show English Subtitle
+        </Button>
+      </Box>
       <Typography variant="body1">{responseMessage}</Typography>
     </Box>
   )

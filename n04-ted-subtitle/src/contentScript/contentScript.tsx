@@ -2,8 +2,8 @@
 
 // Include React (make sure it's bundled and available in your extension)
 import React, { useState, useEffect, useRef } from 'react'
-// import ReactDOM from 'react-dom'
 import ReactDOM from 'react-dom/client'
+import { createRoot } from 'react-dom/client'
 
 let talkId = ''
 let titleUrl = []
@@ -68,10 +68,10 @@ function App() {
 
   function bootcode() {
     // change paddingTop
-    const mainElement = document.querySelector(
-      'main#maincontent'
-    ) as HTMLElement
-    mainElement.style.paddingTop = '7rem'
+    // const mainElement = document.querySelector(
+    //   'main#maincontent'
+    // ) as HTMLElement
+    // mainElement.style.paddingTop = '7rem'
 
     // get talkId, titleUrl, videoUrl
     raw = document.querySelector('#__NEXT_DATA__').textContent
@@ -134,6 +134,10 @@ function App() {
           }
         }
 
+        const showElement = document.getElementById(
+          'insert-subtitle'
+        ) as HTMLElement
+        showElement.style.display = 'none'
         // Now you can use vttData, which contains the content of the selected .vtt file
         // You can then proceed to update your video's subtitles as needed
       }
@@ -274,13 +278,75 @@ function App() {
   )
 }
 
-const headElemnet = document.querySelector('#__next div')
+const topElement = document.querySelector('#__next div')
 const rootElement = document.createElement('div')
-const firstChild = headElemnet.firstChild
-headElemnet.insertBefore(rootElement, firstChild)
-const root = ReactDOM.createRoot(rootElement)
+const firstChild = topElement.firstChild
+topElement.insertBefore(rootElement, firstChild)
 
+const root = createRoot(rootElement)
 root.render(<App />)
+
+function ShowSubtitle() {
+  const [isSubtitle, setIsSubtitle] = useState<boolean>(true)
+  const [vttContent, setVttContent] = useState<string>('')
+
+  function handleShowEnglishSubtitle() {
+    let xhr = new XMLHttpRequest()
+    if (vttUrl !== '') {
+      xhr.open('GET', vttUrl, false)
+      xhr.send()
+
+      if (xhr.status === 200) {
+        let lines = xhr.responseText.split('\n')
+        let content = ''
+        let foundSubtitle = false
+
+        // console.log(xhr.responseText as string)
+        lines.forEach((line, index) => {
+          if (line.length != 0 && index != 0) {
+            if (!line.includes('-->')) {
+              if (foundSubtitle || content.length == 0) {
+                content = content + line
+              } else {
+                content = content + '\n' + line
+              }
+              foundSubtitle = true
+            } else {
+              foundSubtitle = false
+            }
+          } else {
+            foundSubtitle = false
+          }
+        })
+        // console.log(content)
+        setVttContent(content)
+      } else {
+        throw new Error('Network response was not ok')
+      }
+    }
+  }
+
+  return (
+    <>
+      {isSubtitle && (
+        <div id="insert-subtitle">
+          <button
+            id="show-english-subtitle"
+            onClick={handleShowEnglishSubtitle}
+          ></button>
+          <pre>{vttContent}</pre>
+        </div>
+      )}
+    </>
+  )
+}
+
+const headElement = document.querySelector('header')
+const rootSubtitleElement = document.createElement('div')
+topElement.insertBefore(rootSubtitleElement, headElement.nextSibling)
+
+const root2 = ReactDOM.createRoot(rootSubtitleElement)
+root2.render(<ShowSubtitle />)
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (message.message === 'generate subtitle') {
@@ -301,6 +367,21 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     console.log('Message received in content script:', message)
     if (talkId !== '' && vttUrl !== '') {
       const buttonElement = document.getElementById('download-english-subtitle')
+      if (buttonElement) {
+        buttonElement.click()
+      }
+    }
+  } else if (message.message === 'show english subtitle') {
+    getVttUrl()
+    sendResponse({ talkId: talkId, vttUrl: vttUrl })
+    console.log('Message received in content script:', message)
+    if (talkId !== '' && vttUrl !== '') {
+      const showElement = document.getElementById(
+        'insert-subtitle'
+      ) as HTMLElement
+      showElement.style.display = 'block'
+
+      const buttonElement = document.getElementById('show-english-subtitle')
       if (buttonElement) {
         buttonElement.click()
       }
@@ -353,8 +434,6 @@ function getVttOffsetMs(vtt) {
 }
 
 window.addEventListener('load', function () {
-  // console.log("window.addEventListener('load')...")
-
   const videoElement = document.querySelector('#video')
   if (videoElement) {
     chrome.storage.sync.get(['fontSizeTed'], (res) => {
