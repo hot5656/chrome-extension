@@ -134,6 +134,17 @@ function App() {
           }
         }
 
+        // it's seem the 1st use subtitle-some video need remove
+        // if not remove --> show original subtitle
+        // if overwrite video not continue run
+        let videoElement = document.querySelector(
+          'video[playsinline="playsinline"]'
+        ) as HTMLTrackElement
+        if (videoElement) {
+          // videoElement.src = subtitleUrl
+          videoElement.removeAttribute('src')
+        }
+
         const showElement = document.getElementById(
           'insert-subtitle'
         ) as HTMLElement

@@ -8,3 +8,8 @@
 // Robert(2023/11/12) : mask options page - upload subtitle
 	ted-dual_subtitles-v1.0.1.zip
 // Robert(2023/11/12) : add show english subtitle
+// Robert(2023/11/13) : fix some video upload subtitle cannot run
+
+
+1. add show english subtitle
+2. if not correct refresh the web browser
