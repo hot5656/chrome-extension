@@ -23,6 +23,7 @@ const DUAL_ON = 'On'
 const App: React.FC<{}> = () => {
   const [languageType1, setlanguageType1] = useState<string>('zh-Hant')
   const [languageType2, setlanguageType2] = useState<string>('en')
+  const [responseMessage, setResponseMessage] = useState<string>('')
 
   const [dualMode, setDualMode] = useState<string>(DUAL_OFF)
 
@@ -68,6 +69,43 @@ const App: React.FC<{}> = () => {
   //   setlanguageTypeUdemy(event.target.value)
   //   // console.log('languageTypeUdemy :', event.target.value)
   // }
+
+  const handleDownloadChineseSubtitle = () => {
+    console.log('handleDownloadChineseSubtitle')
+
+    chrome.tabs.query(
+      {
+        active: true,
+        currentWindow: true,
+      },
+      (tabs) => {
+        console.log(tabs)
+        if (tabs.length > 0) {
+          console.log(tabs[0].url)
+          if (tabs[0].url.match('https://www.coursera.org/learn/*')) {
+            chrome.tabs.sendMessage(
+              tabs[0].id,
+              {
+                message: 'download chinese subtitle',
+              },
+              (response) => {
+                console.log('response:', response)
+                if (response) {
+                  setResponseMessage(response.message)
+                } else {
+                  setResponseMessage('no response message....')
+                }
+              }
+            )
+
+            console.log('send message...')
+          } else {
+            setResponseMessage('Not the Correct Website ...')
+          }
+        }
+      }
+    )
+  }
 
   return (
     <Box>
@@ -124,6 +162,16 @@ const App: React.FC<{}> = () => {
           </Select>
         </FormControl>
       </Box>
+      <Box mx="8px" my="16px">
+        <Button
+          variant="contained"
+          onClick={handleDownloadChineseSubtitle}
+          style={{ width: '190px' }}
+        >
+          Download Chinese Subtitle
+        </Button>
+      </Box>
+      <Typography variant="body1">{responseMessage}</Typography>
     </Box>
   )
 }

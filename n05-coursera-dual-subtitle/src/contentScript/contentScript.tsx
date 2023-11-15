@@ -1,73 +1,79 @@
-chrome.storage.sync.get(['doubleTitleUdemy'], (storage) => {
-  // console.log('window.location.host', window.location.host)
+import React from 'react'
+import ReactDOM, { createRoot } from 'react-dom/client'
 
-  // change document.domain to window.location.host %?%
+chrome.storage.sync.get(['doubleTitleUdemy'], (storage) => {
   if (
     storage.doubleTitleUdemy &&
     ['www.coursera.org'].includes(window.location.host)
   ) {
     console.log('found udemy....')
-
-    // // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
-    // // set path
-    // let ajaxHook = chrome.runtime.getURL('ajaxhook.js')
-
-    // // not inject JS
-    // if (!document.head.querySelector(`script[src='${ajaxHook}']`)) {
-    //   function injectJs(src) {
-    //     let script = document.createElement('script')
-    //     script.src = src
-    //     document.head.appendChild(script)
-    //     return script
-    //   }
-
-    //   // load ajaxHook
-    //   injectJs(ajaxHook).onload = function () {
-    //     // 防止再次載入相同的腳本時重複執行該事件處理程序
-    //     this.onload = null
-    //     // load injected.js
-    //     injectJs(chrome.runtime.getURL('injected.js'))
-    //   }
-    // }
   }
 })
 
-// content send message(it is always send to background)
-// chrome.runtime.sendMessage(
-//   { message: 'hi, message from content script' },
-//   (response) => {
-//     console.log(response.message)
-//   }
-// )
+function App() {
+  function handleSubtitleFileChange(event) {
+    const selectedFile = event.target.files[0]
 
-// // when all page load complete, set data-language, and get langeage from chrome storge
-// window.addEventListener('load', function () {
-//   let languageDiv = document.createElement('div')
+    if (selectedFile) {
+      const reader = new FileReader()
 
-//   languageDiv.setAttribute('data-language', 'zh-Hant')
-//   languageDiv.id = 'language-show'
-//   // console.log('languageDiv', languageDiv)
-//   // console.log('document.body', document.body)
-//   document.body.appendChild(languageDiv)
+      reader.onload = function (e) {
+        const vttData = e.target.result
+        const subtitleUrl = URL.createObjectURL(event.target.files[0])
 
-//   chrome.storage.sync.get(['languageTypeUdemy'], (res) => {
-//     const languageTypeUdemy = res.languageTypeUdemy ?? 'zh-Hant'
+        console.log('subtitleUrl:', subtitleUrl)
 
-//     languageDiv.setAttribute('data-language', languageTypeUdemy)
-//   })
-// })
+        let trackElement = document.querySelector(
+          'track[srclang="en"]'
+        ) as HTMLTrackElement
+        if (trackElement) {
+          trackElement.src = subtitleUrl
+          console.log('trackElement:', trackElement)
+        }
+      }
 
-// // Robert(2023/10/06) : popup send message to content script for change language
-// chrome.runtime.onMessage.addListener((message, sender) => {
-//   const languageDiv = document.getElementById('language-show')
-//   languageDiv.setAttribute('data-language', message.languageTypeUdemy)
+      reader.readAsText(selectedFile)
+    }
+  }
 
-//   // console.log('message', message)
-//   // console.log('sender', sender)
-//   // console.log('languageTypeUdemy : ', message.languageTypeUdemy)
-// })
+  return (
+    // <div id="insert-div">
+    <input type="file" accept=".vtt" onChange={handleSubtitleFileChange} />
+    // </div>
+  )
+}
+
+// add load div
+function addUploadDiv() {
+  // const firstChild = document.querySelector('.rc-Course')
+  const firstChild = document.querySelector('.align-items-vertical-center')
+  console.log('firstChild', firstChild)
+  if (firstChild) {
+    // const bodyElement = document.querySelector('.rc-MetatagsWrapper')
+    const bodyElement = document.querySelector('.c-container')
+    const rootElement = document.createElement('div')
+    rootElement.id = 'insert-div'
+    console.log(bodyElement)
+    console.log(rootElement)
+    bodyElement.insertBefore(rootElement, firstChild)
+
+    const root = createRoot(rootElement)
+    root.render(<App />)
+  }
+}
+// const topElement = document.querySelector('#fb-root')
+// if (topElement) {
+//   const bodyElement = document.body
+//   const rootElement = document.createElement('div')
+//   // bodyElement.insertBefore(rootElement, firstChild)
+//   bodyElement.appendChild(rootElement)
+
+//   const root = createRoot(bodyElement)
+//   root.render(<App />)
+// }
 
 let timer = 0
+let languages = []
 window.addEventListener('load', function () {
   console.log('contentScript load...')
   let languageElements = document.querySelectorAll('video track')
@@ -78,7 +84,6 @@ window.addEventListener('load', function () {
 
   const intervalId = setInterval(() => {
     let videoElement = document.querySelector('video')
-    let languages = []
     if (videoElement) {
       console.log('found videoElement :', typeof videoElement)
       console.log(videoElement.ariaLabel)
@@ -91,16 +96,47 @@ window.addEventListener('load', function () {
     }
     let languageElements = document.querySelectorAll('video track')
     timer = timer + 1000
-    // console.log(timer, 'languageElements:', languageElements)
     for (let element of languageElements as NodeListOf<HTMLTrackElement>) {
-      languages.push(element.srclang)
-      // console.log(`${element.srclang} ${element.src}`)
-      // console.log(typeof element, element)
+      languages.push({ language: element.srclang, src: element.src })
     }
     if (languages.length > 0) {
+      addUploadDiv()
       console.log(languages)
       // stop the interval
       clearInterval(intervalId)
     }
   }, 1000)
 })
+
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (message.message === 'download chinese subtitle') {
+    sendResponse({ message: 'receive download chinese subtitle' })
+    DownloadChineseSubtitle()
+  }
+})
+
+function DownloadChineseSubtitle() {
+  let index = languages.findIndex((item) => item.language === 'zh-CN')
+  if (index !== -1) {
+    console.log(languages[index])
+    downloadChinesetitle(languages[index].src)
+  } else {
+    console.log('not found zh-CN')
+  }
+}
+
+function downloadChinesetitle(subtitleUri) {
+  let xhr = new XMLHttpRequest()
+  xhr.open('GET', subtitleUri, false)
+  xhr.send()
+  if (xhr.status === 200) {
+    console.log(xhr.responseText)
+    chrome.runtime.sendMessage({
+      message: 'chinese subtitle',
+      title: 'coursera_chinese',
+      subtitle: xhr.responseText,
+    })
+  } else {
+    throw new Error('Network response was not ok')
+  }
+}

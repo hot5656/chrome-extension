@@ -14,7 +14,7 @@
 		"default_icon": "icon.png"
 	},
 	"permissions": [
-		"activeTab",
+		"downloads",
 		"tabs",
 		"storage"
 	],
@@ -25,10 +25,13 @@
 	"content_scripts": [
 		{
 			"matches": [
-				"https://www.coursera.org/*"
+				"https://www.coursera.org/learn/*"
 			],
 			"js": [
 				"contentScript.js"
+			],
+			"css": [
+				"contentScript.css"
 			],
 			"run_at": "document_end",
 			"all_frames": true
