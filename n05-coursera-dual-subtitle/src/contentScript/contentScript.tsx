@@ -36,20 +36,14 @@ function App() {
     }
   }
 
-  return (
-    // <div id="insert-div">
-    <input type="file" accept=".vtt" onChange={handleSubtitleFileChange} />
-    // </div>
-  )
+  return <input type="file" accept=".vtt" onChange={handleSubtitleFileChange} />
 }
 
 // add load div
 function addUploadDiv() {
-  // const firstChild = document.querySelector('.rc-Course')
   const firstChild = document.querySelector('.align-items-vertical-center')
   console.log('firstChild', firstChild)
   if (firstChild) {
-    // const bodyElement = document.querySelector('.rc-MetatagsWrapper')
     const bodyElement = document.querySelector('.c-container')
     const rootElement = document.createElement('div')
     rootElement.id = 'insert-div'
@@ -61,16 +55,6 @@ function addUploadDiv() {
     root.render(<App />)
   }
 }
-// const topElement = document.querySelector('#fb-root')
-// if (topElement) {
-//   const bodyElement = document.body
-//   const rootElement = document.createElement('div')
-//   // bodyElement.insertBefore(rootElement, firstChild)
-//   bodyElement.appendChild(rootElement)
-
-//   const root = createRoot(bodyElement)
-//   root.render(<App />)
-// }
 
 let timer = 0
 let languages = []
@@ -112,11 +96,15 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (message.message === 'download chinese subtitle') {
     sendResponse({ message: 'receive download chinese subtitle' })
     DownloadChineseSubtitle()
+  } else if (message.message === 'show active') {
+    sendResponse({ message: 'receive show active' })
+    ShowActive()
   }
 })
 
 function DownloadChineseSubtitle() {
-  let index = languages.findIndex((item) => item.language === 'zh-CN')
+  // let index = languages.findIndex((item) => item.language === 'zh-CN')
+  let index = languages.findIndex((item) => item.language === 'en')
   if (index !== -1) {
     console.log(languages[index])
     downloadChinesetitle(languages[index].src)
@@ -133,10 +121,70 @@ function downloadChinesetitle(subtitleUri) {
     console.log(xhr.responseText)
     chrome.runtime.sendMessage({
       message: 'chinese subtitle',
-      title: 'coursera_chinese',
+      // title: 'coursera_chinese',
+      title: 'coursera_english',
       subtitle: xhr.responseText,
     })
   } else {
     throw new Error('Network response was not ok')
   }
+}
+
+function ShowActive() {
+  const activeElement = document.querySelector('li.active span')
+  if (activeElement) {
+    console.log('activeElement:', activeElement)
+    let ariaLabel = activeElement.getAttribute('aria-label')
+    console.log('aria-label:', ariaLabel)
+
+    let actickTrackElement = document.querySelector(
+      `track[label="${ariaLabel}"]`
+    )
+    if (actickTrackElement) {
+      console.log('actickTrackElement:', actickTrackElement)
+    } else {
+      console.log('no active track ...')
+    }
+  } else {
+    console.log('no active subtitle ...')
+  }
+  combine()
+}
+
+function combine() {
+  let contenSubtitle1 = loadSubtitle(getLenguageUri('汉字 (自动)'))
+  let contenSubtitle2 = loadSubtitle(getLenguageUri('English'))
+
+  console.log(contenSubtitle1)
+  console.log(contenSubtitle2)
+}
+
+// zh-CN
+function getLenguageUri(language) {
+  let subtitleUrl = ''
+  let trackElement = document.querySelector(
+    `track[label="${language}"]`
+  ) as HTMLTrackElement
+  if (getLenguageUri) {
+    console.log(`"${language}" typeof trackElement:`, typeof trackElement)
+    console.log(`"${language}" trackElement:`, trackElement)
+    console.log(`"${language}" trackElement.src:`, trackElement.src)
+    subtitleUrl = trackElement.src
+  } else {
+    console.log('no ', language)
+  }
+  return subtitleUrl
+}
+
+function loadSubtitle(subtitleUrl) {
+  let content = ''
+  if (subtitleUrl !== '') {
+    let xhr = new XMLHttpRequest()
+    xhr.open('GET', subtitleUrl, false)
+    xhr.send()
+    if (xhr.status === 200) {
+      content = xhr.responseText
+    }
+  }
+  return content
 }

@@ -107,6 +107,43 @@ const App: React.FC<{}> = () => {
     )
   }
 
+  const handleShowActive = () => {
+    console.log('handleDownloadChineseSubtitle')
+
+    chrome.tabs.query(
+      {
+        active: true,
+        currentWindow: true,
+      },
+      (tabs) => {
+        console.log(tabs)
+        if (tabs.length > 0) {
+          console.log(tabs[0].url)
+          if (tabs[0].url.match('https://www.coursera.org/learn/*')) {
+            chrome.tabs.sendMessage(
+              tabs[0].id,
+              {
+                message: 'show active',
+              },
+              (response) => {
+                console.log('response:', response)
+                if (response) {
+                  setResponseMessage(response.message)
+                } else {
+                  setResponseMessage('no response message....')
+                }
+              }
+            )
+
+            console.log('send message...')
+          } else {
+            setResponseMessage('Not the Correct Website ...')
+          }
+        }
+      }
+    )
+  }
+
   return (
     <Box>
       <Typography variant="h5">{dualMode}</Typography>
@@ -169,6 +206,15 @@ const App: React.FC<{}> = () => {
           style={{ width: '190px' }}
         >
           Download Chinese Subtitle
+        </Button>
+      </Box>
+      <Box mx="8px" my="16px">
+        <Button
+          variant="contained"
+          onClick={handleShowActive}
+          style={{ width: '190px' }}
+        >
+          Show active
         </Button>
       </Box>
       <Typography variant="body1">{responseMessage}</Typography>
