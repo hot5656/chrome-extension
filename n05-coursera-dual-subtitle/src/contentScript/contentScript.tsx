@@ -3,7 +3,8 @@ import ReactDOM, { createRoot } from 'react-dom/client'
 
 const downloadLanguage = 'zh-CN'
 const filterFile = 'filterFile'
-const filterLanguage = 'zh-CN'
+// const filterLanguage = 'zh-CN'
+const filterLanguage = 'dual'
 // const downloadLanguage = 'en'
 let timer = 0
 let languages = []
@@ -167,10 +168,10 @@ function ShowActive() {
 }
 
 function combine() {
-  // let contenSubtitle1 = loadSubtitle(getLenguageUri('汉字 (自动)'))
-  // let contenSubtitle2 = loadSubtitle(getLenguageUri('English'))
-  let contenSubtitle2 = loadSubtitle(getLenguageUri('汉字 (自动)'))
-  let contenSubtitle1 = loadSubtitle(getLenguageUri('English'))
+  let contenSubtitle1 = loadSubtitle(getLenguageUri('汉字 (自动)'))
+  let contenSubtitle2 = loadSubtitle(getLenguageUri('English'))
+  // let contenSubtitle2 = loadSubtitle(getLenguageUri('汉字 (自动)'))
+  // let contenSubtitle1 = loadSubtitle(getLenguageUri('English'))
   let linesSutitle1 = contenSubtitle1.split('\n')
   let linesSutitle2 = contenSubtitle2.split('\n')
   let linesLength1 = linesSutitle1.length
@@ -185,6 +186,8 @@ function combine() {
   let foundItem2 = false
   let timestemp1 = 0
   let timestemp2 = 0
+  let timestempStr1 = ''
+  let timestempStr2 = ''
   let subtitleIndex1 = '0'
   let subtitleIndex2 = '0'
   let i = 0
@@ -192,12 +195,13 @@ function combine() {
 
   for (; i < linesLength1; i++) {
     if (i === 0) {
-      content = linesSutitle1[0] + '\n\n'
+      content = linesSutitle1[0] + '\n'
       continue
     } else if (Number(linesSutitle1[i]) > 0) {
       subtitleIndex1 = `(${linesSutitle1[i]}) `
       continue
     } else if (linesSutitle1[i].includes('-->')) {
+      timestempStr1 = linesSutitle1[i]
       timestemp1 = Number(
         linesSutitle1[i].split(' --> ')[0].replace(/[:.]/g, '')
       )
@@ -206,7 +210,7 @@ function combine() {
     } else if (linesSutitle1[i].length === 0) {
       if (i != 1) {
         console.log(subtitleIndex1, contentItem1)
-        contentItem1 = ''
+        // contentItem1 = ''
         foundItem1 = false
       } else {
         continue
@@ -218,7 +222,7 @@ function combine() {
         contentItem1 = linesSutitle1[i]
       }
       console.log(subtitleIndex1, contentItem1)
-      contentItem1 = ''
+      // contentItem1 = ''
       foundItem1 = false
     } else {
       if (foundItem1) {
@@ -237,16 +241,31 @@ function combine() {
         j++
         continue
       } else if (linesSutitle2[j].includes('-->')) {
+        timestempStr2 = linesSutitle2[j]
         timestemp2 = Number(
           linesSutitle2[j].split(' --> ')[0].replace(/[:.]/g, '')
         )
         console.log('timestemp2:', timestemp2)
+        if (timestemp1 < timestemp2) {
+          content =
+            content +
+            '\n' +
+            index.toString() +
+            '\n' +
+            timestempStr1 +
+            '\n' +
+            contentItem1 +
+            '\n'
+          index++
+
+          break
+        }
         j++
         continue
       } else if (linesSutitle2[j].length === 0) {
         if (j != 1) {
           console.log(subtitleIndex2, contentItem2)
-          contentItem2 = ''
+          // contentItem2 = ''
           foundItem2 = false
         } else {
           j++
@@ -259,7 +278,7 @@ function combine() {
           contentItem2 = linesSutitle2[j]
         }
         console.log(subtitleIndex2, contentItem2)
-        contentItem2 = ''
+        // contentItem2 = ''
         foundItem2 = false
       } else {
         if (foundItem2) {
@@ -272,17 +291,42 @@ function combine() {
         continue
       }
       j++
-      console.log('  ===================')
-      break
+      if (timestemp1 === timestemp2) {
+        content =
+          content +
+          '\n' +
+          index.toString() +
+          '\n' +
+          timestempStr1 +
+          '\n' +
+          contentItem1 +
+          '\n' +
+          contentItem2 +
+          '\n'
+        index++
+        console.log('  ===================')
+        break
+      } else if (timestemp1 > timestemp2) {
+        content =
+          content +
+          '\n' +
+          index.toString() +
+          '\n' +
+          timestempStr2 +
+          '\n' +
+          contentItem2 +
+          '\n'
+        index++
+      }
     }
   }
 
-  // chrome.runtime.sendMessage({
-  //   message: 'chinese subtitle',
-  //   name: filterFile,
-  //   lenguage: filterLanguage,
-  //   subtitle: content,
-  // })
+  chrome.runtime.sendMessage({
+    message: 'chinese subtitle',
+    name: filterFile,
+    lenguage: filterLanguage,
+    subtitle: content,
+  })
 
   // process 1st subtitle the save to the file
   // for (let i = 0; i < linesLength1; i++) {
