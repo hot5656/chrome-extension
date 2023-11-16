@@ -167,10 +167,10 @@ function ShowActive() {
 }
 
 function combine() {
-  let contenSubtitle1 = loadSubtitle(getLenguageUri('汉字 (自动)'))
-  let contenSubtitle2 = loadSubtitle(getLenguageUri('English'))
-  // let contenSubtitle2 = loadSubtitle(getLenguageUri('汉字 (自动)'))
-  // let contenSubtitle1 = loadSubtitle(getLenguageUri('English'))
+  // let contenSubtitle1 = loadSubtitle(getLenguageUri('汉字 (自动)'))
+  // let contenSubtitle2 = loadSubtitle(getLenguageUri('English'))
+  let contenSubtitle2 = loadSubtitle(getLenguageUri('汉字 (自动)'))
+  let contenSubtitle1 = loadSubtitle(getLenguageUri('English'))
   let linesSutitle1 = contenSubtitle1.split('\n')
   let linesSutitle2 = contenSubtitle2.split('\n')
   let linesLength1 = linesSutitle1.length
@@ -179,69 +179,163 @@ function combine() {
   let linesSutitleItems2 = countSubtitleItems(linesSutitle2)
   let content = ''
   let index = 1
-  let contentItem = ''
-  let foundItem = false
+  let contentItem1 = ''
+  let contentItem2 = ''
+  let foundItem1 = false
+  let foundItem2 = false
+  let timestemp1 = 0
+  let timestemp2 = 0
+  let subtitleIndex1 = '0'
+  let subtitleIndex2 = '0'
+  let i = 0
+  let j = 1
 
-  for (let i = 0; i < linesLength1; i++) {
+  for (; i < linesLength1; i++) {
     if (i === 0) {
       content = linesSutitle1[0] + '\n\n'
+      continue
     } else if (Number(linesSutitle1[i]) > 0) {
-      content = content + index.toString() + '\n'
-      index++
+      subtitleIndex1 = `(${linesSutitle1[i]}) `
+      continue
     } else if (linesSutitle1[i].includes('-->')) {
-      let timestemp = Number(
+      timestemp1 = Number(
         linesSutitle1[i].split(' --> ')[0].replace(/[:.]/g, '')
       )
-      console.log('timestemp1:', linesSutitle1[i].split(' --> '))
-      console.log(
-        'timestemp2:',
-        linesSutitle1[i].split(' --> ')[0].replace(/[:.]/g, '')
-      )
-      console.log('timestemp:', timestemp)
-      content = content + linesSutitle1[i] + '\n'
+      console.log('timestemp1:', timestemp1)
+      continue
     } else if (linesSutitle1[i].length === 0) {
-      if (index != 1) {
-        console.log(`(${index - 1}):`, contentItem)
-        content = content + contentItem + '\n\n'
+      if (i != 1) {
+        console.log(subtitleIndex1, contentItem1)
+        contentItem1 = ''
+        foundItem1 = false
+      } else {
+        continue
       }
-      contentItem = ''
-      foundItem = false
     } else if (i === linesLength1 - 1) {
-      if (foundItem) {
-        contentItem = contentItem + ' ' + linesSutitle1[i]
+      if (foundItem1) {
+        contentItem1 = contentItem1 + ' ' + linesSutitle1[i]
       } else {
-        contentItem = linesSutitle1[i]
+        contentItem1 = linesSutitle1[i]
       }
-      console.log(`(${index - 1}):`, contentItem)
-      content = content + contentItem + '\n'
-      contentItem = ''
-      foundItem = false
+      console.log(subtitleIndex1, contentItem1)
+      contentItem1 = ''
+      foundItem1 = false
     } else {
-      if (foundItem) {
-        contentItem = contentItem + ' ' + linesSutitle1[i]
+      if (foundItem1) {
+        contentItem1 = contentItem1 + ' ' + linesSutitle1[i]
       } else {
-        contentItem = linesSutitle1[i]
+        contentItem1 = linesSutitle1[i]
       }
-      foundItem = true
+      foundItem1 = true
+      continue
     }
-    // for (let j=0 ; j < linesLength2  ; j++){
-    // }
+
+    console.log('-------------------')
+    while (j < linesLength2) {
+      if (Number(linesSutitle2[j]) > 0) {
+        subtitleIndex2 = `(${linesSutitle2[j]}) `
+        j++
+        continue
+      } else if (linesSutitle2[j].includes('-->')) {
+        timestemp2 = Number(
+          linesSutitle2[j].split(' --> ')[0].replace(/[:.]/g, '')
+        )
+        console.log('timestemp2:', timestemp2)
+        j++
+        continue
+      } else if (linesSutitle2[j].length === 0) {
+        if (j != 1) {
+          console.log(subtitleIndex2, contentItem2)
+          contentItem2 = ''
+          foundItem2 = false
+        } else {
+          j++
+          continue
+        }
+      } else if (j === linesLength2 - 1) {
+        if (foundItem2) {
+          contentItem2 = contentItem2 + ' ' + linesSutitle2[j]
+        } else {
+          contentItem2 = linesSutitle2[j]
+        }
+        console.log(subtitleIndex2, contentItem2)
+        contentItem2 = ''
+        foundItem2 = false
+      } else {
+        if (foundItem2) {
+          contentItem2 = contentItem2 + ' ' + linesSutitle2[j]
+        } else {
+          contentItem2 = linesSutitle2[j]
+        }
+        foundItem2 = true
+        j++
+        continue
+      }
+      j++
+      console.log('  ===================')
+      break
+    }
   }
 
-  chrome.runtime.sendMessage({
-    message: 'chinese subtitle',
-    name: filterFile,
-    lenguage: filterLanguage,
-    subtitle: content,
-  })
+  // chrome.runtime.sendMessage({
+  //   message: 'chinese subtitle',
+  //   name: filterFile,
+  //   lenguage: filterLanguage,
+  //   subtitle: content,
+  // })
+
+  // process 1st subtitle the save to the file
+  // for (let i = 0; i < linesLength1; i++) {
+  //   if (i === 0) {
+  //     content = linesSutitle1[0] + '\n\n'
+  //   } else if (Number(linesSutitle1[i]) > 0) {
+  //     content = content + index.toString() + '\n'
+  //     index++
+  //   } else if (linesSutitle1[i].includes('-->')) {
+  //     let timestemp = Number(
+  //       linesSutitle1[i].split(' --> ')[0].replace(/[:.]/g, '')
+  //     )
+  //     console.log('timestemp1:', linesSutitle1[i].split(' --> '))
+  //     console.log(
+  //       'timestemp2:',
+  //       linesSutitle1[i].split(' --> ')[0].replace(/[:.]/g, '')
+  //     )
+  //     console.log('timestemp:', timestemp)
+  //     content = content + linesSutitle1[i] + '\n'
+  //   } else if (linesSutitle1[i].length === 0) {
+  //     if (index != 1) {
+  //       console.log(`(${index - 1}):`, contentItem)
+  //       content = content + contentItem + '\n\n'
+  //     }
+  //     contentItem = ''
+  //     foundItem = false
+  //   } else if (i === linesLength1 - 1) {
+  //     if (foundItem) {
+  //       contentItem = contentItem + ' ' + linesSutitle1[i]
+  //     } else {
+  //       contentItem = linesSutitle1[i]
+  //     }
+  //     console.log(`(${index - 1}):`, contentItem)
+  //     content = content + contentItem + '\n'
+  //     contentItem = ''
+  //     foundItem = false
+  //   } else {
+  //     if (foundItem) {
+  //       contentItem = contentItem + ' ' + linesSutitle1[i]
+  //     } else {
+  //       contentItem = linesSutitle1[i]
+  //     }
+  //     foundItem = true
+  //   }
 
   // }
 
-  // console.log('linesSutitleItems1 : ', countSubtitleItems(linesSutitle1))
-  // console.log('linesSutitleItems2 : ', countSubtitleItems(linesSutitle2))
-
-  // console.log(contenSubtitle1)
-  // console.log(contenSubtitle2)
+  // chrome.runtime.sendMessage({
+  //   message: 'chinese subtitle',
+  //   name: filterFile,
+  //   lenguage: filterLanguage,
+  //   subtitle: content,
+  // })
 }
 
 function countSubtitleItems(lineSubtitle) {
