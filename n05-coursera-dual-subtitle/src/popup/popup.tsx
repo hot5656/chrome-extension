@@ -116,6 +116,14 @@ const App: React.FC<{}> = () => {
     )
   }
 
+  const languageOptions = [
+    { value: 'zh-Hant', label: '1Chinese Traditional' },
+    { value: 'zh-Hans', label: '2Chinese Simplified' },
+    { value: 'ja', label: '3Japanese' },
+    { value: 'ko', label: '4Korean' },
+    { value: 'en', label: '5English' },
+  ]
+
   return (
     <Box>
       <Typography variant="h5">{dualMode}</Typography>
@@ -146,11 +154,16 @@ const App: React.FC<{}> = () => {
             value={languageType1}
             label="Language1"
           >
-            <MenuItem value={'zh-Hant'}>Chinese Traditional</MenuItem>
+            {languageOptions.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.value}
+              </MenuItem>
+            ))}
+            {/* <MenuItem value={'zh-Hant'}>Chinese Traditional</MenuItem>
             <MenuItem value={'zh-Hans'}>Chinese Simplified</MenuItem>
             <MenuItem value={'ja'}>Japanese</MenuItem>
             <MenuItem value={'ko'}>Korean</MenuItem>
-            <MenuItem value={'en'}>English</MenuItem>
+            <MenuItem value={'en'}>English</MenuItem> */}
           </Select>
         </FormControl>
       </Box>

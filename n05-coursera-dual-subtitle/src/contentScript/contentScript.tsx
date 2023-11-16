@@ -51,13 +51,13 @@ function App() {
 // add load div
 function addUploadDiv() {
   const firstChild = document.querySelector('.align-items-vertical-center')
-  console.log('firstChild', firstChild)
+  // console.log('firstChild', firstChild)
   if (firstChild) {
     const bodyElement = document.querySelector('.c-container')
     const rootElement = document.createElement('div')
     rootElement.id = 'insert-div'
-    console.log(bodyElement)
-    console.log(rootElement)
+    // console.log(bodyElement)
+    // console.log(rootElement)
     bodyElement.insertBefore(rootElement, firstChild)
 
     const root = createRoot(rootElement)
@@ -67,11 +67,11 @@ function addUploadDiv() {
 
 window.addEventListener('load', function () {
   console.log('contentScript load...')
-  let languageElements = document.querySelectorAll('video track')
-  console.log(timer, 'languageElements:', languageElements)
-  for (let element of languageElements) {
-    console.log(typeof element, element)
-  }
+  // let languageElements = document.querySelectorAll('video track')
+  // console.log(timer, 'languageElements:', languageElements)
+  // for (let element of languageElements) {
+  //   console.log(typeof element, element)
+  // }
 
   const intervalId = setInterval(() => {
     let nameElement = document.querySelector('link[hreflang="x-default"]')
@@ -85,19 +85,21 @@ window.addEventListener('load', function () {
 
     let videoElement = document.querySelector('video')
     if (videoElement) {
-      console.log('found videoElement :', typeof videoElement)
-      console.log(videoElement.ariaLabel)
+      // console.log('found videoElement :', typeof videoElement)
+      console.log('video :', videoElement.ariaLabel)
 
-      let sourceElements = document.querySelectorAll('video source')
-      console.log(sourceElements)
-      for (let source of sourceElements as NodeListOf<HTMLTrackElement>) {
-        console.log(source.src)
-      }
+      //   let sourceElements = document.querySelectorAll('video source')
+      //   console.log(sourceElements)
+      //   for (let source of sourceElements as NodeListOf<HTMLTrackElement>) {
+      //     console.log(source.src)
+      //   }
     }
     let languageElements = document.querySelectorAll('video track')
     timer = timer + 1000
+    console.log(` ${timer} ms, languageElements : `, languageElements)
     for (let element of languageElements as NodeListOf<HTMLTrackElement>) {
-      languages.push({ language: element.srclang, src: element.src })
+      // languages.push({ language: element.srclang, src: element.src })
+      languages.push({ label: element.label, srclang: element.srclang })
     }
     if (languages.length > 0) {
       addUploadDiv()
@@ -321,12 +323,14 @@ function combine() {
     }
   }
 
-  chrome.runtime.sendMessage({
-    message: 'chinese subtitle',
-    name: filterFile,
-    lenguage: filterLanguage,
-    subtitle: content,
-  })
+  setDualSubtitle(content)
+
+  // chrome.runtime.sendMessage({
+  //   message: 'chinese subtitle',
+  //   name: filterFile,
+  //   lenguage: filterLanguage,
+  //   subtitle: content,
+  // })
 
   // process 1st subtitle the save to the file
   // for (let i = 0; i < linesLength1; i++) {
@@ -423,4 +427,23 @@ function loadSubtitle(subtitleUrl) {
     }
   }
   return content
+}
+
+function setDualSubtitle(subtitle) {
+  // Create a Blob from the WebVTT content
+  const blob = new Blob([subtitle], { type: 'text/vtt' })
+  // Create a data URL from the Blob
+  const dataUrl = URL.createObjectURL(blob)
+
+  const activeElement = document.querySelector('li.active span')
+  if (activeElement) {
+    console.log('activeElement:', activeElement)
+    let ariaLabel = activeElement.getAttribute('aria-label')
+    let actickTrackElement = document.querySelector(
+      `track[label="${ariaLabel}"]`
+    ) as HTMLTrackElement
+    if (actickTrackElement) {
+      actickTrackElement.src = dataUrl
+    }
+  }
 }
