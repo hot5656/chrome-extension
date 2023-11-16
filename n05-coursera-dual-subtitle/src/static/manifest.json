@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "Coursera Dual Subtitle",
 	"description": "Coursera Dual Subtitle",
-	"version": "1.1.1",
+	"version": "1.0.0",
 	"icons": {
 		"16": "icon.png",
 		"48": "icon.png",

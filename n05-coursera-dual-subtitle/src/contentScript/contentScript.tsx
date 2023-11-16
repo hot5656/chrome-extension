@@ -1,12 +1,20 @@
 import React from 'react'
 import ReactDOM, { createRoot } from 'react-dom/client'
 
-chrome.storage.sync.get(['doubleTitleUdemy'], (storage) => {
+const downloadLanguage = 'zh-CN'
+const filterFile = 'filterFile'
+const filterLanguage = 'zh-CN'
+// const downloadLanguage = 'en'
+let timer = 0
+let languages = []
+let courseName = ''
+
+chrome.storage.sync.get(['dualTitleUCoursera'], (storage) => {
   if (
-    storage.doubleTitleUdemy &&
+    storage.dualTitleUCoursera &&
     ['www.coursera.org'].includes(window.location.host)
   ) {
-    console.log('found udemy....')
+    console.log('found coursera....')
   }
 })
 
@@ -56,8 +64,6 @@ function addUploadDiv() {
   }
 }
 
-let timer = 0
-let languages = []
 window.addEventListener('load', function () {
   console.log('contentScript load...')
   let languageElements = document.querySelectorAll('video track')
@@ -67,6 +73,15 @@ window.addEventListener('load', function () {
   }
 
   const intervalId = setInterval(() => {
+    let nameElement = document.querySelector('link[hreflang="x-default"]')
+    if (nameElement) {
+      courseName = nameElement.getAttribute('href')
+      let nameArray = courseName.split('/')
+      if (nameArray.length > 0) {
+        courseName = nameArray[nameArray.length - 1]
+      }
+    }
+
     let videoElement = document.querySelector('video')
     if (videoElement) {
       console.log('found videoElement :', typeof videoElement)
@@ -103,13 +118,13 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 })
 
 function DownloadChineseSubtitle() {
-  // let index = languages.findIndex((item) => item.language === 'zh-CN')
-  let index = languages.findIndex((item) => item.language === 'en')
+  let index = languages.findIndex((item) => item.language === downloadLanguage)
+  // let index = languages.findIndex((item) => item.language === 'en')
   if (index !== -1) {
     console.log(languages[index])
     downloadChinesetitle(languages[index].src)
   } else {
-    console.log('not found zh-CN')
+    console.log(`not found ${downloadLanguage}`)
   }
 }
 
@@ -121,8 +136,8 @@ function downloadChinesetitle(subtitleUri) {
     console.log(xhr.responseText)
     chrome.runtime.sendMessage({
       message: 'chinese subtitle',
-      // title: 'coursera_chinese',
-      title: 'coursera_english',
+      name: courseName,
+      lenguage: downloadLanguage,
       subtitle: xhr.responseText,
     })
   } else {
@@ -154,12 +169,95 @@ function ShowActive() {
 function combine() {
   let contenSubtitle1 = loadSubtitle(getLenguageUri('汉字 (自动)'))
   let contenSubtitle2 = loadSubtitle(getLenguageUri('English'))
+  // let contenSubtitle2 = loadSubtitle(getLenguageUri('汉字 (自动)'))
+  // let contenSubtitle1 = loadSubtitle(getLenguageUri('English'))
+  let linesSutitle1 = contenSubtitle1.split('\n')
+  let linesSutitle2 = contenSubtitle2.split('\n')
+  let linesLength1 = linesSutitle1.length
+  let linesLength2 = linesSutitle2.length
+  let linesSutitleItems1 = countSubtitleItems(linesSutitle1)
+  let linesSutitleItems2 = countSubtitleItems(linesSutitle2)
+  let content = ''
+  let index = 1
+  let contentItem = ''
+  let foundItem = false
 
-  console.log(contenSubtitle1)
-  console.log(contenSubtitle2)
+  for (let i = 0; i < linesLength1; i++) {
+    if (i === 0) {
+      content = linesSutitle1[0] + '\n\n'
+    } else if (Number(linesSutitle1[i]) > 0) {
+      content = content + index.toString() + '\n'
+      index++
+    } else if (linesSutitle1[i].includes('-->')) {
+      let timestemp = Number(
+        linesSutitle1[i].split(' --> ')[0].replace(/[:.]/g, '')
+      )
+      console.log('timestemp1:', linesSutitle1[i].split(' --> '))
+      console.log(
+        'timestemp2:',
+        linesSutitle1[i].split(' --> ')[0].replace(/[:.]/g, '')
+      )
+      console.log('timestemp:', timestemp)
+      content = content + linesSutitle1[i] + '\n'
+    } else if (linesSutitle1[i].length === 0) {
+      if (index != 1) {
+        console.log(`(${index - 1}):`, contentItem)
+        content = content + contentItem + '\n\n'
+      }
+      contentItem = ''
+      foundItem = false
+    } else if (i === linesLength1 - 1) {
+      if (foundItem) {
+        contentItem = contentItem + ' ' + linesSutitle1[i]
+      } else {
+        contentItem = linesSutitle1[i]
+      }
+      console.log(`(${index - 1}):`, contentItem)
+      content = content + contentItem + '\n'
+      contentItem = ''
+      foundItem = false
+    } else {
+      if (foundItem) {
+        contentItem = contentItem + ' ' + linesSutitle1[i]
+      } else {
+        contentItem = linesSutitle1[i]
+      }
+      foundItem = true
+    }
+    // for (let j=0 ; j < linesLength2  ; j++){
+    // }
+  }
+
+  chrome.runtime.sendMessage({
+    message: 'chinese subtitle',
+    name: filterFile,
+    lenguage: filterLanguage,
+    subtitle: content,
+  })
+
+  // }
+
+  // console.log('linesSutitleItems1 : ', countSubtitleItems(linesSutitle1))
+  // console.log('linesSutitleItems2 : ', countSubtitleItems(linesSutitle2))
+
+  // console.log(contenSubtitle1)
+  // console.log(contenSubtitle2)
 }
 
-// zh-CN
+function countSubtitleItems(lineSubtitle) {
+  const length = lineSubtitle.length
+  let items = 0
+
+  for (let i = 0; i < 10; i++) {
+    // const dataNumber()
+    if (Number(lineSubtitle[length - 1 - i]) > 0) {
+      items = Number(lineSubtitle[length - 1 - i])
+      break
+    }
+  }
+  return items
+}
+
 function getLenguageUri(language) {
   let subtitleUrl = ''
   let trackElement = document.querySelector(

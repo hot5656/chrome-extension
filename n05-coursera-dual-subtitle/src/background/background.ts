@@ -10,7 +10,7 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === 'chinese subtitle') {
     console.log(request)
-    saveFile(`${request.title}.vtt`, request.subtitle)
+    saveFile(`${request.name}_${request.lenguage}.vtt`, request.subtitle)
   }
 })
 

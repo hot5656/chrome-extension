@@ -42,34 +42,6 @@ const App: React.FC<{}> = () => {
     }
   )
 
-  // useEffect(() => {
-  //   chrome.storage.sync.get(['languageTypeUdemy'], (res) => {
-  //     console.log('storage languageTypeUdemy:', res.languageTypeUdemy)
-  //   })
-  // }, [])
-
-  // const handleSelectTranslateModeClick = (event: SelectChangeEvent) => {
-  //   if (event.target.value === DUAL_OFF) {
-  //     chrome.storage.sync.set({
-  //       dualTitleUCoursera: false,
-  //     })
-  //   } else {
-  //     chrome.storage.sync.set({
-  //       dualTitleUCoursera: true,
-  //     })
-  //   }
-  //   setTranslateMode(event.target.value)
-  //   // console.log('translateMode :', event.target.value)
-  // }
-
-  // const handleSelectLanguageClick = (event: SelectChangeEvent) => {
-  //   chrome.storage.sync.set({
-  //     languageTypeUdemy: event.target.value,
-  //   })
-  //   setlanguageTypeUdemy(event.target.value)
-  //   // console.log('languageTypeUdemy :', event.target.value)
-  // }
-
   const handleDownloadChineseSubtitle = () => {
     console.log('handleDownloadChineseSubtitle')
 
