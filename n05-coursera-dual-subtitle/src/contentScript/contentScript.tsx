@@ -1,11 +1,17 @@
 import React from 'react'
 import ReactDOM, { createRoot } from 'react-dom/client'
+import {
+  DOWNLOAD_SUBTITLE,
+  SHOW_ACTIVE,
+  LANGUGAES_INFO,
+  UDAL_MODE,
+} from '../utils/messageType'
 
-const downloadLanguage = 'zh-CN'
+// const downloadLanguage = 'zh-CN'
 const filterFile = 'filterFile'
 // const filterLanguage = 'zh-CN'
 const filterLanguage = 'dual'
-// const downloadLanguage = 'en'
+const downloadLanguage = 'en'
 let timer = 0
 let languages = []
 let courseName = ''
@@ -73,35 +79,92 @@ window.addEventListener('load', function () {
   //   console.log(typeof element, element)
   // }
 
+  let videoElement = document.querySelector('video')
+  if (videoElement) {
+    // console.log('found videoElement :', typeof videoElement)
+    console.log('video :', videoElement.ariaLabel)
+
+    //   let sourceElements = document.querySelectorAll('video source')
+    //   console.log(sourceElements)
+    //   for (let source of sourceElements as NodeListOf<HTMLTrackElement>) {
+    //     console.log(source.src)
+    //   }
+  }
+
   const intervalId = setInterval(() => {
+    const mainElement = document.querySelector('main div')
+    if (mainElement) {
+      console.log(mainElement)
+    } else {
+      console.log('mainElement no exist')
+    }
+
+    if (mainElement && mainElement.hasAttribute('role')) {
+      console.log('role:', mainElement.getAttribute('role'))
+    }
+    // const videoElement = document.querySelector('video')
+    // if (videoElement) {
+    //   console.log(videoElement)
+    // } else {
+    //   console.log('videoElement no exist')
+    // }
+
     let nameElement = document.querySelector('link[hreflang="x-default"]')
     if (nameElement) {
       courseName = nameElement.getAttribute('href')
+      if (courseName.includes('lecture')) {
+        console.log('lecture')
+      } else {
+        courseName = 'x'
+        console.log('no lecture')
+        // stop the interval
+        clearInterval(intervalId)
+      }
+
       let nameArray = courseName.split('/')
       if (nameArray.length > 0) {
         courseName = nameArray[nameArray.length - 1]
+        console.log(courseName)
       }
     }
 
-    let videoElement = document.querySelector('video')
-    if (videoElement) {
-      // console.log('found videoElement :', typeof videoElement)
-      console.log('video :', videoElement.ariaLabel)
-
-      //   let sourceElements = document.querySelectorAll('video source')
-      //   console.log(sourceElements)
-      //   for (let source of sourceElements as NodeListOf<HTMLTrackElement>) {
-      //     console.log(source.src)
-      //   }
-    }
     let languageElements = document.querySelectorAll('video track')
     timer = timer + 1000
     console.log(` ${timer} ms, languageElements : `, languageElements)
     for (let element of languageElements as NodeListOf<HTMLTrackElement>) {
       // languages.push({ language: element.srclang, src: element.src })
-      languages.push({ label: element.label, srclang: element.srclang })
+      languages.push({
+        label: element.label,
+        srclang: element.srclang,
+        src: element.src,
+      })
     }
     if (languages.length > 0) {
+      chrome.storage.sync.get(
+        ['language2ndCoursera', 'dualTitleUCoursera'],
+        (res) => {
+          if (res.language2ndCoursera !== '' && res.dualTitleUCoursera) {
+            let activeLanguage = getActiveLanguage()
+            console.log(
+              'combine:',
+              res.dualTitleUCoursera,
+              res.language2ndCoursera
+            )
+            if (activeLanguage !== '') {
+              combine(activeLanguage, res.language2ndCoursera)
+            }
+          }
+
+          // if (res.language2ndCoursera) {
+          //   setlanguageType2(res.language2ndCoursera)
+          // }
+          // console.log('setlanguageType2:', res.language2ndCoursera)
+
+          // setDualMode(res.dualTitleUCoursera ? DUAL_ON : DUAL_OFF)
+          // console.log('chrome.storage.sync.get...')
+        }
+      )
+
       addUploadDiv()
       console.log(languages)
       // stop the interval
@@ -111,17 +174,32 @@ window.addEventListener('load', function () {
 })
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  if (message.message === 'download chinese subtitle') {
+  if (message.message === DOWNLOAD_SUBTITLE) {
     sendResponse({ message: 'receive download chinese subtitle' })
     DownloadChineseSubtitle()
-  } else if (message.message === 'show active') {
+  } else if (message.message === SHOW_ACTIVE) {
     sendResponse({ message: 'receive show active' })
     ShowActive()
+  } else if (message.message === LANGUGAES_INFO) {
+    sendResponse({
+      message: 'receive get languages info',
+      courseName: courseName,
+      languages: languages,
+    })
+  } else if (message.message === UDAL_MODE) {
+    sendResponse({ message: 'doul mode setting' })
+    if (message.secondLanguage !== '' && message.duleMode) {
+      let activeLanguage = getActiveLanguage()
+      console.log('combine:', activeLanguage, message.secondLanguage)
+      if (activeLanguage !== '') {
+        combine(activeLanguage, message.secondLanguage)
+      }
+    }
   }
 })
 
 function DownloadChineseSubtitle() {
-  let index = languages.findIndex((item) => item.language === downloadLanguage)
+  let index = languages.findIndex((item) => item.srclang === downloadLanguage)
   // let index = languages.findIndex((item) => item.language === 'en')
   if (index !== -1) {
     console.log(languages[index])
@@ -138,7 +216,7 @@ function downloadChinesetitle(subtitleUri) {
   if (xhr.status === 200) {
     console.log(xhr.responseText)
     chrome.runtime.sendMessage({
-      message: 'chinese subtitle',
+      message: DOWNLOAD_SUBTITLE,
       name: courseName,
       lenguage: downloadLanguage,
       subtitle: xhr.responseText,
@@ -166,12 +244,12 @@ function ShowActive() {
   } else {
     console.log('no active subtitle ...')
   }
-  combine()
+  combine('English', '汉字 (自动)')
 }
 
-function combine() {
-  let contenSubtitle1 = loadSubtitle(getLenguageUri('汉字 (自动)'))
-  let contenSubtitle2 = loadSubtitle(getLenguageUri('English'))
+function combine(firstLanguage, secondLanguage) {
+  let contenSubtitle1 = loadSubtitle(getLenguageUri(secondLanguage))
+  let contenSubtitle2 = loadSubtitle(getLenguageUri(firstLanguage))
   // let contenSubtitle2 = loadSubtitle(getLenguageUri('汉字 (自动)'))
   // let contenSubtitle1 = loadSubtitle(getLenguageUri('English'))
   let linesSutitle1 = contenSubtitle1.split('\n')
@@ -326,60 +404,7 @@ function combine() {
   setDualSubtitle(content)
 
   // chrome.runtime.sendMessage({
-  //   message: 'chinese subtitle',
-  //   name: filterFile,
-  //   lenguage: filterLanguage,
-  //   subtitle: content,
-  // })
-
-  // process 1st subtitle the save to the file
-  // for (let i = 0; i < linesLength1; i++) {
-  //   if (i === 0) {
-  //     content = linesSutitle1[0] + '\n\n'
-  //   } else if (Number(linesSutitle1[i]) > 0) {
-  //     content = content + index.toString() + '\n'
-  //     index++
-  //   } else if (linesSutitle1[i].includes('-->')) {
-  //     let timestemp = Number(
-  //       linesSutitle1[i].split(' --> ')[0].replace(/[:.]/g, '')
-  //     )
-  //     console.log('timestemp1:', linesSutitle1[i].split(' --> '))
-  //     console.log(
-  //       'timestemp2:',
-  //       linesSutitle1[i].split(' --> ')[0].replace(/[:.]/g, '')
-  //     )
-  //     console.log('timestemp:', timestemp)
-  //     content = content + linesSutitle1[i] + '\n'
-  //   } else if (linesSutitle1[i].length === 0) {
-  //     if (index != 1) {
-  //       console.log(`(${index - 1}):`, contentItem)
-  //       content = content + contentItem + '\n\n'
-  //     }
-  //     contentItem = ''
-  //     foundItem = false
-  //   } else if (i === linesLength1 - 1) {
-  //     if (foundItem) {
-  //       contentItem = contentItem + ' ' + linesSutitle1[i]
-  //     } else {
-  //       contentItem = linesSutitle1[i]
-  //     }
-  //     console.log(`(${index - 1}):`, contentItem)
-  //     content = content + contentItem + '\n'
-  //     contentItem = ''
-  //     foundItem = false
-  //   } else {
-  //     if (foundItem) {
-  //       contentItem = contentItem + ' ' + linesSutitle1[i]
-  //     } else {
-  //       contentItem = linesSutitle1[i]
-  //     }
-  //     foundItem = true
-  //   }
-
-  // }
-
-  // chrome.runtime.sendMessage({
-  //   message: 'chinese subtitle',
+  //   message: DOWNLOAD_SUBTITLE,
   //   name: filterFile,
   //   lenguage: filterLanguage,
   //   subtitle: content,
@@ -409,7 +434,11 @@ function getLenguageUri(language) {
     console.log(`"${language}" typeof trackElement:`, typeof trackElement)
     console.log(`"${language}" trackElement:`, trackElement)
     console.log(`"${language}" trackElement.src:`, trackElement.src)
-    subtitleUrl = trackElement.src
+    if (trackElement.hasAttribute('data-src')) {
+      subtitleUrl = trackElement.getAttribute('data-src')
+    } else {
+      subtitleUrl = trackElement.src
+    }
   } else {
     console.log('no ', language)
   }
@@ -439,11 +468,23 @@ function setDualSubtitle(subtitle) {
   if (activeElement) {
     console.log('activeElement:', activeElement)
     let ariaLabel = activeElement.getAttribute('aria-label')
-    let actickTrackElement = document.querySelector(
+    let trackElement = document.querySelector(
       `track[label="${ariaLabel}"]`
     ) as HTMLTrackElement
-    if (actickTrackElement) {
-      actickTrackElement.src = dataUrl
+    if (trackElement) {
+      if (!trackElement.hasAttribute('data-src')) {
+        trackElement.setAttribute('data-src', trackElement.src)
+      }
+      trackElement.src = dataUrl
     }
   }
+}
+
+function getActiveLanguage() {
+  const activeElement = document.querySelector('li.active span')
+  if (activeElement) {
+    // console.log('activeElement:', activeElement)
+    return activeElement.getAttribute('aria-label')
+  }
+  return ''
 }

@@ -1,14 +1,15 @@
+import { DOWNLOAD_SUBTITLE } from '../utils/messageType'
+
 chrome.runtime.onInstalled.addListener(() => {
   console.log('background installed')
   chrome.storage.sync.set({
-    dualTitleUCoursera: true,
-    language1stCoursera: 'zh-Hant',
-    language2ndCoursera: 'en',
+    dualTitleUCoursera: false,
+    language2ndCoursera: '',
   })
 })
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request.message === 'chinese subtitle') {
+  if (request.message === DOWNLOAD_SUBTITLE) {
     console.log(request)
     saveFile(`${request.name}_${request.lenguage}.vtt`, request.subtitle)
   }
