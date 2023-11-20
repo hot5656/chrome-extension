@@ -136,127 +136,139 @@ window.addEventListener('load', function () {
     if (languages.length > 0) {
       console.log('languages:', languages)
 
-      // let activeLanguage = getActiveLanguage()
-      // if (activeLanguage !== '') {
-      //   if (getLenguageUri(activeLanguage) !== '') {
-      //     // active subtitle
+      let activeLanguage = getActiveLanguage()
+      if (activeLanguage !== '') {
+        dualMode = addCourseStateDiv(dualMode)
 
-      //     chrome.storage.sync.get(
-      //       ['language2ndCoursera', 'dualTitleUCoursera'],
-      //       (res) => {
-      //         console.log('sync.get:', res)
+        // found active state
+        if (getLenguageUri(activeLanguage) !== '') {
+          // active subtitle
 
-      //         if (res.language2ndCoursera !== '' && res.dualTitleUCoursera) {
-      //           console.log(
-      //             'combine:',
-      //             res.dualTitleUCoursera,
-      //             res.language2ndCoursera
-      //           )
-      //           console.log('activeLanguage:', activeLanguage, activerCount)
+          chrome.storage.sync.get(
+            ['language2ndCoursera', 'dualTitleUCoursera'],
+            (res) => {
+              console.log('sync.get:', res)
 
-      //           if (getLenguageUri(res.language2ndCoursera) === '') {
-      //             // active(single)
-      //             dualMode = addCourseStateDiv(dualMode)
-      //             setTranslateState(dualMode, TRANSLATE_SINGLE)
+              if (res.language2ndCoursera !== '' && res.dualTitleUCoursera) {
+                console.log(
+                  'combine:',
+                  res.dualTitleUCoursera,
+                  res.language2ndCoursera
+                )
+                console.log('activeLanguage:', activeLanguage, activerCount)
 
-      //             console.log(languages)
-      //             // stop the interval
-      //             clearInterval(intervalId)
-      //           } else {
-      //             console.log(languages)
-      //             // stop the interval
-      //             clearInterval(intervalId)
+                if (getLenguageUri(res.language2ndCoursera) === '') {
+                  // active(single)
+                  dualMode = addCourseStateDiv(dualMode)
+                  setTranslateState(dualMode, TRANSLATE_SINGLE)
 
-      //             combine(activeLanguage, res.language2ndCoursera)
+                  console.log(languages)
+                  // stop the interval
+                  clearInterval(intervalId)
+                } else {
+                  console.log(languages)
+                  // stop the interval
+                  clearInterval(intervalId)
 
-      //             dualMode = addCourseStateDiv(dualMode)
-      //             setTranslateState(dualMode, TRANSLATE_DUAL)
-      //           }
-      //         }
-      //       }
-      //     )
-      //   } else {
-      //     // no active subtitle
-      //     dualMode = addCourseStateDiv(dualMode)
-      //     setTranslateState(dualMode, TRANSLATE_DISABLE)
+                  combine(activeLanguage, res.language2ndCoursera)
 
-      //     console.log(languages)
-      //     // stop the interval
-      //     clearInterval(intervalId)
-      //   }
-      // } else if (activerCount >= ACTIVE_COUNT_MAX) {
-      //   // over times - no active subtitle
-      //   dualMode = addCourseStateDiv(dualMode)
-      //   setTranslateState(dualMode, TRANSLATE_DISABLE)
-
-      //   console.log(languages)
-      //   // stop the interval
-      //   clearInterval(intervalId)
-      // }
-      // activerCount++
-
-      chrome.storage.sync.get(
-        ['language2ndCoursera', 'dualTitleUCoursera'],
-        (res) => {
-          console.log('sync.get:', res)
-
-          if (res.language2ndCoursera !== '' && res.dualTitleUCoursera) {
-            let activeLanguage = getActiveLanguage()
-            console.log(
-              'combine:',
-              res.dualTitleUCoursera,
-              res.language2ndCoursera
-            )
-            console.log('activeLanguage:', activeLanguage, activerCount)
-
-            // active enable
-            if (activeLanguage !== '') {
-              combine(activeLanguage, res.language2ndCoursera)
-
-              dualMode = addCourseStateDiv(dualMode)
-              setTranslateState(dualMode, TRANSLATE_DUAL)
-
-              console.log(languages)
-              // stop the interval
-              clearInterval(intervalId)
-
-              // active disable
-            } else {
-              if (activerCount >= ACTIVE_COUNT_MAX) {
+                  dualMode = addCourseStateDiv(dualMode)
+                  setTranslateState(dualMode, TRANSLATE_DUAL)
+                }
+              } else {
+                // not set dual at storage
+                // active(single)
                 dualMode = addCourseStateDiv(dualMode)
-                setTranslateState(dualMode, TRANSLATE_DISABLE)
+                setTranslateState(dualMode, TRANSLATE_SINGLE)
 
                 console.log(languages)
                 // stop the interval
                 clearInterval(intervalId)
               }
-              activerCount++
             }
-          } else {
-            // no enable
-            dualMode = addCourseStateDiv(dualMode)
+          )
+        } else {
+          // no active subtitle
+          dualMode = addCourseStateDiv(dualMode)
+          setTranslateState(dualMode, TRANSLATE_DISABLE)
 
-            let activeLanguage = getActiveLanguage()
-            if (activeLanguage !== '') {
-              setTranslateState(dualMode, TRANSLATE_SINGLE)
-            } else {
-              setTranslateState(dualMode, TRANSLATE_DISABLE)
-            }
-
-            console.log(languages)
-            // stop the interval
-            clearInterval(intervalId)
-          }
-
-          // if (res.language2ndCoursera) {
-          //   setlanguageType2(res.language2ndCoursera)
-          // }
-          // console.log('setlanguageType2:', res.language2ndCoursera)
-
-          // setDualMode(res.dualTitleUCoursera ? DUAL_ON : DUAL_OFF)
-          // console.log('chrome.storage.sync.get...')
+          console.log(languages)
+          // stop the interval
+          clearInterval(intervalId)
         }
-      )
+      } else if (activerCount >= ACTIVE_COUNT_MAX) {
+        // over times - no active subtitle
+        dualMode = addCourseStateDiv(dualMode)
+        setTranslateState(dualMode, TRANSLATE_DISABLE)
+
+        console.log(languages)
+        // stop the interval
+        clearInterval(intervalId)
+      }
+      activerCount++
+
+      // chrome.storage.sync.get(
+      //   ['language2ndCoursera', 'dualTitleUCoursera'],
+      //   (res) => {
+      //     console.log('sync.get:', res)
+
+      //     if (res.language2ndCoursera !== '' && res.dualTitleUCoursera) {
+      //       let activeLanguage = getActiveLanguage()
+      //       console.log(
+      //         'combine:',
+      //         res.dualTitleUCoursera,
+      //         res.language2ndCoursera
+      //       )
+      //       console.log('activeLanguage:', activeLanguage, activerCount)
+
+      //       // active enable
+      //       if (activeLanguage !== '') {
+      //         combine(activeLanguage, res.language2ndCoursera)
+
+      //         dualMode = addCourseStateDiv(dualMode)
+      //         setTranslateState(dualMode, TRANSLATE_DUAL)
+
+      //         console.log(languages)
+      //         // stop the interval
+      //         clearInterval(intervalId)
+
+      //         // active disable
+      //       } else {
+      //         if (activerCount >= ACTIVE_COUNT_MAX) {
+      //           dualMode = addCourseStateDiv(dualMode)
+      //           setTranslateState(dualMode, TRANSLATE_DISABLE)
+
+      //           console.log(languages)
+      //           // stop the interval
+      //           clearInterval(intervalId)
+      //         }
+      //         activerCount++
+      //       }
+      //     } else {
+      //       // no enable
+      //       dualMode = addCourseStateDiv(dualMode)
+
+      //       let activeLanguage = getActiveLanguage()
+      //       if (activeLanguage !== '') {
+      //         setTranslateState(dualMode, TRANSLATE_SINGLE)
+      //       } else {
+      //         setTranslateState(dualMode, TRANSLATE_DISABLE)
+      //       }
+
+      //       console.log(languages)
+      //       // stop the interval
+      //       clearInterval(intervalId)
+      //     }
+
+      //     // if (res.language2ndCoursera) {
+      //     //   setlanguageType2(res.language2ndCoursera)
+      //     // }
+      //     // console.log('setlanguageType2:', res.language2ndCoursera)
+
+      //     // setDualMode(res.dualTitleUCoursera ? DUAL_ON : DUAL_OFF)
+      //     // console.log('chrome.storage.sync.get...')
+      //   }
+      // )
     }
   }, 1000)
 })

@@ -201,9 +201,7 @@ const App: React.FC<{}> = () => {
             onChange={handle2ndLanguageClick}
           >
             {languageOptions.map((option) => (
-              <MenuItem key={option.label} value={option.label}>
-                {option.label}
-              </MenuItem>
+              <MenuItem value={option.label}>{option.label}</MenuItem>
             ))}
             {/* <MenuItem value={'zh-Hant'}>Chinese Traditional</MenuItem>
             <MenuItem value={'zh-Hans'}>Chinese Simplified</MenuItem>
