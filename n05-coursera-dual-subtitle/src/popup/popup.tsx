@@ -152,7 +152,7 @@ const App: React.FC<{}> = () => {
 
     sendMessageToContentScript(UDAL_MODE, {
       message: UDAL_MODE,
-      duleMode: dualMode === event.target.value,
+      duleMode: event.target.value === DUAL_ON,
       secondLanguage: languageType2,
     })
   }

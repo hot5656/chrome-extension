@@ -2,3 +2,9 @@
   background-color: pink;
   display: flex;
 }
+
+#course-satae {
+  background-color: pink;
+  width: 400px;
+  display: inline-flex;
+}
