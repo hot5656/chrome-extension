@@ -4,17 +4,11 @@
 }
 
 #course-satae {
-  /* background-color: pink; */
   width: 300px;
   display: inline-flex;
   height: 32px;
   padding: 30px 0;
 }
-
-/* #course-show {
-  background-color: orange;
-  border-radius: 50%;
-} */
 
 #course-show-all {
   margin-left: 50px;
