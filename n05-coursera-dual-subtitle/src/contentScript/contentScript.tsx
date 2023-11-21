@@ -22,6 +22,8 @@ let languages = []
 let courseName = ''
 let activerCount = 1
 let dualMode = false
+let activeMode = TRANSLATE_DISABLE
+let active2ndLanguage = ''
 
 chrome.storage.sync.get(['dualTitleUCoursera'], (storage) => {
   if (
@@ -161,6 +163,8 @@ window.addEventListener('load', function () {
                   // active(single)
                   dualMode = addCourseStateDiv(dualMode)
                   setTranslateState(dualMode, TRANSLATE_SINGLE)
+                  let active2ndLanguage = ''
+                  activeMode = TRANSLATE_SINGLE
 
                   console.log(languages)
                   // stop the interval
@@ -174,12 +178,16 @@ window.addEventListener('load', function () {
 
                   dualMode = addCourseStateDiv(dualMode)
                   setTranslateState(dualMode, TRANSLATE_DUAL)
+                  active2ndLanguage = res.language2ndCoursera
+                  activeMode = TRANSLATE_DUAL
                 }
               } else {
                 // not set dual at storage
                 // active(single)
                 dualMode = addCourseStateDiv(dualMode)
                 setTranslateState(dualMode, TRANSLATE_SINGLE)
+                let active2ndLanguage = ''
+                activeMode = TRANSLATE_SINGLE
 
                 console.log(languages)
                 // stop the interval
@@ -191,6 +199,8 @@ window.addEventListener('load', function () {
           // no active subtitle
           dualMode = addCourseStateDiv(dualMode)
           setTranslateState(dualMode, TRANSLATE_DISABLE)
+          let active2ndLanguage = ''
+          activeMode = TRANSLATE_DISABLE
 
           console.log(languages)
           // stop the interval
@@ -200,6 +210,8 @@ window.addEventListener('load', function () {
         // over times - no active subtitle
         dualMode = addCourseStateDiv(dualMode)
         setTranslateState(dualMode, TRANSLATE_DISABLE)
+        let active2ndLanguage = ''
+        activeMode = TRANSLATE_DISABLE
 
         console.log(languages)
         // stop the interval
@@ -273,6 +285,205 @@ window.addEventListener('load', function () {
   }, 1000)
 })
 
+function checkInterval() {
+  const intervalId = setInterval(() => {
+    const mainElement = document.querySelector('main div')
+    if (mainElement) {
+      console.log(mainElement)
+    } else {
+      console.log('mainElement no exist')
+    }
+
+    if (mainElement && mainElement.hasAttribute('role')) {
+      console.log('role:', mainElement.getAttribute('role'))
+    }
+    // const videoElement = document.querySelector('video')
+    // if (videoElement) {
+    //   console.log(videoElement)
+    // } else {
+    //   console.log('videoElement no exist')
+    // }
+
+    let nameElement = document.querySelector('link[hreflang="x-default"]')
+    if (nameElement) {
+      courseName = nameElement.getAttribute('href')
+      if (courseName.includes('lecture')) {
+        console.log('lecture')
+      } else {
+        courseName = 'x'
+        console.log('no lecture')
+        // stop the interval
+        clearInterval(intervalId)
+      }
+
+      let nameArray = courseName.split('/')
+      if (nameArray.length > 0) {
+        courseName = nameArray[nameArray.length - 1]
+        console.log(courseName)
+      }
+    }
+
+    let languageElements = document.querySelectorAll('video track')
+    timer = timer + 1000
+    console.log(` ${timer} ms, languageElements : `, languageElements)
+    for (let element of languageElements as NodeListOf<HTMLTrackElement>) {
+      // languages.push({ language: element.srclang, src: element.src })
+      languages.push({
+        label: element.label,
+        srclang: element.srclang,
+        src: element.src,
+      })
+    }
+    if (languages.length > 0) {
+      console.log('languages:', languages)
+
+      let activeLanguage = getActiveLanguage()
+      if (activeLanguage !== '') {
+        dualMode = addCourseStateDiv(dualMode)
+
+        // found active state
+        if (getLenguageUri(activeLanguage) !== '') {
+          // active subtitle
+
+          chrome.storage.sync.get(
+            ['language2ndCoursera', 'dualTitleUCoursera'],
+            (res) => {
+              console.log('sync.get:', res)
+
+              if (res.language2ndCoursera !== '' && res.dualTitleUCoursera) {
+                console.log(
+                  'combine:',
+                  res.dualTitleUCoursera,
+                  res.language2ndCoursera
+                )
+                console.log('activeLanguage:', activeLanguage, activerCount)
+
+                if (getLenguageUri(res.language2ndCoursera) === '') {
+                  // active(single)
+                  dualMode = addCourseStateDiv(dualMode)
+                  setTranslateState(dualMode, TRANSLATE_SINGLE)
+                  let active2ndLanguage = ''
+                  activeMode = TRANSLATE_SINGLE
+
+                  console.log(languages)
+                  // stop the interval
+                  clearInterval(intervalId)
+                } else {
+                  console.log(languages)
+                  // stop the interval
+                  clearInterval(intervalId)
+
+                  combine(activeLanguage, res.language2ndCoursera)
+
+                  dualMode = addCourseStateDiv(dualMode)
+                  setTranslateState(dualMode, TRANSLATE_DUAL)
+                  active2ndLanguage = res.language2ndCoursera
+                  activeMode = TRANSLATE_DUAL
+                }
+              } else {
+                // not set dual at storage
+                // active(single)
+                dualMode = addCourseStateDiv(dualMode)
+                setTranslateState(dualMode, TRANSLATE_SINGLE)
+                let active2ndLanguage = ''
+                activeMode = TRANSLATE_SINGLE
+
+                console.log(languages)
+                // stop the interval
+                clearInterval(intervalId)
+              }
+            }
+          )
+        } else {
+          // no active subtitle
+          dualMode = addCourseStateDiv(dualMode)
+          setTranslateState(dualMode, TRANSLATE_DISABLE)
+          let active2ndLanguage = ''
+          activeMode = TRANSLATE_DISABLE
+
+          console.log(languages)
+          // stop the interval
+          clearInterval(intervalId)
+        }
+      } else if (activerCount >= ACTIVE_COUNT_MAX) {
+        // over times - no active subtitle
+        dualMode = addCourseStateDiv(dualMode)
+        setTranslateState(dualMode, TRANSLATE_DISABLE)
+        let active2ndLanguage = ''
+        activeMode = TRANSLATE_DISABLE
+
+        console.log(languages)
+        // stop the interval
+        clearInterval(intervalId)
+      }
+      activerCount++
+
+      // chrome.storage.sync.get(
+      //   ['language2ndCoursera', 'dualTitleUCoursera'],
+      //   (res) => {
+      //     console.log('sync.get:', res)
+
+      //     if (res.language2ndCoursera !== '' && res.dualTitleUCoursera) {
+      //       let activeLanguage = getActiveLanguage()
+      //       console.log(
+      //         'combine:',
+      //         res.dualTitleUCoursera,
+      //         res.language2ndCoursera
+      //       )
+      //       console.log('activeLanguage:', activeLanguage, activerCount)
+
+      //       // active enable
+      //       if (activeLanguage !== '') {
+      //         combine(activeLanguage, res.language2ndCoursera)
+
+      //         dualMode = addCourseStateDiv(dualMode)
+      //         setTranslateState(dualMode, TRANSLATE_DUAL)
+
+      //         console.log(languages)
+      //         // stop the interval
+      //         clearInterval(intervalId)
+
+      //         // active disable
+      //       } else {
+      //         if (activerCount >= ACTIVE_COUNT_MAX) {
+      //           dualMode = addCourseStateDiv(dualMode)
+      //           setTranslateState(dualMode, TRANSLATE_DISABLE)
+
+      //           console.log(languages)
+      //           // stop the interval
+      //           clearInterval(intervalId)
+      //         }
+      //         activerCount++
+      //       }
+      //     } else {
+      //       // no enable
+      //       dualMode = addCourseStateDiv(dualMode)
+
+      //       let activeLanguage = getActiveLanguage()
+      //       if (activeLanguage !== '') {
+      //         setTranslateState(dualMode, TRANSLATE_SINGLE)
+      //       } else {
+      //         setTranslateState(dualMode, TRANSLATE_DISABLE)
+      //       }
+
+      //       console.log(languages)
+      //       // stop the interval
+      //       clearInterval(intervalId)
+      //     }
+
+      //     // if (res.language2ndCoursera) {
+      //     //   setlanguageType2(res.language2ndCoursera)
+      //     // }
+      //     // console.log('setlanguageType2:', res.language2ndCoursera)
+
+      //     // setDualMode(res.dualTitleUCoursera ? DUAL_ON : DUAL_OFF)
+      //     // console.log('chrome.storage.sync.get...')
+      //   }
+      // )
+    }
+  }, 1000)
+}
+
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (message.message === DOWNLOAD_SUBTITLE) {
     sendResponse({ message: 'receive download chinese subtitle' })
@@ -290,11 +501,26 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     sendResponse({ message: 'doul mode setting' })
     console.log('UDAL_MODE....', message)
     if (message.secondLanguage !== '' && message.duleMode) {
-      let activeLanguage = getActiveLanguage()
-      console.log('combine:', activeLanguage, message.secondLanguage)
-      if (activeLanguage !== '') {
-        combine(activeLanguage, message.secondLanguage)
-        setTranslateState(dualMode, TRANSLATE_DUAL)
+      if (message.duleMode) {
+        let activeLanguage = getActiveLanguage()
+        console.log('combine:', activeLanguage, message.secondLanguage)
+        if (activeLanguage !== '') {
+          if (
+            activeMode !== TRANSLATE_DUAL ||
+            message.secondLanguage !== active2ndLanguage
+          ) {
+            combine(activeLanguage, message.secondLanguage)
+            active2ndLanguage = message.secondLanguage
+            setTranslateState(dualMode, TRANSLATE_DUAL)
+            activeMode = TRANSLATE_DUAL
+          }
+        }
+      }
+    } else {
+      if (activeMode == TRANSLATE_DUAL) {
+        setTranslateState(dualMode, TRANSLATE_SINGLE)
+        activeMode = TRANSLATE_SINGLE
+        setSingleSubtitle()
       }
     }
   }
@@ -529,7 +755,7 @@ function getLenguageUri(language) {
   let trackElement = document.querySelector(
     `track[label="${language}"]`
   ) as HTMLTrackElement
-  if (getLenguageUri) {
+  if (trackElement) {
     console.log(`"${language}" typeof trackElement:`, typeof trackElement)
     console.log(`"${language}" trackElement:`, trackElement)
     console.log(`"${language}" trackElement.src:`, trackElement.src)
@@ -579,6 +805,21 @@ function setDualSubtitle(subtitle) {
   }
 }
 
+function setSingleSubtitle() {
+  const activeElement = document.querySelector('li.active span')
+  if (activeElement) {
+    let ariaLabel = activeElement.getAttribute('aria-label')
+    let trackElement = document.querySelector(
+      `track[label="${ariaLabel}"]`
+    ) as HTMLTrackElement
+    if (trackElement) {
+      if (trackElement.hasAttribute('data-src')) {
+        trackElement.setAttribute('src', trackElement.getAttribute('data-src'))
+      }
+    }
+  }
+}
+
 function getActiveLanguage() {
   const activeElement = document.querySelector('li.active span')
   if (activeElement) {
@@ -592,21 +833,112 @@ function getActiveLanguage() {
 
 // Function to handle link clicks
 function handleLinkClick(event) {
+  let isRun = false
   console.log('=====================================')
   console.log('handleLinkClick', event)
-  console.log('URI', event.target.baseURI)
-  if (event.target.baseURI.includes('lecture')) {
-    console.log('includes lecture...')
-  }
-  // // Check if the clicked element is a link (anchor tag)
-  // if (event.target.tagName === 'A') {
-  //   // Perform actions based on the link click
-  //   console.log('Link clicked:', event.target.href);
 
-  //   // You can modify this part to check if the clicked link is a "next" link
-  //   // and take appropriate actions.
+  if (event.target.className === 'subtitle-label') {
+    // let activeLanguage = getActiveLanguage()
+    // console.log('-------------------> 1')
+    // console.log('activeLanguage:', activeLanguage)
+    // console.log('LenguageUri:', getLenguageUri(activeLanguage))
+    checkActiveChange()
+    isRun = true
+  } else if ('childNodes' in event.target) {
+    // console.log('-------------------> 2')
+    if (event.target.childNodes.length >= 2) {
+      // console.log('event.traget.childNodes:', event.target.childNodes)
+      if (event.target.childNodes[1].className === 'subtitle-label') {
+        checkActiveChange()
+        isRun = true
+      }
+    }
+  }
+
+  if (!isRun) {
+    setTimeout(() => {
+      console.log('class:', event.target.className)
+      console.log('url:', event.target.baseURI)
+      if (
+        event.target.className.includes('cds') &&
+        event.target.baseURI.includes('lecture')
+      ) {
+        // dualMode = addCourseStateDiv(dualMode)
+        checkInterval()
+      }
+    }, 300)
+  }
+
+  // if ('childNodes' in event.target) {
+  //   console.log('event.target.className', event.target.className)
+  //   console.log('event.traget.childNodes:', event.target.childNodes)
   // }
 }
+
+function checkActiveChange() {
+  setTimeout(() => {
+    let activeLanguage = getActiveLanguage()
+    let languageUri = getLenguageUri(activeLanguage)
+    if (languageUri === '') {
+      setTranslateState(dualMode, TRANSLATE_DISABLE)
+      let active2ndLanguage = ''
+      activeMode = TRANSLATE_DISABLE
+    } else {
+      chrome.storage.sync.get(
+        ['language2ndCoursera', 'dualTitleUCoursera'],
+        (res) => {
+          if (res.language2ndCoursera !== '' && res.dualTitleUCoursera) {
+            // dual mode
+            if (getLenguageUri(res.language2ndCoursera) === '') {
+              setTranslateState(dualMode, TRANSLATE_SINGLE)
+              let active2ndLanguage = ''
+              activeMode = TRANSLATE_SINGLE
+            } else {
+              combine(activeLanguage, res.language2ndCoursera)
+
+              setTranslateState(dualMode, TRANSLATE_DUAL)
+              active2ndLanguage = res.language2ndCoursera
+              activeMode = TRANSLATE_DUAL
+            }
+          } else {
+            setTranslateState(dualMode, TRANSLATE_SINGLE)
+            let active2ndLanguage = ''
+            activeMode = TRANSLATE_SINGLE
+          }
+        }
+      )
+    }
+
+    console.log('-------------------> 3')
+    console.log('activeLanguage:', activeLanguage)
+    console.log('LenguageUri:', getLenguageUri(activeLanguage))
+  }, 500)
+}
+
+// // Function to handle link clicks
+// function handleLinkClick(event) {
+//   console.log('=====================================')
+//   console.log('handleLinkClick', event)
+//   // console.log('URI', event.target.baseURI)
+//   // if (event.target.baseURI.includes('lecture')) {
+//   //   console.log('includes lecture...')
+//   // }
+
+//   if ('childNodes' in event.target) {
+//     console.log('event.traget.childNodes:', event.traget.childNodes)
+//     // if (event.traget.childNodes.length >= 2) {
+//     //   console.log('event.traget.childNodes:', event.traget.childNodes)
+//     // }
+//   }
+//   // // Check if the clicked element is a link (anchor tag)
+//   // if (event.target.tagName === 'A') {
+//   //   // Perform actions based on the link click
+//   //   console.log('Link clicked:', event.target.href);
+
+//   //   // You can modify this part to check if the clicked link is a "next" link
+//   //   // and take appropriate actions.
+//   // }
+// }
 
 // Attach the click event listener to the entire document
 document.addEventListener('click', handleLinkClick)
@@ -614,6 +946,11 @@ document.addEventListener('click', handleLinkClick)
 function setTranslateState(dualMode, state) {
   if (dualMode) {
     const tranlateElement = document.getElementById('course-show-pic')
-    tranlateElement.style.backgroundColor = state
+    if (tranlateElement) {
+      tranlateElement.style.backgroundColor = state
+    } else {
+      // console.error("Element with ID 'course-show-pic' not found.")
+      console.log("Element with ID 'course-show-pic' not found.")
+    }
   }
 }

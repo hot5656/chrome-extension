@@ -4,7 +4,36 @@
 }
 
 #course-satae {
-  background-color: pink;
-  width: 400px;
+  /* background-color: pink; */
+  width: 300px;
   display: inline-flex;
+  height: 32px;
+  padding: 30px 0;
+}
+
+/* #course-show {
+  background-color: orange;
+  border-radius: 50%;
+} */
+
+#course-show-all {
+  margin-left: 50px;
+  display: flex;
+  align-items: center;
+}
+
+#course-show-pic {
+  /* background-color: orange; */
+  /* background-color: green; */
+  background-color: gray;
+  height: 32px;
+  border-radius: 50%;
+  width: 32px;
+  margin-right: 20px;
+}
+
+#course-show-text {
+  color: brown;
+  font-weight: bold;
+  font-size: 24px;
 }
