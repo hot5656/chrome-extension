@@ -91,7 +91,7 @@ function getHTMLPlugins(chunks) {
   return chunks.map(
     (chunk) =>
       new HtmlPlugin({
-        title: 'React Extension',
+        title: 'Coursera Dual Subtitles',
         filename: `${chunk}.html`,
         chunks: [chunk],
       })

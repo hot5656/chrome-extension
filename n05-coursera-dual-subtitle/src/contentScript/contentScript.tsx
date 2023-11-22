@@ -35,14 +35,19 @@ function addCourseStateDiv(dual) {
     if (firstChild) {
       success = true
 
-      const bodyElement = document.querySelector('.c-container')
-      const rootElement = document.createElement('div')
-      rootElement.id = 'course-satae'
-      rootElement.className = 'horizontal-box'
-      bodyElement.insertBefore(rootElement, firstChild)
+      // console.log('addCourseStateDiv ...')
+      let courseStateElements = document.querySelector('#course-satae')
+      if (!courseStateElements) {
+        // console.log('addCourseStateDiv ...sure')
+        const bodyElement = document.querySelector('.c-container')
+        const rootElement = document.createElement('div')
+        rootElement.id = 'course-satae'
+        rootElement.className = 'horizontal-box'
+        bodyElement.insertBefore(rootElement, firstChild)
 
-      const root = createRoot(rootElement)
-      root.render(<CourseState />)
+        const root = createRoot(rootElement)
+        root.render(<CourseState />)
+      }
     }
   }
   return success
@@ -60,9 +65,11 @@ function checkInterval() {
       courseName = nameElement.getAttribute('href')
       if (!courseName.includes('lecture')) {
         courseName = 'x'
-        console.log('no lecture')
+        // console.log('no lecture')
         // stop the interval
         clearInterval(intervalId)
+      } else {
+        dualMode = addCourseStateDiv(dualMode)
       }
 
       let nameArray = courseName.split('/')
@@ -88,7 +95,7 @@ function checkInterval() {
 
       let activeLanguage = getActiveLanguage()
       if (activeLanguage !== '') {
-        dualMode = addCourseStateDiv(dualMode)
+        // dualMode = addCourseStateDiv(dualMode)
 
         // found active state
         if (getLenguageUri(activeLanguage) !== '') {
@@ -97,7 +104,7 @@ function checkInterval() {
           chrome.storage.sync.get(
             ['language2ndCoursera', 'dualTitleCoursera'],
             (res) => {
-              // console.log('sync.get:', res)
+              // console.log('sync.get1:', res)
 
               if (res.language2ndCoursera !== '' && res.dualTitleCoursera) {
                 // console.log(
@@ -111,8 +118,6 @@ function checkInterval() {
                   // active(single)
                   dualMode = addCourseStateDiv(dualMode)
                   setTranslateState(dualMode, TRANSLATE_SINGLE, '')
-                  // active2ndLanguage = ''
-                  // activeMode = TRANSLATE_SINGLE
 
                   // console.log(languages)
                   // stop the interval
@@ -130,16 +135,12 @@ function checkInterval() {
                     TRANSLATE_DUAL,
                     res.language2ndCoursera
                   )
-                  // active2ndLanguage = res.language2ndCoursera
-                  // activeMode = TRANSLATE_DUAL
                 }
               } else {
                 // not set dual at storage
                 // active(single)
                 dualMode = addCourseStateDiv(dualMode)
                 setTranslateState(dualMode, TRANSLATE_SINGLE, '')
-                // let active2ndLanguage = ''
-                // activeMode = TRANSLATE_SINGLE
 
                 // console.log(languages)
                 // stop the interval
@@ -151,8 +152,6 @@ function checkInterval() {
           // no active subtitle
           dualMode = addCourseStateDiv(dualMode)
           setTranslateState(dualMode, TRANSLATE_DISABLE, '')
-          // let active2ndLanguage = ''
-          // activeMode = TRANSLATE_DISABLE
 
           // console.log(languages)
           // stop the interval
@@ -162,8 +161,6 @@ function checkInterval() {
         // over times - no active subtitle
         dualMode = addCourseStateDiv(dualMode)
         setTranslateState(dualMode, TRANSLATE_DISABLE, '')
-        // active2ndLanguage = ''
-        // activeMode = TRANSLATE_DISABLE
 
         // console.log(languages)
         // stop the interval
@@ -197,8 +194,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
           ) {
             combine(activeLanguage, message.secondLanguage)
             setTranslateState(dualMode, TRANSLATE_DUAL, message.secondLanguage)
-            // active2ndLanguage = message.secondLanguage
-            // activeMode = TRANSLATE_DUAL
           }
         }
       }
@@ -438,50 +433,51 @@ function handleLinkClick(event) {
   // console.log('=====================================')
   // console.log('handleLinkClick', event)
 
-  if (event.target.className === 'subtitle-label') {
-    checkActiveChange()
-    isRun = true
-  } else if ('childNodes' in event.target) {
-    if (event.target.childNodes.length >= 2) {
-      if (event.target.childNodes[1].className === 'subtitle-label') {
+  setTimeout(() => {
+    if (typeof event.target.className === 'string') {
+      if (event.target.className === 'subtitle-label') {
         checkActiveChange()
         isRun = true
       }
     }
-  }
-
-  if (!isRun) {
-    setTimeout(() => {
-      // console.log('class:', event.target.className)
-      // console.log('url:', event.target.baseURI)
-      if (
-        event.target.className.includes('cds') &&
-        event.target.baseURI.includes('lecture')
-      ) {
-        checkInterval()
+    if ('childNodes' in event.target && !isRun) {
+      if (event.target.childNodes.length >= 2) {
+        if (event.target.childNodes[1].className === 'subtitle-label') {
+          checkActiveChange()
+          isRun = true
+        }
       }
-    }, 300)
-  }
+    }
+
+    if (!isRun) {
+      if (event.target.baseURI.includes('lecture')) {
+        let courseStateElements = document.querySelector('#course-satae')
+        if (!courseStateElements) {
+          dualMode = false
+          checkInterval()
+        }
+      }
+    }
+  }, 300)
 }
 
 function checkActiveChange() {
   setTimeout(() => {
     let activeLanguage = getActiveLanguage()
     let languageUri = getLenguageUri(activeLanguage)
+    // console.log('languageUri:', languageUri)
     if (languageUri === '') {
       setTranslateState(dualMode, TRANSLATE_DISABLE, '')
-      // active2ndLanguage = ''
-      // activeMode = TRANSLATE_DISABLE
     } else {
       chrome.storage.sync.get(
         ['language2ndCoursera', 'dualTitleCoursera'],
         (res) => {
+          // console.log('sync.get2:', res)
+
           if (res.language2ndCoursera !== '' && res.dualTitleCoursera) {
             // dual mode
             if (getLenguageUri(res.language2ndCoursera) === '') {
               setTranslateState(dualMode, TRANSLATE_SINGLE, '')
-              // active2ndLanguage = ''
-              // activeMode = TRANSLATE_SINGLE
             } else {
               combine(activeLanguage, res.language2ndCoursera)
 
@@ -490,13 +486,9 @@ function checkActiveChange() {
                 TRANSLATE_DUAL,
                 res.language2ndCoursera
               )
-              // active2ndLanguage = res.language2ndCoursera
-              // activeMode = TRANSLATE_DUAL
             }
           } else {
             setTranslateState(dualMode, TRANSLATE_SINGLE, '')
-            // active2ndLanguage = ''
-            // activeMode = TRANSLATE_SINGLE
           }
         }
       )

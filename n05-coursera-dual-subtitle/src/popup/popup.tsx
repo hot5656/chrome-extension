@@ -58,6 +58,8 @@ const App: React.FC<{}> = () => {
                     chrome.storage.sync.get(
                       ['language2ndCoursera', 'dualTitleCoursera'],
                       (res) => {
+                        // console.log('sync.get(popupo):', res)
+
                         if (res.language2ndCoursera) {
                           setlanguageType2(res.language2ndCoursera)
                         }
@@ -67,7 +69,6 @@ const App: React.FC<{}> = () => {
                         // )
 
                         setDualMode(res.dualTitleCoursera ? DUAL_ON : DUAL_OFF)
-                        // console.log('chrome.storage.sync.get...')
                       }
                     )
                   }
@@ -91,10 +92,12 @@ const App: React.FC<{}> = () => {
       chrome.storage.sync.set({
         dualTitleCoursera: false,
       })
+      // console.log('sync.set dualTitleCoursera :', false)
     } else {
       chrome.storage.sync.set({
         dualTitleCoursera: true,
       })
+      // console.log('sync.set dualTitleCoursera :', true)
     }
     setDualMode(event.target.value)
     // console.log(`set ${event.target.value}`)
@@ -111,6 +114,7 @@ const App: React.FC<{}> = () => {
     chrome.storage.sync.set({
       language2ndCoursera: event.target.value,
     })
+    // console.log('sync.set language2ndCoursera :', event.target.value)
     sendMessageToContentScript(UDAL_MODE, {
       message: UDAL_MODE,
       duleMode: dualMode === DUAL_ON,
@@ -124,14 +128,12 @@ const App: React.FC<{}> = () => {
       <Typography variant="h5">{languageType2}</Typography> */}
       <Box my={'16px'}>
         <FormControl fullWidth>
-          <InputLabel id="translate-mode-select-label">
-            Translate Mode
-          </InputLabel>
+          <InputLabel id="translate-mode-select-label">Dual Mode</InputLabel>
           <Select
             labelId="translate-mode-select-label"
             id="translate-mode-select"
             value={dualMode}
-            label="Translate Mode"
+            label="Dual Mode"
             onChange={handDualModeClick}
           >
             <MenuItem value={DUAL_ON}>{DUAL_ON}</MenuItem>
