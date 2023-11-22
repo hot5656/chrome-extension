@@ -1,0 +1,38 @@
+{
+	"manifest_version": 3,
+	"name": "edX Dual Subtitle",
+	"description": "edX Dual Subtitle",
+	"version": "1.0.0",
+	"icons": {
+		"16": "icon.png",
+		"48": "icon.png",
+		"128": "icon.png"
+	},
+	"action": {
+		"default_popup": "popup.html",
+		"default_title": "edx Dual Subtitle",
+		"default_icon": "icon.png"
+	},
+	"permissions": [
+		"tabs",
+		"storage"
+	],
+	"background": {
+		"service_worker": "background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"https://learning.edx.org/course/*"
+			],
+			"js": [
+				"contentScript.js"
+			],
+			"css": [
+				"contentScript.css"
+			],
+			"run_at": "document_end",
+			"all_frames": true
+		}
+	]
+}
