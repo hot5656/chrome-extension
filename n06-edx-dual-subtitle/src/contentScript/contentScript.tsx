@@ -8,6 +8,10 @@ let INTERVAL_STEP = 1000
 let activerCount = 1
 let intervalRun = false
 
+function SecondSubtitle() {
+  return <>ABC</>
+}
+
 window.addEventListener('load', function () {
   console.log('contentScript load...')
   checkInterval()
@@ -67,19 +71,29 @@ function checkInterval() {
         lectureSvgElement.style.height = '32px'
         lectureSvgElement.style.color = 'red'
 
-        // ???
-        let courseStateElements = document.querySelector('#course-satae')
-        if (!courseStateElements) {
-          // console.log('addCourseStateDiv ...sure')
-          const bodyElement = document.querySelector('.c-container')
-          const rootElement = document.createElement('div')
-          rootElement.id = 'course-satae'
-          rootElement.className = 'horizontal-box'
-          bodyElement.insertBefore(rootElement, firstChild)
+        console.log('wait...')
+        setTimeout(() => {
+          console.log('run...')
+          let firstChild = document.querySelector('.closed-captions')
+          let bodyElement = document.querySelector('.video-wrapper')
+          console.log('firstChild', firstChild)
+          console.log('bodyElement', bodyElement)
+          // // add div
+          // const firstChild = document.querySelector('.closed-captions')
+          // console.log('firstChild', firstChild)
+          // if (firstChild) {
+          //   const bodyElement = document.querySelector('.video-wrapper')
+          //   const rootElement = document.createElement('div')
+          //   console.log('bodyElement', bodyElement)
+          //   console.log('rootElement', rootElement)
+          //   rootElement.id = 'second-subtitle'
+          //   // rootElement.className = 'horizontal-box'
+          //   bodyElement.insertBefore(rootElement, firstChild)
 
-          const root = createRoot(rootElement)
-          root.render(<CourseState />)
-        }
+          //   const root = createRoot(rootElement)
+          //   root.render(<SecondSubtitle />)
+          // }
+        }, 10000)
       } else {
         let lectureIconSvgElements = document.querySelectorAll(
           'a.btn.btn-link>svg'
