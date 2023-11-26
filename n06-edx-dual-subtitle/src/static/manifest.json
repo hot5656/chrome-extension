@@ -14,12 +14,19 @@
 		"default_icon": "icon.png"
 	},
 	"permissions": [
+		"activeTab",
 		"tabs",
 		"storage"
 	],
 	"background": {
 		"service_worker": "background.js"
 	},
+	"web_accessible_resources": [
+		{
+			"resources": "contentScript.js",
+			"matches": "https://learning.edx.org/course/*"
+		}
+	],
 	"content_scripts": [
 		{
 			"matches": [

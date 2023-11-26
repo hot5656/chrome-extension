@@ -89,8 +89,59 @@ function checkInterval() {
           }
         }
 
-        let btnElements = document.querySelectorAll('.btn-link')
-        console.log('btnElements:', btnElements)
+        // let btnElements = document.querySelectorAll('.btn-link')
+        // console.log('btnElements:', btnElements)
+
+        // let iframe = document.querySelector(
+        //   'iframe#unit-iframe'
+        // ) as HTMLIFrameElement
+        // console.log('iframeElement', iframe)
+        // console.log('iframe.contentDocument', iframe.contentDocument)
+        // if (iframe) {
+        //   // Use executeScript to inject a script into the iframe
+        //   chrome.scripting.executeScript({
+        //     target: { tabId: chrome.tabs.TAB_ID_NONE }, // Execute in the context of the active tab
+        //     function: (iframeContent: Document | null) => {
+        //       // Code to be executed in the context of the iframe
+        //       console.log(
+        //         'Iframe content:',
+        //         iframeContent ? iframeContent.textContent : 'Iframe not found'
+        //       )
+        //     },
+        //     args: [iframe.contentDocument],
+        //   })
+        // }
+
+        // contentScript.tsx
+
+        // Find the iframe in the current page
+        const iframe = document.getElementById(
+          'unit-iframe'
+        ) as HTMLIFrameElement
+
+        // Check if the iframe is found
+        if (iframe) {
+          // Use executeScript to inject a script into the iframe
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs.length > 0) {
+              chrome.tabs.executeScript(tabs[0].id, {
+                code: `
+          (function() {
+            // Code to be executed in the context of the iframe
+            console.log('Iframe content:', document.body.innerHTML);
+          })();
+        `,
+              })
+            }
+          })
+        } else {
+          console.error('Iframe with id "i-unit" not found.')
+        }
+
+        // if (iframe) {
+        //   let tcElement = iframe.contentDocument.querySelector('div.tc-wrapper')
+        //   console.log('tcElement4', tcElement)
+        // }
 
         // intervalSubtitleRun = false
         // if (intervalSubtitleRun) {
