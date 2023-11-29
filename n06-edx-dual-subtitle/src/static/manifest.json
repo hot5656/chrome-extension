@@ -14,13 +14,8 @@
 		"default_icon": "icon.png"
 	},
 	"permissions": [
-		"scripting",
-		"activeTab",
 		"tabs",
 		"storage"
-	],
-	"host_permissions": [
-		"https://learning.edx.org/course/*"
 	],
 	"background": {
 		"service_worker": "background.js"
@@ -38,17 +33,6 @@
 			],
 			"run_at": "document_end",
 			"all_frames": true
-		}
-	],
-	"web_accessible_resources": [
-		{
-			"resources": [
-				"injected.js",
-				"script.js"
-			],
-			"matches": [
-				"https://learning.edx.org/*"
-			]
 		}
 	]
 }
