@@ -14,19 +14,17 @@
 		"default_icon": "icon.png"
 	},
 	"permissions": [
+		"scripting",
 		"activeTab",
 		"tabs",
 		"storage"
 	],
+	"host_permissions": [
+		"https://learning.edx.org/course/*"
+	],
 	"background": {
 		"service_worker": "background.js"
 	},
-	"web_accessible_resources": [
-		{
-			"resources": "contentScript.js",
-			"matches": "https://learning.edx.org/course/*"
-		}
-	],
 	"content_scripts": [
 		{
 			"matches": [
@@ -40,6 +38,17 @@
 			],
 			"run_at": "document_end",
 			"all_frames": true
+		}
+	],
+	"web_accessible_resources": [
+		{
+			"resources": [
+				"injected.js",
+				"script.js"
+			],
+			"matches": [
+				"https://learning.edx.org/*"
+			]
 		}
 	]
 }

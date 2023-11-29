@@ -89,6 +89,208 @@ function checkInterval() {
           }
         }
 
+        console.log('chrome.tabs.query...')
+        let iframeElement = document.getElementById(
+          'unit-iframe'
+        ) as HTMLIFrameElement
+        // let iframeContentElement = iframeElement.contentWindow.document
+        // console.log('iframeContentElement', iframeContentElement)
+
+        const scriptIframeElement = document.querySelector(
+          'script-iframe-content'
+        )
+        if (!scriptIframeElement) {
+          const scriptElement = document.createElement('script')
+          // scriptElement.textContent = `console.log("123")`
+          // scriptElement.textContent = `window.parent.postMessage({ type: 'getIframeContent' }, '*')`
+          scriptElement.setAttribute('src', 'script.js')
+          scriptElement.id = 'script-iframe-content'
+
+          // Append the script element to the body
+          iframeElement.appendChild(scriptElement)
+          console.log('scriptElement', scriptElement)
+        }
+
+        // chrome.runtime.sendMessage(
+        //   {
+        //     message: 'get iframe content',
+        //     url: iframeElement.src,
+        //   },
+        //   (response) => {
+        //     console.log('response.content', response.content)
+        //   }
+        // )
+
+        // window.postMessage(
+        //   {
+        //     message: 'get iframe content',
+        //     url: iframeElement.src,
+        //   },
+        //   '*'
+        // )
+
+        // window.postMessage('test')
+
+        // window.addEventListener('message', (e) => {
+        //   console.log(e.data)
+        // })
+
+        // window.postMessage(
+        //   {
+        //     // from: 'contentScript',
+        //     channel: 'myExtension',
+        //     message: 'loaded',
+        //   },
+        //   '*'
+        // )
+
+        // const msg = {
+        //   channel: 'myExtension',
+        //   message: 'loaded',
+        // }
+
+        // console.log('Sending message:', msg)
+
+        // window.postMessage(msg, '*')
+
+        // const iframe = document.getElementsByTagName('iframe')[0]
+
+        // iframe.onload = () => {
+        //   const nestedFrame =
+        //     iframe.contentDocument.getElementsByTagName('iframe')[0]
+
+        //   chrome.runtime.sendMessage(
+        //     {
+        //       getNestedIframeContent: true,
+        //       url: nestedFrame.src,
+        //     },
+        //     (response) => {
+        //       // Access proxied content
+        //       console.log(response.content)
+        //     }
+        //   )
+        // }
+
+        // let iframe = document.getElementsByTagName('iframe')[0]
+
+        // // Wait for iframe load to complete
+        // iframe.onload = function () {
+        // 	// Access Iframe document body
+        // 	let iframeDoc =
+        // 		iframe.contentDocument || iframe.contentWindow.document
+        // 	let body = iframeDoc.body
+
+        // 	// Display iframe body HTML
+        // 	console.log('body.innerHTML', body.innerHTML)
+        // }
+
+        // let iframe = document.getElementsByTagName('iframe')[0]
+
+        // chrome.runtime.sendMessage(
+        //   {
+        //     getIframeContent: true,
+        //     iframeUrl: iframe.src,
+        //   },
+        //   (response) => {
+        //     let iframeContent = response.content
+
+        //     // Do something with the content
+        //     console.log(iframeContent)
+        //   }
+        // )
+
+        // // Assuming you have a reference to the iframe element
+        // const iframe = document.querySelector(
+        //   'iframe#unit-iframe'
+        // ) as HTMLIFrameElement
+
+        // if (iframe) {
+        //   const iframeContent = iframe.contentDocument.body.innerHTML
+        //   console.log('Iframe content:', iframeContent)
+        //   console.log('Iframe content2:', iframe.contentDocument)
+        //   console.log('Iframe content3:', iframe.contentDocument.body)
+        // } else {
+        //   console.error('Iframe with ID "unit-iframe" not found.')
+        // }
+
+        // // Find the iframe by its ID
+        // let iframe = document.querySelector(
+        //   'iframe#unit-iframe'
+        // ) as HTMLIFrameElement
+
+        // if (iframe) {
+        //   // Send a message to the background script to request iframe content
+        //   chrome.runtime.sendMessage(
+        //     { action: 'getIframeContent', iframeSrc: iframe.src },
+        //     function (response) {
+        //       if (chrome.runtime.lastError) {
+        //         console.error(chrome.runtime.lastError)
+        //         return
+        //       }
+
+        //       // Handle the response, which contains the iframe content
+        //       const iframeContent = response.iframeContent
+        //       console.log(
+        //         'Content of iframe with ID "unit-iframe":',
+        //         iframeContent
+        //       )
+        //     }
+        //   )
+        // } else {
+        //   console.error('Iframe with ID "unit-iframe" not found.')
+        // }
+
+        // // Send a message to the background script to request information about the current tab
+        // chrome.runtime.sendMessage(
+        //   { action: 'getCurrentTabInfo' },
+        //   function (response) {
+        //     if (chrome.runtime.lastError) {
+        //       console.error(chrome.runtime.lastError)
+        //       return
+        //     }
+
+        //     // Handle the response, which contains information about the current tab
+        //     const tabInfo = response.tabInfo
+        //     const iframes = response.iframes
+
+        //     console.log('Information about the current tab:', tabInfo)
+        //     console.log('Iframes within the current tab:', iframes)
+        //   }
+        // )
+
+        // // Query all frames in the current tab
+        // chrome.tabs.query(
+        //   { active: true, currentWindow: true },
+        //   function (tabs) {
+        //     console.log(tabs)
+        //     // const tabId = tabs[0].id
+
+        //     // // Get all frames in the tab
+        //     // chrome.webNavigation.getAllFrames(
+        //     //   { tabId: tabId },
+        //     //   function (details) {
+        //     //     handleFrames(details)
+        //     //   }
+        //     // )
+        //   }
+        // )
+
+        // // Query all frames in the current tab
+        // chrome.tabs.query(
+        //   { active: true, currentWindow: true },
+        //   function (tabs) {
+        //     const tabId = tabs[0].id
+
+        //     // Get all frames in the tab
+        //     chrome.webNavigation.getAllFrames(
+        //       { tabId: tabId },
+        //       function (details) {
+        //         handleFrames(details)
+        //       }
+        //     )
+        //   }
+        // )
+
         // let btnElements = document.querySelectorAll('.btn-link')
         // console.log('btnElements:', btnElements)
 
@@ -114,29 +316,29 @@ function checkInterval() {
 
         // contentScript.tsx
 
-        // Find the iframe in the current page
-        const iframe = document.getElementById(
-          'unit-iframe'
-        ) as HTMLIFrameElement
+        // // Find the iframe in the current page
+        // const iframe = document.getElementById(
+        //   'unit-iframe'
+        // ) as HTMLIFrameElement
 
-        // Check if the iframe is found
-        if (iframe) {
-          // Use executeScript to inject a script into the iframe
-          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs.length > 0) {
-              chrome.tabs.executeScript(tabs[0].id, {
-                code: `
-          (function() {
-            // Code to be executed in the context of the iframe
-            console.log('Iframe content:', document.body.innerHTML);
-          })();
-        `,
-              })
-            }
-          })
-        } else {
-          console.error('Iframe with id "i-unit" not found.')
-        }
+        // // Check if the iframe is found
+        // if (iframe) {
+        //   // Use executeScript to inject a script into the iframe
+        //   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        //     if (tabs.length > 0) {
+        //       chrome.tabs.executeScript(tabs[0].id, {
+        //         code: `
+        //   (function() {
+        //     // Code to be executed in the context of the iframe
+        //     console.log('Iframe content:', document.body.innerHTML);
+        //   })();
+        // `,
+        //       })
+        //     }
+        //   })
+        // } else {
+        //   console.error('Iframe with id "i-unit" not found.')
+        // }
 
         // if (iframe) {
         //   let tcElement = iframe.contentDocument.querySelector('div.tc-wrapper')
@@ -212,6 +414,17 @@ function checkInterval() {
     activerCount++
   }, INTERVAL_STEP)
 }
+
+// function handleFrames(frames) {
+//   frames.forEach((frame) => {
+//     // Access the content of each iframe
+//     const iframeContent = frame.contentDocument.body.innerHTML
+//     console.log(`Content of iframe ${frame.id}:`, iframeContent)
+
+//     // Modify the content of each iframe if needed
+//     // frame.contentDocument.body.innerHTML = 'New content for the iframe';
+//   })
+// }
 
 let intervalSubtitleRun = false
 let activerSubtilleCount = 1
@@ -321,3 +534,38 @@ document.addEventListener('click', handleLinkClick)
 //   childList: true,
 //   subtree: true,
 // })
+
+// content.js
+
+document.addEventListener('DOMContentLoaded', function () {
+  console.log('DOMContentLoaded.....')
+  // Query all frames in the current tab
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    const tabId = tabs[0].id
+
+    // Get all frames in the tab
+    chrome.webNavigation.getAllFrames({ tabId: tabId }, function (details) {
+      handleFrames(details)
+    })
+  })
+})
+
+function handleFrames(frames) {
+  frames.forEach((frame) => {
+    const iframeContent = frame.contentDocument.body.innerHTML
+    console.log(`Content of iframe ${frame.id}:`, iframeContent)
+  })
+}
+
+// add injected
+const script = document.createElement('script')
+script.src = chrome.runtime.getURL('injected.js')
+document.body.appendChild(script)
+
+window.addEventListener('message', function (event) {
+  if (event.data && event.data.type === 'getIframeContent') {
+    // Access the iframe content
+    // const iframeContent = event.source.document.body.innerHTML;
+    console.log('iframeContent event', event)
+  }
+})
