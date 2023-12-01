@@ -31,3 +31,30 @@
   font-weight: bold;
   font-size: 24px;
 }
+
+.load-item {
+  margin: 5px 0;
+}
+
+#video-show {
+  position: relative;
+}
+
+#my-video {
+  position: relative;
+}
+
+#subtitle-text {
+  position: absolute;
+  color: #ffffff;
+  background-color: #1c1c1c;
+  font-size: 16px;
+  bottom: 45px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  display: inline-block;
+  white-space: nowrap;
+  padding: 4px;
+  z-index: 1;
+}

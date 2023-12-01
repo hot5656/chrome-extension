@@ -7,9 +7,11 @@ let INTERVAL_STEP = 1000
 
 let activerCount = 1
 let intervalRun = false
+let language_code = 'zh-Hant'
 
 function NewVideo() {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const preIndex = useRef<number>(0)
   const subtitleContainerRef = useRef<HTMLParagraphElement>(null)
   const [subtitles, setSubtitles] = useState<
     { timeStart: number; timeEnd: number; text: string }[]
@@ -136,10 +138,39 @@ function NewVideo() {
       (subtitle) =>
         currentTime >= subtitle.timeStart && currentTime <= subtitle.timeEnd
     )
-    console.log(`subtitles[${index}]=`, subtitles[index])
-    const currentSubtitle = index !== -1 ? subtitles[index].text : ''
+    if (index !== preIndex.current) {
+      console.log(`subtitles[${index}]=`, subtitles[index])
+      let currentSubtitle = index !== -1 ? subtitles[index].text : ''
 
-    subtitleContainer.innerText = currentSubtitle
+      if (currentSubtitle.length != 0) {
+        let tempSubtitle = currentSubtitle
+        if (tempSubtitle.includes('%')) {
+          tempSubtitle = tempSubtitle.replace(/%/g, 'percent')
+        }
+
+        let xhr = new XMLHttpRequest()
+        xhr.open(
+          'GET',
+          `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${language_code}&dt=t&q=${tempSubtitle}`,
+          false
+        )
+        xhr.send()
+
+        if (xhr.status === 200) {
+          let data = JSON.parse(xhr.responseText)
+          let newWords = data[0][0][0]
+          currentSubtitle = newWords + '\n' + currentSubtitle
+        } else {
+          throw new Error('Network response was not ok')
+        }
+      }
+
+      subtitleContainer.innerText = currentSubtitle
+    } else {
+      console.log('index=', index)
+    }
+
+    preIndex.current = index
   }
 
   useEffect(() => {
@@ -160,11 +191,25 @@ function NewVideo() {
 
   return (
     <>
-      <h1>HTML5 Video Player with MP4 and Subtitles</h1>
-      <input type="file" accept="video/mp4" onChange={handleVideoFileChange} />
-      <input type="file" accept=".vtt" onChange={handleSubtitleFileChange} />
-      <video id="my-video" controls width="600" ref={videoRef}></video>
-      <p id="subtitle-text" ref={subtitleContainerRef}></p>
+      mp4 load :{' '}
+      <input
+        className="load-item"
+        type="file"
+        accept="video/mp4"
+        onChange={handleVideoFileChange}
+      />
+      <br />
+      vtt load :{' '}
+      <input
+        className="load-item"
+        type="file"
+        accept=".vtt"
+        onChange={handleSubtitleFileChange}
+      />
+      <div id="video-show">
+        <video id="my-video" controls width="100%" ref={videoRef}></video>
+        <p id="subtitle-text" ref={subtitleContainerRef}></p>
+      </div>
     </>
   )
 }
