@@ -1,4 +1,4 @@
-import React, { useRef, ChangeEvent } from 'react'
+import React, { useRef, useEffect, useState, ChangeEvent } from 'react'
 import ReactDOM, { createRoot } from 'react-dom/client'
 import { SHOW_ACTIVE, LANGUGAES_INFO, UDAL_MODE } from '../utils/messageType'
 
@@ -10,6 +10,12 @@ let intervalRun = false
 
 function NewVideo() {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const subtitleContainerRef = useRef<HTMLParagraphElement>(null)
+  const [subtitles, setSubtitles] = useState<
+    { timeStart: number; timeEnd: number; text: string }[]
+  >([])
+
+  // const subtitleContainer = subtitleContainerRef.current
 
   const handleVideoFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const fileInput = event.target
@@ -39,35 +45,118 @@ function NewVideo() {
 
     if (selectedFile) {
       const videoElement = videoRef.current
+      const subtitleContainer = subtitleContainerRef.current
 
-      // Clear existing tracks
-      if (videoElement && videoElement.textTracks) {
-        const textTracks = videoElement.textTracks
-        for (let i = textTracks.length - 1; i >= 0; i--) {
-          const track = textTracks[i]
-          track.mode = 'hidden'
-        }
-      }
+      // Read the subtitle file content
+      const subtitleContent = await selectedFile.text()
 
-      const subtitleBlob = new Blob([selectedFile], {
-        type: 'text/vtt',
-      })
-      const subtitleBlobURL = URL.createObjectURL(subtitleBlob)
+      // Parse the subtitle content
+      const parsedSubtitles = parseSubtitleContent(subtitleContent)
+      console.log('Parsed Subtitles:', parsedSubtitles)
 
-      const trackElement = document.createElement('track')
-      trackElement.src = subtitleBlobURL
-      trackElement.kind = 'subtitles'
-      trackElement.srclang = 'en'
-      trackElement.label = 'English'
-      trackElement.default = true
+      // Set subtitles state
+      setSubtitles(parsedSubtitles)
 
-      // Append the track element to the video
+      // Load the new source
       if (videoElement) {
-        videoElement.appendChild(trackElement)
         videoElement.load()
       }
     }
   }
+
+  function timeToSecond(timeString) {
+    const [hours, minutes, seconds] = timeString.split(':')
+
+    // Convert minutes and seconds to numbers
+    const hoursAsSeconds = parseInt(hours) * 360
+    const minutesAsSeconds = parseInt(minutes) * 60
+    const secondsWithTenths = parseFloat(seconds)
+
+    // Combine minutes and seconds
+    return parseFloat(
+      (hoursAsSeconds + minutesAsSeconds + secondsWithTenths).toFixed(3)
+    )
+  }
+
+  const parseSubtitleContent = (subtitleContent: string) => {
+    // Example: assuming each subtitle is separated by a newline character
+    const subtitleLines = subtitleContent.split('\n')
+
+    console.log('subtitleLines:', subtitleLines)
+
+    // Assuming each subtitle consists of two lines: timing and text
+    const parsedSubtitles = []
+    let isTime = false
+    let timeStart = 0
+    let timeEnd = 0
+    let text = ''
+    let textCount = 1
+    for (let i = 1; i < subtitleLines.length; i++) {
+      if (subtitleLines[i].includes('-->')) {
+        if (isTime) {
+          parsedSubtitles.push({ timeStart: timeStart, timeEnd: timeEnd, text })
+        }
+
+        timeStart = timeToSecond(subtitleLines[i].split(' ')[0])
+        timeEnd = timeToSecond(subtitleLines[i].split(' ')[2])
+        isTime = true
+        textCount = 1
+        text = ''
+      } else if (subtitleLines[i].length > 0) {
+        if (textCount === 1) {
+          text = subtitleLines[i]
+        } else {
+          text = text + '\n' + subtitleLines[i]
+        }
+        textCount++
+      }
+    }
+
+    if (isTime && textCount > 1) {
+      parsedSubtitles.push({ timeStart: timeStart, timeEnd: timeEnd, text })
+    }
+
+    console.log('parsedSubtitles : ', parsedSubtitles)
+
+    return parsedSubtitles
+  }
+
+  const handleTimeUpdate = () => {
+    const videoElement = videoRef.current
+    const subtitleContainer = subtitleContainerRef.current
+
+    if (!videoElement || !subtitleContainer) return
+
+    // Get the current playback time
+    const currentTime = videoElement.currentTime
+
+    console.log('Current Time:', currentTime)
+
+    const index = subtitles.findIndex(
+      (subtitle) =>
+        currentTime >= subtitle.timeStart && currentTime <= subtitle.timeEnd
+    )
+    console.log(`subtitles[${index}]=`, subtitles[index])
+    const currentSubtitle = index !== -1 ? subtitles[index].text : ''
+
+    subtitleContainer.innerText = currentSubtitle
+  }
+
+  useEffect(() => {
+    const videoElement = videoRef.current
+
+    // Add event listener for time updates
+    if (videoElement) {
+      videoElement.addEventListener('timeupdate', handleTimeUpdate)
+    }
+
+    // Clean up event listener when the component is unmounted
+    return () => {
+      if (videoElement) {
+        videoElement.removeEventListener('timeupdate', handleTimeUpdate)
+      }
+    }
+  }, [subtitles])
 
   return (
     <>
@@ -75,6 +164,7 @@ function NewVideo() {
       <input type="file" accept="video/mp4" onChange={handleVideoFileChange} />
       <input type="file" accept=".vtt" onChange={handleSubtitleFileChange} />
       <video id="my-video" controls width="600" ref={videoRef}></video>
+      <p id="subtitle-text" ref={subtitleContainerRef}></p>
     </>
   )
 }
