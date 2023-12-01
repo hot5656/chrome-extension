@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, ChangeEvent } from 'react'
 import ReactDOM, { createRoot } from 'react-dom/client'
 import { SHOW_ACTIVE, LANGUGAES_INFO, UDAL_MODE } from '../utils/messageType'
 
@@ -8,8 +8,91 @@ let INTERVAL_STEP = 1000
 let activerCount = 1
 let intervalRun = false
 
-function SecondSubtitle() {
-  return <>ABC</>
+function NewVideo() {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  const handleVideoFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const fileInput = event.target
+    const selectedFile = fileInput.files?.[0]
+
+    if (selectedFile) {
+      const videoElement = videoRef.current
+
+      // Create a Blob URL for the selected video file
+      const blobURL = URL.createObjectURL(selectedFile)
+
+      // Set the Blob URL as the source for the video
+      if (videoElement) {
+        videoElement.src = blobURL
+
+        // Load the new source
+        videoElement.load()
+      }
+    }
+  }
+
+  const handleSubtitleFileChange = async (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    const fileInput = event.target
+    const selectedFile = fileInput.files?.[0]
+
+    if (selectedFile) {
+      const videoElement = videoRef.current
+
+      // Clear existing tracks
+      if (videoElement && videoElement.textTracks) {
+        const textTracks = videoElement.textTracks
+        for (let i = textTracks.length - 1; i >= 0; i--) {
+          const track = textTracks[i]
+          track.mode = 'hidden'
+        }
+      }
+
+      const subtitleBlob = new Blob([selectedFile], {
+        type: 'text/vtt',
+      })
+      const subtitleBlobURL = URL.createObjectURL(subtitleBlob)
+
+      const trackElement = document.createElement('track')
+      trackElement.src = subtitleBlobURL
+      trackElement.kind = 'subtitles'
+      trackElement.srclang = 'en'
+      trackElement.label = 'English'
+      trackElement.default = true
+
+      // Append the track element to the video
+      if (videoElement) {
+        videoElement.appendChild(trackElement)
+        videoElement.load()
+      }
+    }
+  }
+
+  return (
+    <>
+      <h1>HTML5 Video Player with MP4 and Subtitles</h1>
+      <input type="file" accept="video/mp4" onChange={handleVideoFileChange} />
+      <input type="file" accept=".vtt" onChange={handleSubtitleFileChange} />
+      <video id="my-video" controls width="600" ref={videoRef}></video>
+    </>
+  )
+}
+
+function addNewVideo() {
+  const newVideoElement = document.querySelector('#new-video')
+  if (!newVideoElement) {
+    const unitElement = document.querySelector('.unit-iframe-wrapper')
+    if (unitElement) {
+      const parentElement = document.querySelector('.unit')
+      const renewVideoElement = document.createElement('div')
+      renewVideoElement.id = 'new-video'
+      parentElement.insertBefore(renewVideoElement, unitElement)
+
+      const root = createRoot(renewVideoElement)
+      root.render(<NewVideo />)
+    }
+  }
 }
 
 window.addEventListener('load', function () {
@@ -23,9 +106,6 @@ function checkInterval() {
   const intervalId = setInterval(() => {
     let iframeElement = document.querySelector('iframe#unit-iframe')
     if (iframeElement) {
-      // iframeElement.removeAttribute('referrerpolicy')
-      // console.log("iframeElement", iframeElement)
-
       let preButton = document.querySelector(
         '.previous-btn.btn.btn-link'
       ) as HTMLButtonElement
@@ -46,13 +126,6 @@ function checkInterval() {
       console.log('title:', iframeElement.getAttribute('title'))
 
       if (iframeElement.getAttribute('title') !== titleLabel) {
-        // console.log('found title...')
-        // let lectureIconElement = document.querySelector(
-        //   'a.active.btn'
-        // ) as HTMLElement
-        // lectureIconElement.style.color = 'red'
-        // console.log('lectureIconElement:', lectureIconElement)
-
         // clear all
         let lectureIconSvgElements = document.querySelectorAll(
           'a.btn.btn-link>svg'
@@ -73,6 +146,8 @@ function checkInterval() {
         console.log('lectureSvgElement:', lectureSvgElement)
         lectureSvgElement.style.height = '32px'
         lectureSvgElement.style.color = 'red'
+
+        addNewVideo()
 
         {
           let videoElement = document.querySelector(
@@ -126,22 +201,6 @@ function checkIntervalSubtitle() {
 
     let lectureElement = document.querySelector('.active.btn')
     console.log('lectureElement', lectureElement)
-
-    // let iframe = document.querySelector(
-    //   'iframe#unit-iframe'
-    // ) as HTMLIFrameElement
-    // console.log('iframeElement', iframe)
-    // if (iframe) {
-    //   let tcElement = iframe.contentDocument.querySelector('div.tc-wrapper')
-    //   // let firstChild = iframe.contentDocument.querySelector(
-    //   //   'div.closed-captions'
-    //   // )
-    //   // let bodyElement =
-    //   // iframe.contentDocument.querySelector('div.video-wrapper')
-    //   console.log('tcElement4', tcElement)
-    //   // console.log('firstChild4', firstChild)
-    //   // console.log('bodyElemen4', bodyElement)
-    // }
 
     let iframe = document.querySelector(
       'iframe#unit-iframe'
