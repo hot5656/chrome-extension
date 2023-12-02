@@ -189,8 +189,14 @@ function NewVideo() {
     }
   }, [subtitles])
 
+  const handleFullScreen = () => {
+    let videoShow = document.getElementById('video-show')
+    videoShow.requestFullscreen()
+  }
+
   return (
     <>
+      <button id="full-screen" onClick={handleFullScreen}></button>
       mp4 load :{' '}
       <input
         className="load-item"
@@ -236,6 +242,7 @@ function addNewVideo() {
 window.addEventListener('load', function () {
   console.log('contentScript load...')
   checkInterval()
+  initFullScreen()
 })
 
 function checkInterval() {
@@ -388,3 +395,128 @@ document.addEventListener('fullscreenchange', () => {
 function adjustSubtitlePosition() {
   // Implement your logic to adjust subtitle positioning
 }
+
+// addNewVideo()
+let isVirtualFullscreen = false
+// let handledChange = true
+function initFullScreen() {
+  const intervalId = setInterval(() => {
+    const videoShow = document.getElementById('video-show')
+    if (videoShow) {
+      const myVideo = document.getElementById('my-video')
+
+      myVideo.addEventListener('click', function () {
+        // Toggle fullscreen mode
+        console.log('click-Toggle fullscreen mode')
+      })
+
+      document.addEventListener('fullscreenchange', function () {
+        // The fullscreenchange event can sometimes fire more than once in certain browsers when requesting fullscreen.
+        // 	1. First when fullscreen is requested
+        // 	2. Second when fullscreen is exited
+
+        console.log('document.fullscreenElement : ', document.fullscreenElement)
+
+        if (document.fullscreenElement === myVideo) {
+          console.log('fullscreenchange')
+
+          if (document.fullscreenElement) {
+            console.log('exitFullscreen..')
+            // document.exitFullscreen()
+          }
+
+          // if (handledChange) {
+          isVirtualFullscreen = !isVirtualFullscreen
+          console.log('isVirtualFullscreen', isVirtualFullscreen)
+          let videoShow = document.getElementById('video-show')
+          videoShow.requestFullscreen()
+
+          // @ts-ignore
+          // videoShow.fullscreenElement()
+          // videoShow.classList.toggle('fullscreen')
+          // }
+          // handledChange = !handledChange
+        }
+      })
+
+      {
+        const videoContainer = document.getElementById('video-show')
+        const videoElement = document.getElementById('my-video')
+
+        videoElement.addEventListener('click', () => {
+          if (videoContainer.requestFullscreen) {
+            videoContainer.requestFullscreen()
+            // @ts-ignore
+          } else if (videoContainer.mozRequestFullScreen) {
+            /* Firefox */
+            // @ts-ignore
+            videoContainer.mozRequestFullScreen()
+            // @ts-ignore
+          } else if (videoContainer.webkitRequestFullscreen) {
+            /* Chrome, Safari and Opera */
+            // @ts-ignore
+            videoContainer.webkitRequestFullscreen()
+            // @ts-ignore
+          } else if (videoContainer.msRequestFullscreen) {
+            /* IE/Edge */
+            // @ts-ignore
+            videoContainer.msRequestFullscreen()
+          }
+        })
+      }
+      // document.addEventListener('fullscreenchange', () => {
+      //   console.log('fullscreenchange2 : ', document.fullscreenElement)
+      //   // if (document.fullscreenElement) {
+      //   //   videoShow.classList.add('fullscreen')
+      //   //   myVideo.classList.add('fullscreen')
+      //   // } else {
+      //   //   videoShow.classList.remove('fullscreen')
+      //   //   myVideo.classList.remove('fullscreen')
+      //   // }
+      // })
+
+      // // Toggle fullscreen mode when clicking on the video
+      // myVideo.addEventListener('click', () => {
+      //   console.log('fullscreenchange2 click ', document.fullscreenElement)
+      //   // if (!document.fullscreenElement) {
+      //   //   videoShow.requestFullscreen().catch((err) => {
+      //   //     console.error('Failed to enter fullscreen mode:', err)
+      //   //   })
+      //   // } else {
+      //   //   document.exitFullscreen()
+      //   // }
+      // })
+
+      console.log(videoShow)
+      console.log(myVideo)
+
+      clearInterval(intervalId)
+    } else {
+      console.log('no video-show....')
+    }
+  }, INTERVAL_STEP)
+}
+
+// set Esc event
+document.addEventListener('keydown', function (e) {
+  console.log("document.addEventListener('keydown'", e)
+  if (e.key === 'Escape') {
+    if (isVirtualFullscreen) {
+      isVirtualFullscreen = false
+      console.log('isVirtualFullscreen[Esc]', isVirtualFullscreen)
+      const videoShow = document.getElementById('video-show')
+      document.exitFullscreen()
+      // videoShow.classList.toggle('fullscreen')
+    }
+    // if (document.exitFullscreen) {
+    //   document.exitFullscreen()
+    // }
+  }
+})
+
+// simulate Esc press
+// let escEvent = new KeyboardEvent("keydown", {
+//   bubbles: true, cancelable: true, keyCode: 27
+//    /* 27 is the keycode for ESC */
+// });
+// document.dispatchEvent(escEvent);

@@ -57,12 +57,13 @@
   padding: 4px;
 } */
 
-#video-show {
+/* #video-show {
   position: relative;
 }
 
 #my-video {
   width: 100%;
+  z-index: 1;
 }
 
 #subtitle-container {
@@ -71,7 +72,7 @@
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
-  z-index: 1; /* Ensure it overlays the video */
+  z-index: 1000;
 }
 
 #subtitle-text {
@@ -80,4 +81,101 @@
   font-size: 16px;
   white-space: nowrap;
   padding: 4px;
+} */
+
+/* css2 */
+/* #video-show {
+  position: relative;
+}
+
+#my-video {
+  width: 100%;
+  z-index: 1;
+}
+
+#subtitle-container {
+  position: absolute;
+  bottom: 45px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 1000;
+}
+
+#subtitle-text {
+  color: #ffffff;
+  background-color: #1c1c1c;
+  font-size: 16px;
+  white-space: nowrap;
+  padding: 4px;
+}
+
+
+#video-show.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  z-index: 1000;
+}
+
+#my-video.fullscreen {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+#subtitle-container.fullscreen {
+  bottom: 0;
+} */
+
+/* css 3 */
+#video-show {
+  position: relative;
+  z-index: 100;
+}
+
+#my-video {
+  width: 100%;
+  z-index: 1;
+}
+
+#subtitle-container {
+  position: absolute;
+  bottom: 45px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 1000;
+}
+
+#subtitle-text {
+  color: #ffffff;
+  background-color: #1c1c1c;
+  font-size: 16px;
+  white-space: nowrap;
+  padding: 4px;
+}
+
+#video-show.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  display: flex;
+  flex-direction: column;
+}
+
+.fullscreen #my-video {
+  flex: 1;
+  object-fit: contain;
+}
+
+.fullscreen #subtitle-container {
+  bottom: 0;
+  position: absolute;
 }
