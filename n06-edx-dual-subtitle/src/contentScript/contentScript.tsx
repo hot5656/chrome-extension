@@ -208,7 +208,10 @@ function NewVideo() {
       />
       <div id="video-show">
         <video id="my-video" controls width="100%" ref={videoRef}></video>
-        <p id="subtitle-text" ref={subtitleContainerRef}></p>
+        <div id="subtitle-container">
+          <p id="subtitle-text" ref={subtitleContainerRef}></p>
+        </div>
+        {/* <p id="subtitle-text" ref={subtitleContainerRef}></p> */}
       </div>
     </>
   )
@@ -374,3 +377,14 @@ function handleLinkClick(event) {
 
 // Attach the click event listener to the entire document
 document.addEventListener('click', handleLinkClick)
+
+const videoElement = document.getElementById('my-video')
+const subtitleContainer = document.getElementById('subtitle-container')
+
+document.addEventListener('fullscreenchange', () => {
+  adjustSubtitlePosition()
+})
+
+function adjustSubtitlePosition() {
+  // Implement your logic to adjust subtitle positioning
+}

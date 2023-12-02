@@ -36,7 +36,7 @@
   margin: 5px 0;
 }
 
-#video-show {
+/* #video-show {
   position: relative;
 }
 
@@ -45,7 +45,6 @@
 }
 
 #subtitle-text {
-  position: absolute;
   color: #ffffff;
   background-color: #1c1c1c;
   font-size: 16px;
@@ -56,5 +55,29 @@
   display: inline-block;
   white-space: nowrap;
   padding: 4px;
-  z-index: 1;
+} */
+
+#video-show {
+  position: relative;
+}
+
+#my-video {
+  width: 100%;
+}
+
+#subtitle-container {
+  position: absolute;
+  bottom: 45px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 1; /* Ensure it overlays the video */
+}
+
+#subtitle-text {
+  color: #ffffff;
+  background-color: #1c1c1c;
+  font-size: 16px;
+  white-space: nowrap;
+  padding: 4px;
 }
