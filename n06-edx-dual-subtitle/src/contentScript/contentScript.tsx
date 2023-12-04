@@ -132,7 +132,7 @@ function NewVideo() {
     // Get the current playback time
     const currentTime = videoElement.currentTime
 
-    console.log('Current Time:', currentTime)
+    // console.log('Current Time:', currentTime)
 
     const index = subtitles.findIndex(
       (subtitle) =>
@@ -167,7 +167,7 @@ function NewVideo() {
 
       subtitleContainer.innerText = currentSubtitle
     } else {
-      console.log('index=', index)
+      // console.log('index=', index)
     }
 
     preIndex.current = index
@@ -190,13 +190,14 @@ function NewVideo() {
   }, [subtitles])
 
   const handleFullScreen = () => {
-    let videoShow = document.getElementById('video-show')
-    videoShow.requestFullscreen()
+    // let videoShow = document.getElementById('video-show')
+    // videoShow.requestFullscreen()
+    // videoShowFullScreen()
+    triggeeClick()
   }
 
   return (
     <>
-      <button id="full-screen" onClick={handleFullScreen}></button>
       mp4 load :{' '}
       <input
         className="load-item"
@@ -205,6 +206,9 @@ function NewVideo() {
         onChange={handleVideoFileChange}
       />
       <br />
+      <button id="full-screen" onClick={handleFullScreen}>
+        Full Screen
+      </button>
       vtt load :{' '}
       <input
         className="load-item"
@@ -290,7 +294,7 @@ function checkInterval() {
         ) as HTMLElement
         console.log('lectureSvgElement:', lectureSvgElement)
         lectureSvgElement.style.height = '32px'
-        lectureSvgElement.style.color = 'red'
+        // lectureSvgElement.style.color = 'red'
 
         addNewVideo()
 
@@ -385,19 +389,20 @@ function handleLinkClick(event) {
 // Attach the click event listener to the entire document
 document.addEventListener('click', handleLinkClick)
 
-const videoElement = document.getElementById('my-video')
-const subtitleContainer = document.getElementById('subtitle-container')
+// const videoElement = document.getElementById('my-video')
+// const subtitleContainer = document.getElementById('subtitle-container')
 
-document.addEventListener('fullscreenchange', () => {
-  adjustSubtitlePosition()
-})
+// document.addEventListener('fullscreenchange', () => {
+//   adjustSubtitlePosition()
+// })
 
-function adjustSubtitlePosition() {
-  // Implement your logic to adjust subtitle positioning
-}
+// function adjustSubtitlePosition() {
+//   // Implement your logic to adjust subtitle positioning
+// }
 
 // addNewVideo()
-let isVirtualFullscreen = false
+// let isVirtualFullscreen = false
+let isVideoFullexit = false
 // let handledChange = true
 function initFullScreen() {
   const intervalId = setInterval(() => {
@@ -407,7 +412,10 @@ function initFullScreen() {
 
       myVideo.addEventListener('click', function () {
         // Toggle fullscreen mode
-        console.log('click-Toggle fullscreen mode')
+        console.log(
+          'click-Toggle fullscreen mode..........................................'
+        )
+        videoShowFullScreen()
       })
 
       document.addEventListener('fullscreenchange', function () {
@@ -424,12 +432,13 @@ function initFullScreen() {
             console.log('exitFullscreen..')
             // document.exitFullscreen()
           }
-
+          isVideoFullexit = true
           // if (handledChange) {
-          isVirtualFullscreen = !isVirtualFullscreen
-          console.log('isVirtualFullscreen', isVirtualFullscreen)
-          let videoShow = document.getElementById('video-show')
-          videoShow.requestFullscreen()
+
+          // isVirtualFullscreen = !isVirtualFullscreen
+          // console.log('isVirtualFullscreen', isVirtualFullscreen)
+          // let videoShow = document.getElementById('video-show')
+          // videoShow.requestFullscreen()
 
           // @ts-ignore
           // videoShow.fullscreenElement()
@@ -437,32 +446,45 @@ function initFullScreen() {
           // }
           // handledChange = !handledChange
         }
+
+        if (!document.fullscreenElement && isVideoFullexit) {
+          isVideoFullexit = false
+          // triggeeClick()
+          // buttonClick()
+          console.log('wait trigger..')
+          const myVideo = document.getElementById('my-video')
+          myVideo.click()
+        }
       })
 
       {
-        const videoContainer = document.getElementById('video-show')
-        const videoElement = document.getElementById('my-video')
-
-        videoElement.addEventListener('click', () => {
-          if (videoContainer.requestFullscreen) {
-            videoContainer.requestFullscreen()
-            // @ts-ignore
-          } else if (videoContainer.mozRequestFullScreen) {
-            /* Firefox */
-            // @ts-ignore
-            videoContainer.mozRequestFullScreen()
-            // @ts-ignore
-          } else if (videoContainer.webkitRequestFullscreen) {
-            /* Chrome, Safari and Opera */
-            // @ts-ignore
-            videoContainer.webkitRequestFullscreen()
-            // @ts-ignore
-          } else if (videoContainer.msRequestFullscreen) {
-            /* IE/Edge */
-            // @ts-ignore
-            videoContainer.msRequestFullscreen()
-          }
-        })
+        // const videoElement = document.getElementById('my-video')
+        // videoElement.addEventListener('click', () => {
+        //   videoShowFullScreen()
+        // })
+        // const videoContainer = document.getElementById('video-show')
+        // const videoElement = document.getElementById('my-video')
+        // videoElement.addEventListener('click', () => {
+        //   videoShowFullScreen()
+        // if (videoContainer.requestFullscreen) {
+        //   videoContainer.requestFullscreen()
+        //   // @ts-ignore
+        // } else if (videoContainer.mozRequestFullScreen) {
+        //   /* Firefox */
+        //   // @ts-ignore
+        //   videoContainer.mozRequestFullScreen()
+        //   // @ts-ignore
+        // } else if (videoContainer.webkitRequestFullscreen) {
+        //   /* Chrome, Safari and Opera */
+        //   // @ts-ignore
+        //   videoContainer.webkitRequestFullscreen()
+        //   // @ts-ignore
+        // } else if (videoContainer.msRequestFullscreen) {
+        //   /* IE/Edge */
+        //   // @ts-ignore
+        //   videoContainer.msRequestFullscreen()
+        // }
+        // })
       }
       // document.addEventListener('fullscreenchange', () => {
       //   console.log('fullscreenchange2 : ', document.fullscreenElement)
@@ -497,22 +519,22 @@ function initFullScreen() {
   }, INTERVAL_STEP)
 }
 
-// set Esc event
-document.addEventListener('keydown', function (e) {
-  console.log("document.addEventListener('keydown'", e)
-  if (e.key === 'Escape') {
-    if (isVirtualFullscreen) {
-      isVirtualFullscreen = false
-      console.log('isVirtualFullscreen[Esc]', isVirtualFullscreen)
-      const videoShow = document.getElementById('video-show')
-      document.exitFullscreen()
-      // videoShow.classList.toggle('fullscreen')
-    }
-    // if (document.exitFullscreen) {
-    //   document.exitFullscreen()
-    // }
-  }
-})
+// // set Esc event
+// document.addEventListener('keydown', function (e) {
+//   console.log("document.addEventListener('keydown'", e)
+//   if (e.key === 'Escape') {
+//     if (isVirtualFullscreen) {
+//       isVirtualFullscreen = false
+//       console.log('isVirtualFullscreen[Esc]', isVirtualFullscreen)
+//       const videoShow = document.getElementById('video-show')
+//       document.exitFullscreen()
+//       // videoShow.classList.toggle('fullscreen')
+//     }
+//     // if (document.exitFullscreen) {
+//     //   document.exitFullscreen()
+//     // }
+//   }
+// })
 
 // simulate Esc press
 // let escEvent = new KeyboardEvent("keydown", {
@@ -520,3 +542,58 @@ document.addEventListener('keydown', function (e) {
 //    /* 27 is the keycode for ESC */
 // });
 // document.dispatchEvent(escEvent);
+
+function videoShowFullScreen() {
+  const videoContainer = document.getElementById('video-show')
+
+  if (videoContainer.requestFullscreen) {
+    videoContainer.requestFullscreen()
+    // @ts-ignore
+  } else if (videoContainer.mozRequestFullScreen) {
+    /* Firefox */
+    // @ts-ignore
+    videoContainer.mozRequestFullScreen()
+    // @ts-ignore
+  } else if (videoContainer.webkitRequestFullscreen) {
+    /* Chrome, Safari and Opera */
+    // @ts-ignore
+    videoContainer.webkitRequestFullscreen()
+    // @ts-ignore
+  } else if (videoContainer.msRequestFullscreen) {
+    /* IE/Edge */
+    // @ts-ignore
+    videoContainer.msRequestFullscreen()
+  }
+}
+
+function triggeeClick() {
+  const myVideo = document.getElementById('my-video')
+
+  // Create a new mouse click event
+  var clickEvent = new MouseEvent('click', {
+    bubbles: true,
+    cancelable: true,
+    view: window,
+  })
+
+  myVideo.dispatchEvent(clickEvent)
+}
+
+// function videoClick() {
+//   const videoElement = document.getElementById('my-video')
+
+//   // Create a new mouse click event
+//   var clickEvent = new MouseEvent('click', {
+//     bubbles: true,
+//     cancelable: true,
+//     view: window,
+//   })
+
+//   // Dispatch the click event on the video element
+//   videoElement.dispatchEvent(clickEvent)
+// }
+
+function buttonClick() {
+  var myButton = document.getElementById('full-screen')
+  myButton.click()
+}
