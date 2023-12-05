@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
-	"name": "edX Dual Subtitle",
-	"description": "edX Dual Subtitle",
+	"name": "edX Dual Subtitle - Harvard and MIT courses",
+	"description": "edX was founded by Harvard and MIT, it provides some free courses for no verified certificate.",
 	"version": "1.0.0",
 	"icons": {
 		"16": "icon.png",

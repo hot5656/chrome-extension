@@ -2,32 +2,33 @@ import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import {
   Box,
-  Typography,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   SelectChangeEvent,
+  Typography,
 } from '@mui/material'
-import { LANGUGAES_INFO, UDAL_MODE } from '../utils/messageType'
+import {
+  MESSAGE_SUBTITLE_MODE,
+  MESSAGE_2ND_LANGUAGE,
+} from '../utils/messageType'
 import './popup.css'
 
-const DUAL_OFF = 'Off'
-const DUAL_ON = 'On'
+const SUBTITLE_MODE = ['Off', 'Single', 'Dual']
+const SECOND_LANGUES = [
+  { language: 'Chinese Traditional', value: 'zh-Hant' },
+  { language: 'Chinese Simplified', value: 'zh-Hans' },
+  { language: 'Japanese', value: 'ja' },
+  { language: 'Korean', value: 'ko' },
+]
 
 const App: React.FC<{}> = () => {
-  const [languageType2, setlanguageType2] = useState<string>('')
+  const [subtitleMode, setSubtitleMode] = useState<string>(SUBTITLE_MODE[2])
+  const [secondLanguage, setSecondLanguage] = useState<string>(
+    SECOND_LANGUES[0].value
+  )
   const [responseMessage, setResponseMessage] = useState<string>('')
-  const [dualMode, setDualMode] = useState<string>(DUAL_OFF)
-  const [isDownloadButtonDisabled, setIsDownloadButtonDisabled] =
-    useState<boolean>(false)
-  const [isActiveButtonDisabled, setIsActiveButtonDisabled] =
-    useState<boolean>(false)
-  const [languageOptions, setLanguageOptions] = useState([])
-
-  useEffect(() => {
-    sendMessageToContentScript(LANGUGAES_INFO, { message: LANGUGAES_INFO })
-  }, [])
 
   function sendMessageToContentScript(messageType, messages) {
     // console.log('sendMessageToContentScript:', messages)
@@ -40,39 +41,43 @@ const App: React.FC<{}> = () => {
         // console.log(tabs)
         if (tabs.length > 0) {
           // console.log(tabs[0].url)
-          if (tabs[0].url.match('https://learning.edx.org/course/*')) {
+          if (
+            tabs[0].url.includes('lecture') &&
+            tabs[0].url.match('https://www.coursera.org/learn/*')
+          ) {
             chrome.tabs.sendMessage(tabs[0].id, messages, (response) => {
               if (chrome.runtime.lastError) {
                 console.error(chrome.runtime.lastError)
               }
 
               // console.log('response:', response)
-              if (response) {
-                setResponseMessage(response.message)
-                if (messageType === LANGUGAES_INFO) {
-                  setLanguageOptions(response.languages)
-                  if (response.languages.length > 0) {
-                    chrome.storage.sync.get(
-                      ['language2ndEdx', 'dualTitleEdx'],
-                      (res) => {
-                        // console.log('sync.get(popupo):', res)
 
-                        if (res.language2ndEdx) {
-                          setlanguageType2(res.language2ndEdx)
-                        }
-                        // console.log(
-                        //   'setlanguageType2:',
-                        //   res.language2ndEdx
-                        // )
+              // if (response) {
+              //   setResponseMessage(response.message)
+              //   if (messageType === LANGUGAES_INFO) {
+              //     setLanguageOptions(response.languages)
+              //     if (response.languages.length > 0) {
+              //       chrome.storage.sync.get(
+              //         ['language2ndCoursera', 'dualTitleCoursera'],
+              //         (res) => {
+              //           // console.log('sync.get(popupo):', res)
 
-                        setDualMode(res.dualTitleEdx ? DUAL_ON : DUAL_OFF)
-                      }
-                    )
-                  }
-                }
-              } else {
-                setResponseMessage('no response message....')
-              }
+              //           if (res.language2ndCoursera) {
+              //             setlanguageType2(res.language2ndCoursera)
+              //           }
+              //           // console.log(
+              //           //   'setlanguageType2:',
+              //           //   res.language2ndCoursera
+              //           // )
+
+              //           setDualMode(res.dualTitleCoursera ? DUAL_ON : DUAL_OFF)
+              //         }
+              //       )
+              //     }
+              //   }
+              // } else {
+              //   setResponseMessage('no response message....')
+              // }
             })
 
             // console.log('send message...')
@@ -84,73 +89,74 @@ const App: React.FC<{}> = () => {
     )
   }
 
-  const handDualModeClick = (event: SelectChangeEvent) => {
-    if (event.target.value === DUAL_OFF) {
-      chrome.storage.sync.set({
-        dualTitleEdx: false,
-      })
-      // console.log('sync.set dualTitleEdx :', false)
-    } else {
-      chrome.storage.sync.set({
-        dualTitleEdx: true,
-      })
-      // console.log('sync.set dualTitleEdx :', true)
-    }
-    setDualMode(event.target.value)
-    // console.log(`set ${event.target.value}`)
+  // when open popup show
+  chrome.storage.sync.get(['subtitleModeEdx', 'language2ndEdx'], (res) => {
+    // const languageTypeUdemy = res.languageTypeUdemy ?? 'zh-Hant'
+    setSubtitleMode(
+      res.subtitleModeEdx ? res.subtitleModeEdx : SUBTITLE_MODE[2]
+    )
+    setSecondLanguage(
+      res.language2ndEdx ? res.language2ndEdx : SECOND_LANGUES[0].value
+    )
+  })
 
-    sendMessageToContentScript(UDAL_MODE, {
-      message: UDAL_MODE,
-      duleMode: event.target.value === DUAL_ON,
-      secondLanguage: languageType2,
+  const handleSubtitleModeClick = (event: SelectChangeEvent) => {
+    chrome.storage.sync.set({
+      subtitleModeEdx: event.target.value,
+    })
+
+    sendMessageToContentScript(MESSAGE_SUBTITLE_MODE, {
+      message: MESSAGE_SUBTITLE_MODE,
+      secondLanguage: event.target.value,
     })
   }
 
-  const handle2ndLanguageClick = (event: SelectChangeEvent) => {
-    setlanguageType2(event.target.value)
+  const handleSecondLanguageClick = (event: SelectChangeEvent) => {
     chrome.storage.sync.set({
       language2ndEdx: event.target.value,
     })
-    // console.log('sync.set language2ndEdxa :', event.target.value)
-    sendMessageToContentScript(UDAL_MODE, {
-      message: UDAL_MODE,
-      duleMode: dualMode === DUAL_ON,
-      secondLanguage: event.target.value,
+
+    sendMessageToContentScript(MESSAGE_2ND_LANGUAGE, {
+      message: MESSAGE_2ND_LANGUAGE,
+      secolanguage2ndEdxndLanguage: event.target.value,
     })
   }
 
   return (
     <Box>
-      {/* <Typography variant="h5">{dualMode}</Typography>
-      <Typography variant="h5">{languageType2}</Typography> */}
+      <Typography variant="h5">{subtitleMode}</Typography>
+      <Typography variant="h5">{secondLanguage}</Typography>
       <Box my={'16px'}>
         <FormControl fullWidth>
-          <InputLabel id="translate-mode-select-label">Dual Mode</InputLabel>
+          <InputLabel id="subtitle-mode-select-label">Subtitle Mode</InputLabel>
           <Select
-            labelId="translate-mode-select-label"
-            id="translate-mode-select"
-            value={dualMode}
-            label="Dual Mode"
-            onChange={handDualModeClick}
+            labelId="subtitle-mode-select-label"
+            id="subtitle-select"
+            value={subtitleMode}
+            label="Second Language"
+            onChange={handleSubtitleModeClick}
           >
-            <MenuItem value={DUAL_ON}>{DUAL_ON}</MenuItem>
-            <MenuItem value={DUAL_OFF}>{DUAL_OFF}</MenuItem>
+            {SUBTITLE_MODE.map((option, index) => (
+              <MenuItem key={index} value={option}>
+                {option}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Box>
       <Box my={'16px'}>
         <FormControl fullWidth>
-          <InputLabel id="language-select-label2">Second Language</InputLabel>
+          <InputLabel id="language-select-label">Language</InputLabel>
           <Select
-            labelId="language-select-label2"
+            labelId="language-select-label"
             id="language-select"
-            value={languageType2}
+            value={secondLanguage}
             label="Second Language"
-            onChange={handle2ndLanguageClick}
+            onChange={handleSecondLanguageClick}
           >
-            {languageOptions.map((option, index) => (
-              <MenuItem key={index} value={option.label}>
-                {option.label}
+            {SECOND_LANGUES.map((option, index) => (
+              <MenuItem key={index} value={option.value}>
+                {option.language}
               </MenuItem>
             ))}
           </Select>

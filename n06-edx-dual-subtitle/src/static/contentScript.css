@@ -38,6 +38,7 @@
 
 #video-show {
   position: relative;
+  display: none;
 }
 
 #my-video {
@@ -68,4 +69,5 @@
   border-radius: 40px;
   margin-right: 10px;
   color: #ffffff;
+  display: none;
 }

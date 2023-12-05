@@ -25,6 +25,14 @@ function NewVideo() {
     if (selectedFile) {
       const videoElement = videoRef.current
 
+      // show video and button
+      const showElement = document.getElementById('video-show') as HTMLElement
+      const buttonElement = document.getElementById(
+        'full-screen-btn'
+      ) as HTMLElement
+      showElement.style.display = 'block'
+      buttonElement.style.display = 'inline-block'
+
       // Create a Blob URL for the selected video file
       const blobURL = URL.createObjectURL(selectedFile)
 
@@ -70,9 +78,16 @@ function NewVideo() {
     const [hours, minutes, seconds] = timeString.split(':')
 
     // Convert minutes and seconds to numbers
-    const hoursAsSeconds = parseInt(hours) * 360
+    const hoursAsSeconds = parseInt(hours) * 3600
     const minutesAsSeconds = parseInt(minutes) * 60
-    const secondsWithTenths = parseFloat(seconds)
+    const secondsWithTenths = parseFloat(seconds.replace(/,/g, '.'))
+
+    // console.log(
+    //   `${hours}:${minutes}:${seconds} ${hoursAsSeconds},${minutesAsSeconds},${secondsWithTenths}=`,
+    //   parseFloat(
+    //     (hoursAsSeconds + minutesAsSeconds + secondsWithTenths).toFixed(3)
+    //   )
+    // )
 
     // Combine minutes and seconds
     return parseFloat(
@@ -91,24 +106,31 @@ function NewVideo() {
     let timeEnd = 0
     let text = ''
     let textCount = 1
-    for (let i = 1; i < subtitleLines.length; i++) {
+    let isData = false
+    for (let i = 0; i < subtitleLines.length; i++) {
       if (subtitleLines[i].includes('-->')) {
         if (isTime) {
           parsedSubtitles.push({ timeStart: timeStart, timeEnd: timeEnd, text })
         }
 
-        timeStart = timeToSecond(subtitleLines[i].split(' ')[0])
-        timeEnd = timeToSecond(subtitleLines[i].split(' ')[2])
+        let tiemInfo = subtitleLines[i].split(' ')
+        timeStart = timeToSecond(tiemInfo[0])
+        timeEnd = timeToSecond(tiemInfo[2])
         isTime = true
+        isData = true
         textCount = 1
         text = ''
+      } else if (subtitleLines[i].length == 0) {
+        isData = false
       } else if (subtitleLines[i].length > 0) {
-        if (textCount === 1) {
-          text = subtitleLines[i]
-        } else {
-          text = text + ' ' + subtitleLines[i]
+        if (isData) {
+          if (textCount === 1) {
+            text = subtitleLines[i]
+          } else {
+            text = text + ' ' + subtitleLines[i]
+          }
+          textCount++
         }
-        textCount++
       }
     }
 
@@ -203,11 +225,11 @@ function NewVideo() {
       <button id="full-screen-btn" onClick={handleFullScreen}>
         Full Screen
       </button>
-      vtt load :{' '}
+      srt load :{' '}
       <input
         className="load-item"
         type="file"
-        accept=".vtt"
+        accept=".srt"
         onChange={handleSubtitleFileChange}
       />
       <div id="video-show">
@@ -289,20 +311,20 @@ function checkInterval() {
 
         addNewVideo()
 
-        {
-          let videoElement = document.querySelector(
-            '.wrapper-downloads .video-sources'
-          ) as HTMLAnchorElement
-          let srtElement = document.querySelector(
-            '.wrapper-download-transcripts .btn-link'
-          )
-          if (videoElement) {
-            console.log('videoElement', videoElement.href)
-          }
-          if (srtElement) {
-            console.log('srtElement', videoElement.href)
-          }
-        }
+        // {
+        //   let videoElement = document.querySelector(
+        //     '.wrapper-downloads .video-sources'
+        //   ) as HTMLAnchorElement
+        //   let srtElement = document.querySelector(
+        //     '.wrapper-download-transcripts .btn-link'
+        //   )
+        //   if (videoElement) {
+        //     console.log('videoElement', videoElement.href)
+        //   }
+        //   if (srtElement) {
+        //     console.log('srtElement', videoElement.href)
+        //   }
+        // }
       } else {
         let lectureIconSvgElements = document.querySelectorAll(
           'a.btn.btn-link>svg'
