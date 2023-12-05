@@ -1,13 +1,23 @@
 import React, { useRef, useEffect, useState, ChangeEvent } from 'react'
 import ReactDOM, { createRoot } from 'react-dom/client'
-import { SHOW_ACTIVE, LANGUGAES_INFO, UDAL_MODE } from '../utils/messageType'
+import {
+  MESSAGE_SUBTITLE_MODE,
+  MESSAGE_2ND_LANGUAGE,
+  SUBTITLE_MODE,
+  SUBTITLE_MODE_OFF,
+  SUBTITLE_MODE_SINGLE,
+  SUBTITLE_MODE_DUAL,
+  SECOND_LANGUES_TRADITIONAL,
+  SECOND_LANGUES,
+} from '../utils/messageType'
 
 let ACTIVE_COUNT_MAX = 10
 let INTERVAL_STEP = 1000
 
 let activerCount = 1
 let intervalRun = false
-let language_code = 'zh-Hant'
+let secondLanguage = SECOND_LANGUES[SECOND_LANGUES_TRADITIONAL].value
+let subtitleMode = SUBTITLE_MODE[SUBTITLE_MODE_DUAL]
 
 function NewVideo() {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -149,6 +159,29 @@ function NewVideo() {
 
     if (!videoElement || !subtitleContainer) return
 
+    const videoTitle = document.getElementById('subtitle-text') as HTMLElement
+    const videoTitletyle = window.getComputedStyle(videoTitle)
+    if (subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_OFF]) {
+      // @ts-ignore
+      if (!videoTitletyle.style) {
+        videoTitle.style.display = 'none'
+      }
+      // // @ts-ignore
+      // if (videoShowStyle.display !== 'none') {
+      //   videoTitle.style.display = 'none'
+      // }
+      return
+    } else {
+      // @ts-ignore
+      if (videoTitletyle.style) {
+        videoTitle.style.removeProperty('display')
+      }
+      // // @ts-ignore
+      // if (videoShowStyle.display === 'none') {
+      //   videoTitle.style.removeProperty('display')
+      // }
+    }
+
     // Get the current playback time
     const currentTime = videoElement.currentTime
     // console.log('Current Time:', currentTime)
@@ -161,26 +194,33 @@ function NewVideo() {
       console.log(`subtitles[${index}]=`, subtitles[index])
       let currentSubtitle = index !== -1 ? subtitles[index].text : ''
 
-      if (currentSubtitle.length != 0) {
-        let tempSubtitle = currentSubtitle
-        if (tempSubtitle.includes('%')) {
-          tempSubtitle = tempSubtitle.replace(/%/g, 'percent')
-        }
+      if (subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_DUAL]) {
+        if (currentSubtitle.length != 0) {
+          let tempSubtitle = currentSubtitle
+          if (tempSubtitle.includes('%')) {
+            tempSubtitle = tempSubtitle.replace(/%/g, 'percent')
+          }
 
-        let xhr = new XMLHttpRequest()
-        xhr.open(
-          'GET',
-          `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${language_code}&dt=t&q=${tempSubtitle}`,
-          false
-        )
-        xhr.send()
+          let xhr = new XMLHttpRequest()
+          xhr.open(
+            'GET',
+            `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${secondLanguage}&dt=t&q=${tempSubtitle}`,
+            false
+          )
+          xhr.send()
 
-        if (xhr.status === 200) {
-          let data = JSON.parse(xhr.responseText)
-          let newWords = data[0][0][0]
-          currentSubtitle = newWords + '\n' + currentSubtitle
-        } else {
-          throw new Error('Network response was not ok')
+          console.log(
+            'ask : ',
+            `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${secondLanguage}&dt=t&q=${tempSubtitle}`
+          )
+          if (xhr.status === 200) {
+            let data = JSON.parse(xhr.responseText)
+            let newWords = data[0][0][0]
+            console.log('newWords', newWords)
+            currentSubtitle = newWords + '\n' + currentSubtitle
+          } else {
+            throw new Error('Network response was not ok')
+          }
         }
       }
 
@@ -258,6 +298,16 @@ function addNewVideo() {
 
 window.addEventListener('load', function () {
   console.log('contentScript load...')
+  chrome.storage.sync.get(['subtitleModeEdx', 'language2ndEdx'], (res) => {
+    if (res.subtitleModeEdx) {
+      subtitleMode = res.subtitleModeEdx
+    }
+
+    if (res.language2ndEdx) {
+      secondLanguage = res.language2ndEdx
+    }
+  })
+
   checkInterval()
   initFullScreen()
 })
@@ -468,3 +518,14 @@ function videoShowFullScreen() {
     videoShow.msRequestFullscreen()
   }
 }
+
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (message.message === MESSAGE_SUBTITLE_MODE) {
+    sendResponse({ message: MESSAGE_SUBTITLE_MODE })
+    subtitleMode = message.subtitleMode
+  } else if (message.message === MESSAGE_2ND_LANGUAGE) {
+    sendResponse({ message: MESSAGE_2ND_LANGUAGE })
+    secondLanguage = message.secondLanguage
+  }
+  console.log('message', message)
+})

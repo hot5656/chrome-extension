@@ -12,21 +12,27 @@ import {
 import {
   MESSAGE_SUBTITLE_MODE,
   MESSAGE_2ND_LANGUAGE,
+  SUBTITLE_MODE,
+  SUBTITLE_MODE_DUAL,
+  SECOND_LANGUES_TRADITIONAL,
+  SECOND_LANGUES,
 } from '../utils/messageType'
 import './popup.css'
 
-const SUBTITLE_MODE = ['Off', 'Single', 'Dual']
-const SECOND_LANGUES = [
-  { language: 'Chinese Traditional', value: 'zh-Hant' },
-  { language: 'Chinese Simplified', value: 'zh-Hans' },
-  { language: 'Japanese', value: 'ja' },
-  { language: 'Korean', value: 'ko' },
-]
+// const SUBTITLE_MODE = ['Off', 'Single', 'Dual']
+// const SECOND_LANGUES = [
+//   { language: 'Chinese Traditional', value: 'zh-Hant' },
+//   { language: 'Chinese Simplified', value: 'zh-Hans' },
+//   { language: 'Japanese', value: 'ja' },
+//   { language: 'Korean', value: 'ko' },
+// ]
 
 const App: React.FC<{}> = () => {
-  const [subtitleMode, setSubtitleMode] = useState<string>(SUBTITLE_MODE[2])
+  const [subtitleMode, setSubtitleMode] = useState<string>(
+    SUBTITLE_MODE[SUBTITLE_MODE_DUAL]
+  )
   const [secondLanguage, setSecondLanguage] = useState<string>(
-    SECOND_LANGUES[0].value
+    SECOND_LANGUES[SECOND_LANGUES_TRADITIONAL].value
   )
   const [responseMessage, setResponseMessage] = useState<string>('')
 
@@ -38,49 +44,21 @@ const App: React.FC<{}> = () => {
         currentWindow: true,
       },
       (tabs) => {
-        // console.log(tabs)
         if (tabs.length > 0) {
-          // console.log(tabs[0].url)
-          if (
-            tabs[0].url.includes('lecture') &&
-            tabs[0].url.match('https://www.coursera.org/learn/*')
-          ) {
+          if (tabs[0].url.match('https://learning.edx.org/course/*')) {
             chrome.tabs.sendMessage(tabs[0].id, messages, (response) => {
               if (chrome.runtime.lastError) {
                 console.error(chrome.runtime.lastError)
               }
 
-              // console.log('response:', response)
+              console.log('response:', response)
 
-              // if (response) {
-              //   setResponseMessage(response.message)
-              //   if (messageType === LANGUGAES_INFO) {
-              //     setLanguageOptions(response.languages)
-              //     if (response.languages.length > 0) {
-              //       chrome.storage.sync.get(
-              //         ['language2ndCoursera', 'dualTitleCoursera'],
-              //         (res) => {
-              //           // console.log('sync.get(popupo):', res)
-
-              //           if (res.language2ndCoursera) {
-              //             setlanguageType2(res.language2ndCoursera)
-              //           }
-              //           // console.log(
-              //           //   'setlanguageType2:',
-              //           //   res.language2ndCoursera
-              //           // )
-
-              //           setDualMode(res.dualTitleCoursera ? DUAL_ON : DUAL_OFF)
-              //         }
-              //       )
-              //     }
-              //   }
-              // } else {
-              //   setResponseMessage('no response message....')
-              // }
+              if (response) {
+                setResponseMessage(response.message)
+              } else {
+                setResponseMessage('no response message....')
+              }
             })
-
-            // console.log('send message...')
           } else {
             setResponseMessage('Not the Correct Website ...')
           }
@@ -93,7 +71,9 @@ const App: React.FC<{}> = () => {
   chrome.storage.sync.get(['subtitleModeEdx', 'language2ndEdx'], (res) => {
     // const languageTypeUdemy = res.languageTypeUdemy ?? 'zh-Hant'
     setSubtitleMode(
-      res.subtitleModeEdx ? res.subtitleModeEdx : SUBTITLE_MODE[2]
+      res.subtitleModeEdx
+        ? res.subtitleModeEdx
+        : SUBTITLE_MODE[SUBTITLE_MODE_DUAL]
     )
     setSecondLanguage(
       res.language2ndEdx ? res.language2ndEdx : SECOND_LANGUES[0].value
@@ -101,24 +81,26 @@ const App: React.FC<{}> = () => {
   })
 
   const handleSubtitleModeClick = (event: SelectChangeEvent) => {
+    setSubtitleMode(event.target.value)
     chrome.storage.sync.set({
       subtitleModeEdx: event.target.value,
     })
 
     sendMessageToContentScript(MESSAGE_SUBTITLE_MODE, {
       message: MESSAGE_SUBTITLE_MODE,
-      secondLanguage: event.target.value,
+      subtitleMode: event.target.value,
     })
   }
 
   const handleSecondLanguageClick = (event: SelectChangeEvent) => {
+    setSecondLanguage(event.target.value)
     chrome.storage.sync.set({
       language2ndEdx: event.target.value,
     })
 
     sendMessageToContentScript(MESSAGE_2ND_LANGUAGE, {
       message: MESSAGE_2ND_LANGUAGE,
-      secolanguage2ndEdxndLanguage: event.target.value,
+      secondLanguage: event.target.value,
     })
   }
 
