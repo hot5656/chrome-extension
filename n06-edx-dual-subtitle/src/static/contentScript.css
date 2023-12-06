@@ -71,3 +71,29 @@
   color: #ffffff;
   display: none;
 }
+
+#custom-controls {
+  position: absolute;
+  bottom: 10px;
+  font-size: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+
+  display: flex;
+  justify-content: space-between;
+}
+
+#backward-button,
+#forward-button {
+  color: #ffffff;
+  background-color: #1c1c1c;
+  margin: 0 10px;
+  border: none;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.fullscreen #custom-controls {
+  bottom: 2px;
+}

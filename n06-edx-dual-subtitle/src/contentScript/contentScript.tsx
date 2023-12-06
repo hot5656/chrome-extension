@@ -92,13 +92,6 @@ function NewVideo() {
     const minutesAsSeconds = parseInt(minutes) * 60
     const secondsWithTenths = parseFloat(seconds.replace(/,/g, '.'))
 
-    // console.log(
-    //   `${hours}:${minutes}:${seconds} ${hoursAsSeconds},${minutesAsSeconds},${secondsWithTenths}=`,
-    //   parseFloat(
-    //     (hoursAsSeconds + minutesAsSeconds + secondsWithTenths).toFixed(3)
-    //   )
-    // )
-
     // Combine minutes and seconds
     return parseFloat(
       (hoursAsSeconds + minutesAsSeconds + secondsWithTenths).toFixed(3)
@@ -159,27 +152,8 @@ function NewVideo() {
 
     if (!videoElement || !subtitleContainer) return
 
-    const videoTitle = document.getElementById('subtitle-text') as HTMLElement
-    const videoTitletyle = window.getComputedStyle(videoTitle)
-    if (subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_OFF]) {
-      // @ts-ignore
-      if (!videoTitletyle.style) {
-        videoTitle.style.display = 'none'
-      }
-      // // @ts-ignore
-      // if (videoShowStyle.display !== 'none') {
-      //   videoTitle.style.display = 'none'
-      // }
+    if (subtitleOffControl(subtitleMode)) {
       return
-    } else {
-      // @ts-ignore
-      if (videoTitletyle.style) {
-        videoTitle.style.removeProperty('display')
-      }
-      // // @ts-ignore
-      // if (videoShowStyle.display === 'none') {
-      //   videoTitle.style.removeProperty('display')
-      // }
     }
 
     // Get the current playback time
@@ -252,6 +226,16 @@ function NewVideo() {
     videoShowFullScreen()
   }
 
+  const handleSeekBackward = () => {
+    const videoElement = document.getElementById('my-video') as HTMLVideoElement
+    videoElement.currentTime -= 5
+  }
+
+  const handleSeekForward = () => {
+    const videoElement = document.getElementById('my-video') as HTMLVideoElement
+    videoElement.currentTime += 5
+  }
+
   return (
     <>
       mp4 load :{' '}
@@ -275,6 +259,14 @@ function NewVideo() {
       <div id="video-show">
         <video id="my-video" controls width="100%" ref={videoRef}></video>
         <p id="subtitle-text" ref={subtitleContainerRef}></p>
+        <div id="custom-controls">
+          <button id="backward-button" onClick={handleSeekBackward}>
+            &#9666; 5s
+          </button>
+          <button id="forward-button" onClick={handleSeekForward}>
+            5s &#9656;
+          </button>
+        </div>
       </div>
     </>
   )
@@ -360,21 +352,6 @@ function checkInterval() {
         // lectureSvgElement.style.color = 'red'
 
         addNewVideo()
-
-        // {
-        //   let videoElement = document.querySelector(
-        //     '.wrapper-downloads .video-sources'
-        //   ) as HTMLAnchorElement
-        //   let srtElement = document.querySelector(
-        //     '.wrapper-download-transcripts .btn-link'
-        //   )
-        //   if (videoElement) {
-        //     console.log('videoElement', videoElement.href)
-        //   }
-        //   if (srtElement) {
-        //     console.log('srtElement', videoElement.href)
-        //   }
-        // }
       } else {
         let lectureIconSvgElements = document.querySelectorAll(
           'a.btn.btn-link>svg'
@@ -523,9 +500,30 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (message.message === MESSAGE_SUBTITLE_MODE) {
     sendResponse({ message: MESSAGE_SUBTITLE_MODE })
     subtitleMode = message.subtitleMode
+    subtitleOffControl(subtitleMode)
   } else if (message.message === MESSAGE_2ND_LANGUAGE) {
     sendResponse({ message: MESSAGE_2ND_LANGUAGE })
     secondLanguage = message.secondLanguage
   }
   console.log('message', message)
 })
+
+function subtitleOffControl(subtitleMode) {
+  let isOff = false
+  const videoTitle = document.getElementById('subtitle-text') as HTMLElement
+  const videoTitletyle = window.getComputedStyle(videoTitle)
+  if (subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_OFF]) {
+    // @ts-ignore
+    if (!videoTitletyle.style) {
+      videoTitle.style.display = 'none'
+    }
+    isOff = true
+    // return
+  } else {
+    // @ts-ignore
+    if (videoTitle.style) {
+      videoTitle.style.removeProperty('display')
+    }
+  }
+  return isOff
+}

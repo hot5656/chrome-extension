@@ -19,14 +19,6 @@ import {
 } from '../utils/messageType'
 import './popup.css'
 
-// const SUBTITLE_MODE = ['Off', 'Single', 'Dual']
-// const SECOND_LANGUES = [
-//   { language: 'Chinese Traditional', value: 'zh-Hant' },
-//   { language: 'Chinese Simplified', value: 'zh-Hans' },
-//   { language: 'Japanese', value: 'ja' },
-//   { language: 'Korean', value: 'ko' },
-// ]
-
 const App: React.FC<{}> = () => {
   const [subtitleMode, setSubtitleMode] = useState<string>(
     SUBTITLE_MODE[SUBTITLE_MODE_DUAL]
@@ -51,17 +43,18 @@ const App: React.FC<{}> = () => {
                 console.error(chrome.runtime.lastError)
               }
 
-              console.log('response:', response)
+              // console.log('response:', response)
 
-              if (response) {
-                setResponseMessage(response.message)
-              } else {
-                setResponseMessage('no response message....')
-              }
+              // if (response) {
+              //   setResponseMessage(response.message)
+              // } else {
+              //   setResponseMessage('no response message....')
+              // }
             })
-          } else {
-            setResponseMessage('Not the Correct Website ...')
           }
+          // else {
+          //   setResponseMessage('Not the Correct Website ...')
+          // }
         }
       }
     )
