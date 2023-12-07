@@ -486,18 +486,20 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 function subtitleOffControl(subtitleMode) {
   let isOff = false
   const videoTitle = document.getElementById('subtitle-text') as HTMLElement
-  const videoTitletyle = window.getComputedStyle(videoTitle)
-  if (subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_OFF]) {
-    // @ts-ignore
-    if (!videoTitletyle.style) {
-      videoTitle.style.display = 'none'
-    }
-    isOff = true
-    // return
-  } else {
-    // @ts-ignore
-    if (videoTitle.style) {
-      videoTitle.style.removeProperty('display')
+  if (videoTitle) {
+    const videoTitletyle = window.getComputedStyle(videoTitle)
+    if (subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_OFF]) {
+      // @ts-ignore
+      if (!videoTitletyle.style) {
+        videoTitle.style.display = 'none'
+      }
+      isOff = true
+      // return
+    } else {
+      // @ts-ignore
+      if (videoTitle.style) {
+        videoTitle.style.removeProperty('display')
+      }
     }
   }
   return isOff
