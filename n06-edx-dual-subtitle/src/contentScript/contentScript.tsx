@@ -72,7 +72,7 @@ function NewVideo() {
 
       // Parse the subtitle content
       const parsedSubtitles = parseSubtitleContent(subtitleContent)
-      console.log('Parsed Subtitles:', parsedSubtitles)
+      // console.log('Parsed Subtitles:', parsedSubtitles)
 
       // Set subtitles state
       setSubtitles(parsedSubtitles)
@@ -100,7 +100,7 @@ function NewVideo() {
 
   const parseSubtitleContent = (subtitleContent: string) => {
     const subtitleLines = subtitleContent.split('\n')
-    console.log('subtitleLines:', subtitleLines)
+    // console.log('subtitleLines:', subtitleLines)
 
     // Assuming each subtitle consists of two lines: timing and text
     const parsedSubtitles = []
@@ -141,7 +141,7 @@ function NewVideo() {
       parsedSubtitles.push({ timeStart: timeStart, timeEnd: timeEnd, text })
     }
 
-    console.log('parsedSubtitles : ', parsedSubtitles)
+    // console.log('parsedSubtitles : ', parsedSubtitles)
 
     return parsedSubtitles
   }
@@ -165,7 +165,7 @@ function NewVideo() {
         currentTime >= subtitle.timeStart && currentTime <= subtitle.timeEnd
     )
     if (index !== preIndex.current) {
-      console.log(`subtitles[${index}]=`, subtitles[index])
+      // console.log(`subtitles[${index}]=`, subtitles[index])
       let currentSubtitle = index !== -1 ? subtitles[index].text : ''
 
       if (subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_DUAL]) {
@@ -183,14 +183,14 @@ function NewVideo() {
           )
           xhr.send()
 
-          console.log(
-            'ask : ',
-            `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${secondLanguage}&dt=t&q=${tempSubtitle}`
-          )
+          // console.log(
+          //   'ask : ',
+          //   `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${secondLanguage}&dt=t&q=${tempSubtitle}`
+          // )
           if (xhr.status === 200) {
             let data = JSON.parse(xhr.responseText)
             let newWords = data[0][0][0]
-            console.log('newWords', newWords)
+            // console.log('newWords', newWords)
             currentSubtitle = newWords + '\n' + currentSubtitle
           } else {
             throw new Error('Network response was not ok')
@@ -301,7 +301,7 @@ window.addEventListener('load', function () {
   })
 
   checkInterval()
-  initFullScreen()
+  // initFullScreen()
 })
 
 function checkInterval() {
@@ -327,7 +327,7 @@ function checkInterval() {
       if (btnlinkElements.length >= titleIndex + 1) {
         titleLabel = btnlinkElements[titleIndex].getAttribute('title')
       }
-      console.log('title:', iframeElement.getAttribute('title'))
+      // console.log('title:', iframeElement.getAttribute('title'))
 
       if (iframeElement.getAttribute('title') !== titleLabel) {
         // clear all
@@ -347,11 +347,12 @@ function checkInterval() {
         let lectureSvgElement = document.querySelector(
           'a.active.btn svg'
         ) as HTMLElement
-        console.log('lectureSvgElement:', lectureSvgElement)
+        // console.log('lectureSvgElement:', lectureSvgElement)
         lectureSvgElement.style.height = '32px'
         // lectureSvgElement.style.color = 'red'
 
         addNewVideo()
+        initFullScreen()
       } else {
         let lectureIconSvgElements = document.querySelectorAll(
           'a.btn.btn-link>svg'
@@ -369,53 +370,24 @@ function checkInterval() {
       intervalRun = false
       clearInterval(intervalId)
     } else if (activerCount >= ACTIVE_COUNT_MAX) {
-      console.log('timeout ...')
+      // console.log('timeout ...')
 
       // stop the interval
       intervalRun = false
       clearInterval(intervalId)
     }
-    console.log(` ${activerCount * INTERVAL_STEP} ms....`)
+    // console.log(` ${activerCount * INTERVAL_STEP} ms....`)
     activerCount++
-  }, INTERVAL_STEP)
-}
-
-let intervalSubtitleRun = false
-let activerSubtilleCount = 1
-function checkIntervalSubtitle() {
-  intervalSubtitleRun = true
-  activerSubtilleCount = 1
-  const intervalId = setInterval(() => {
-    console.log(` ${activerSubtilleCount * INTERVAL_STEP} ms....`)
-
-    let lectureElement = document.querySelector('.active.btn')
-    console.log('lectureElement', lectureElement)
-
-    let iframe = document.querySelector(
-      'iframe#unit-iframe'
-    ) as HTMLIFrameElement
-
-    console.log('iframeElement', iframe)
-
-    if (iframe && iframe.contentDocument) {
-      // Check if the iframe and its contentDocument are available
-      let tcElement = iframe.contentDocument.querySelector('div.tc-wrapper')
-      console.log('tcElement4', tcElement)
-    } else {
-      console.log('iframe or contentDocument is null')
-    }
-
-    activerSubtilleCount++
   }, INTERVAL_STEP)
 }
 
 // Function to handle link clicks
 function handleLinkClick(event) {
   setTimeout(() => {
-    console.log('=====================================')
-    console.log('handleLinkClick :', event)
-    console.log('baseURI :', event.target.baseURI)
-    console.log('baseURI :', event.target.className)
+    // console.log('=====================================')
+    // console.log('handleLinkClick :', event)
+    // console.log('baseURI :', event.target.baseURI)
+    // console.log('baseURI :', event.target.className)
     if (intervalRun) {
       setTimeout(() => {
         checkInterval()
@@ -435,24 +407,23 @@ function initFullScreen() {
     if (videoShow) {
       const myVideo = document.getElementById('my-video')
 
-      myVideo.addEventListener('click', function () {
-        // video click fullscreen
-        console.log('click full screen')
-        videoShowFullScreen()
-      })
+      // myVideo.addEventListener('click', function (event) {
+      //   // video click fullscreen
+      //   // videoShowFullScreen()
+      // })
 
       document.addEventListener('fullscreenchange', function () {
         // The fullscreenchange event can sometimes fire more than once in certain browsers when requesting fullscreen.
         // 	1. First when fullscreen is requested
         // 	2. Second when fullscreen is exited
 
-        console.log('document.fullscreenElement : ', document.fullscreenElement)
+        // console.log('document.fullscreenElement : ', document.fullscreenElement)
 
         if (document.fullscreenElement === myVideo) {
-          console.log('fullscreenchange')
+          // console.log('fullscreenchange')
 
           if (document.fullscreenElement) {
-            console.log('exitFullscreen..')
+            // console.log('exitFullscreen..')
             document.exitFullscreen()
           }
         }
@@ -462,18 +433,21 @@ function initFullScreen() {
         }
       })
 
-      console.log(videoShow)
-      console.log(myVideo)
+      // console.log(videoShow)
+      // console.log(myVideo)
 
       clearInterval(intervalId)
-    } else {
-      console.log('no video-show....')
     }
+    // else {
+    //   console.log('no video-show....')
+    // }
   }, INTERVAL_STEP)
 }
 
 function videoShowFullScreen() {
   const videoShow = document.getElementById('video-show')
+  // console.log('videoShowFullScreen')
+  // if (videoShow.classList.contains('fullscreen')) {
   videoShow.classList.add('fullscreen')
 
   if (videoShow.requestFullscreen) {
@@ -494,6 +468,7 @@ function videoShowFullScreen() {
     // @ts-ignore
     videoShow.msRequestFullscreen()
   }
+  // }
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {

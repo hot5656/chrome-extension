@@ -99,8 +99,8 @@ const App: React.FC<{}> = () => {
 
   return (
     <Box>
-      <Typography variant="h5">{subtitleMode}</Typography>
-      <Typography variant="h5">{secondLanguage}</Typography>
+      {/* <Typography variant="h5">{subtitleMode}</Typography>
+      <Typography variant="h5">{secondLanguage}</Typography> */}
       <Box my={'16px'}>
         <FormControl fullWidth>
           <InputLabel id="subtitle-mode-select-label">Subtitle Mode</InputLabel>
@@ -121,7 +121,7 @@ const App: React.FC<{}> = () => {
       </Box>
       <Box my={'16px'}>
         <FormControl fullWidth>
-          <InputLabel id="language-select-label">Language</InputLabel>
+          <InputLabel id="language-select-label">Second Language</InputLabel>
           <Select
             labelId="language-select-label"
             id="language-select"
