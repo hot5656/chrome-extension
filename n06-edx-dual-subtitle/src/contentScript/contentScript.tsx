@@ -310,62 +310,74 @@ function checkInterval() {
   const intervalId = setInterval(() => {
     let iframeElement = document.querySelector('iframe#unit-iframe')
     if (iframeElement) {
-      let preButton = document.querySelector(
-        '.previous-btn.btn.btn-link'
-      ) as HTMLButtonElement
-      let titleIndex = 1
-      let btnlinkElements = document.querySelectorAll(
-        'a.btn.btn-link'
-      ) as NodeListOf<SVGElement>
-      let titleLabel = 'none@@'
+      // console.log('enter course ....')
 
-      if (preButton) {
-        if (preButton.disabled) {
-          titleIndex = 0
-        }
-      }
-      if (btnlinkElements.length >= titleIndex + 1) {
-        titleLabel = btnlinkElements[titleIndex].getAttribute('title')
-      }
-      // console.log('title:', iframeElement.getAttribute('title'))
+      // let preButton = document.querySelector(
+      //   '.previous-btn.btn.btn-link'
+      // ) as HTMLButtonElement
+      // let titleIndex = 1
+      // let btnlinkElements = document.querySelectorAll(
+      //   'a.btn.btn-link'
+      // ) as NodeListOf<SVGElement>
+      // let titleLabel = 'none@@'
 
-      if (iframeElement.getAttribute('title') !== titleLabel) {
-        // clear all
-        let lectureIconSvgElements = document.querySelectorAll(
-          'a.btn.btn-link>svg'
-        ) as NodeListOf<SVGElement>
-        lectureIconSvgElements.forEach((element) => {
-          if (element.style.color !== undefined) {
-            element.style.removeProperty('color')
-          }
-          if (element.style.height !== undefined) {
-            element.style.removeProperty('height')
-          }
-        })
+      // if (preButton) {
+      //   if (preButton.disabled) {
+      //     titleIndex = 0
+      //   }
+      // }
+      // if (btnlinkElements.length >= titleIndex + 1) {
+      //   titleLabel = btnlinkElements[titleIndex].getAttribute('title')
+      // }
+      // // console.log('title:', iframeElement.getAttribute('title'))
 
-        // set more bigger
-        let lectureSvgElement = document.querySelector(
-          'a.active.btn svg'
-        ) as HTMLElement
-        // console.log('lectureSvgElement:', lectureSvgElement)
-        lectureSvgElement.style.height = '32px'
-        // lectureSvgElement.style.color = 'red'
+      // if (iframeElement.getAttribute('title') !== titleLabel) {
+      //   console.log('enter course ....')
 
-        addNewVideo()
-        initFullScreen()
-      } else {
-        let lectureIconSvgElements = document.querySelectorAll(
-          'a.btn.btn-link>svg'
-        ) as NodeListOf<SVGElement>
-        lectureIconSvgElements.forEach((element) => {
-          if (element.style.color !== undefined) {
-            element.style.removeProperty('color')
-          }
-          if (element.style.height !== undefined) {
-            element.style.removeProperty('height')
-          }
-        })
-      }
+      //   // clear all
+      //   let lectureIconSvgElements = document.querySelectorAll(
+      //     'a.btn.btn-link>svg'
+      //   ) as NodeListOf<SVGElement>
+      //   lectureIconSvgElements.forEach((element) => {
+      //     if (element.style.color !== undefined) {
+      //       element.style.removeProperty('color')
+      //     }
+      //     if (element.style.height !== undefined) {
+      //       element.style.removeProperty('height')
+      //     }
+      //   })
+
+      //   // set more bigger
+      //   let lectureSvgElement = document.querySelector(
+      //     'a.active.btn svg'
+      //   ) as HTMLElement
+      //   // console.log('lectureSvgElement:', lectureSvgElement)
+      //   lectureSvgElement.style.height = '32px'
+      //   // lectureSvgElement.style.color = 'red'
+
+      //   addNewVideo()
+      //   initFullScreen()
+      // } else {
+      //   console.log('no video ....')
+
+      //   let lectureIconSvgElements = document.querySelectorAll(
+      //     'a.btn.btn-link>svg'
+      //   ) as NodeListOf<SVGElement>
+      //   lectureIconSvgElements.forEach((element) => {
+      //     if (element.style.color !== undefined) {
+      //       element.style.removeProperty('color')
+      //     }
+      //     if (element.style.height !== undefined) {
+      //       element.style.removeProperty('height')
+      //     }
+      //   })
+      // }
+
+      addNewVideo()
+      initFullScreen()
+
+      // console.log('stop interval ...')
+
       // stop the interval
       intervalRun = false
       clearInterval(intervalId)
@@ -480,7 +492,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     sendResponse({ message: MESSAGE_2ND_LANGUAGE })
     secondLanguage = message.secondLanguage
   }
-  console.log('message', message)
+  // console.log('message', message)
 })
 
 function subtitleOffControl(subtitleMode) {

@@ -8,27 +8,29 @@ chrome.storage.sync.get(['doubleTitleUdemy'], (storage) => {
   ) {
     console.log('found udemy....')
 
-    // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
-    // set path
-    let ajaxHook = chrome.runtime.getURL('ajaxhook.js')
+    checkInterval()
 
-    // not inject JS
-    if (!document.head.querySelector(`script[src='${ajaxHook}']`)) {
-      function injectJs(src) {
-        let script = document.createElement('script')
-        script.src = src
-        document.head.appendChild(script)
-        return script
-      }
+    // // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
+    // // set path
+    // let ajaxHook = chrome.runtime.getURL('ajaxhook.js')
 
-      // load ajaxHook
-      injectJs(ajaxHook).onload = function () {
-        // 防止再次載入相同的腳本時重複執行該事件處理程序
-        this.onload = null
-        // load injected.js
-        injectJs(chrome.runtime.getURL('injected.js'))
-      }
-    }
+    // // not inject JS
+    // if (!document.head.querySelector(`script[src='${ajaxHook}']`)) {
+    //   function injectJs(src) {
+    //     let script = document.createElement('script')
+    //     script.src = src
+    //     document.head.appendChild(script)
+    //     return script
+    //   }
+
+    //   // load ajaxHook
+    //   injectJs(ajaxHook).onload = function () {
+    //     // 防止再次載入相同的腳本時重複執行該事件處理程序
+    //     this.onload = null
+    //     // load injected.js
+    //     injectJs(chrome.runtime.getURL('injected.js'))
+    //   }
+    // }
   }
 })
 
@@ -66,3 +68,27 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   // console.log('sender', sender)
   // console.log('languageTypeUdemy : ', message.languageTypeUdemy)
 })
+
+let INTERVAL_STEP = 1000
+let activerCount = 1
+function checkInterval() {
+  const intervalId = setInterval(() => {
+    const videoElement = document.querySelector(
+      '#udemy video'
+    ) as HTMLVideoElement
+    console.log('videoElement', videoElement)
+
+    if (videoElement) {
+      videoElement.addEventListener('timeupdate', function () {
+        // Get the current time in seconds
+        var currentTime = videoElement.currentTime
+
+        // Display or use the current time as needed
+        console.log('Current Time: ' + currentTime)
+      })
+      clearInterval(intervalId)
+    }
+    console.log(` ${activerCount * INTERVAL_STEP} ms....`)
+    activerCount++
+  }, INTERVAL_STEP)
+}
