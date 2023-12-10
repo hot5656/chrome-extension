@@ -1,0 +1,26 @@
+#my-subtitle {
+  position: relative;
+  display: inline;
+  height: auto;
+  max-width: 30em;
+  color: #fff;
+  background-color: #2d2f31;
+  font-family: sans-serif;
+  line-height: 1.4;
+  text-align: left;
+  margin: 0 0.5em 1em;
+  padding: 0.2rem 0.8rem;
+  white-space: pre-line;
+  writing-mode: horizontal-tb;
+  unicode-bidi: plaintext;
+  direction: ltr;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  font-size: 1.6rem;
+  opacity: 0.75;
+}
+
+.captions-display--captions-container--1SP58
+  .captions-display--captions-cue-text--1W4Ia {
+  display: none;
+}

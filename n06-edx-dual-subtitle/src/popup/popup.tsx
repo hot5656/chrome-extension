@@ -69,7 +69,9 @@ const App: React.FC<{}> = () => {
         : SUBTITLE_MODE[SUBTITLE_MODE_DUAL]
     )
     setSecondLanguage(
-      res.language2ndEdx ? res.language2ndEdx : SECOND_LANGUES[0].value
+      res.language2ndEdx
+        ? res.language2ndEdx
+        : SECOND_LANGUES[SECOND_LANGUES_TRADITIONAL].value
     )
   })
 

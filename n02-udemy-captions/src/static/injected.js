@@ -88,10 +88,10 @@ let getResult = function (map, response) {
 ah.proxy({
   //請求發起前進入
   onRequest: (config, handler) => {
-    // if (config.url.includes(url_subtitle)) {
-    //   console.log('--------------------------------------')
-    //   console.log(config.url)
-    // }
+    if (config.url.includes(url_subtitle)) {
+      console.log('--------------------------------------')
+      console.log(config.url)
+    }
     handler.next(config)
   },
   //請求發生錯誤時進入，例如超時；注意，不包括http狀態碼錯誤，如404仍然會認為請求成功
@@ -102,8 +102,9 @@ ah.proxy({
   //請求成功後進入
   onResponse: (response, handler) => {
     if (response.config.url.includes(url_subtitle)) {
-      let map = setMap(response.response)
-      response.response = getResult(map, response.response)
+      // let map = setMap(response.response)
+      // response.response = getResult(map, response.response)
+      console.log("res[ponse data:", response.response)
     }
     handler.next(response)
   },

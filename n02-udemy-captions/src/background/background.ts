@@ -1,9 +1,19 @@
-chrome.runtime.onInstalled.addListener(() => {
-  console.log('background installed')
-  chrome.storage.sync.set({
-    doubleTitleUdemy: true,
-    languageTypeUdemy: 'zh-Hant',
-  })
+chrome.runtime.onInstalled.addListener((details) => {
+  console.log('background installed', details)
+
+  chrome.storage.sync.set(
+    {
+      subtitleModeUdemy: 'Dual',
+      language2ndUdemy: 'zh-Hant',
+    },
+    function () {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError)
+      } else {
+        console.log('Data successfully saved')
+      }
+    }
+  )
 })
 
 // chrome.action.onClicked.addListener(() => {
@@ -54,6 +64,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.changeIcon) {
     const iconPath = chrome.runtime.getURL(request.newIconPath)
     chrome.action.setIcon({ path: iconPath })
-    // console.log(iconPath)
   }
+  console.log('request', request)
+})
+
+// Listen for tab updates
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete') {
+    // Send a message to the content script
+    chrome.tabs.sendMessage(tabId, { action: 'pageLoaded' })
+  }
+  console.log('changeInfo', changeInfo)
 })
