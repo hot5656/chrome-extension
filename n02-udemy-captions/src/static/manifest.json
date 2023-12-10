@@ -36,16 +36,5 @@
 			"run_at": "document_end",
 			"all_frames": true
 		}
-	],
-	"web_accessible_resources": [
-		{
-			"resources": [
-				"injected.js",
-				"ajaxhook.js"
-			],
-			"matches": [
-				"https://www.udemy.com/*"
-			]
-		}
 	]
 }

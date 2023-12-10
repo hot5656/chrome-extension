@@ -6,17 +6,13 @@ const mergerSegs = function (segs, event, map) {
     if (val) {
       utf8 = `${val[0].utf8}\n${utf8}`
     }
-    return [
-      {
-        utf8,
-      },
-    ]
+    return [{
+      utf8,
+    }, ]
   } else {
-    return [
-      {
-        utf8: '',
-      },
-    ]
+    return [{
+      utf8: '',
+    }, ]
   }
 }
 
@@ -79,7 +75,9 @@ const processEvents = function (events) {
       if (!e.aAppend && e.tStartMs >= pre.tStartMs + pre.dDurationMs) {
         pre = e
       }
-      e.segs = [{ utf8: e.segs.map((seg) => seg.utf8).join('') }]
+      e.segs = [{
+        utf8: e.segs.map((seg) => seg.utf8).join('')
+      }]
       let cc = map.get(pre.tStartMs)
       if (!cc) {
         cc = []
@@ -92,14 +90,12 @@ const processEvents = function (events) {
   map.forEach((e) => {
     events.push(
       Object.assign({}, e[0], {
-        segs: [
-          {
-            utf8: e
-              .map((c) => c.segs[0].utf8)
-              .join('')
-              .replace(/\n/g, ' '),
-          },
-        ],
+        segs: [{
+          utf8: e
+            .map((c) => c.segs[0].utf8)
+            .join('')
+            .replace(/\n/g, ' '),
+        }, ],
       })
     )
   })
@@ -113,7 +109,10 @@ let getResult = function (response, map) {
   // console.log('-------------------')
 
   // 英文 segs array 文字接在一起
+  console.log("org subtitle:", resJson.events)
   resJson.events = processEvents(resJson.events)
+
+  console.log("subtitle:", resJson.events)
 
   // 將中英文加再一起
   let events = []

@@ -1,13 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import {
   Box,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  Switch,
-  TextField,
   Typography,
   FormControl,
   InputLabel,
@@ -25,9 +19,6 @@ import {
 } from '../utils/messageType'
 import './popup.css'
 
-// const TRANSLATE_OFF = 'Off'
-// const TRANSLATE_ON = 'On'
-
 const App: React.FC<{}> = () => {
   const [subtitleMode, setSubtitleMode] = useState<string>(
     SUBTITLE_MODE[SUBTITLE_MODE_DUAL]
@@ -36,9 +27,6 @@ const App: React.FC<{}> = () => {
     SECOND_LANGUES[SECOND_LANGUES_TRADITIONAL].value
   )
   const [responseMessage, setResponseMessage] = useState<string>('')
-
-  // const [languageTypeUdemy, setlanguageTypeUdemy] = useState<string>('zh-Hant')
-  // const [translateMode, setTranslateMode] = useState<string>(TRANSLATE_OFF)
 
   function sendMessageToContentScript(messageType, messages) {
     chrome.tabs.query(
@@ -73,34 +61,6 @@ const App: React.FC<{}> = () => {
         : SECOND_LANGUES[SECOND_LANGUES_TRADITIONAL].value
     )
   })
-
-  // useEffect(() => {
-  //   chrome.storage.sync.get(['languageTypeUdemy'], (res) => {
-  //     console.log('storage languageTypeUdemy:', res.languageTypeUdemy)
-  //   })
-  // }, [])
-
-  // const handleSelectTranslateModeClick = (event: SelectChangeEvent) => {
-  //   if (event.target.value === TRANSLATE_OFF) {
-  //     chrome.storage.sync.set({
-  //       doubleTitleUdemy: false,
-  //     })
-  //   } else {
-  //     chrome.storage.sync.set({
-  //       doubleTitleUdemy: true,
-  //     })
-  //   }
-  //   setTranslateMode(event.target.value)
-  //   // console.log('translateMode :', event.target.value)
-  // }
-
-  // const handleSelectLanguageClick = (event: SelectChangeEvent) => {
-  //   chrome.storage.sync.set({
-  //     languageTypeUdemy: event.target.value,
-  //   })
-  //   setlanguageTypeUdemy(event.target.value)
-  //   // console.log('languageTypeUdemy :', event.target.value)
-  // }
 
   const handleSubtitleModeClick = (event: SelectChangeEvent) => {
     setSubtitleMode(event.target.value)
