@@ -33,11 +33,6 @@ window.addEventListener('load', function () {
   checkContainerContent()
 })
 
-let INTERVAL_STEP = 1000
-let activerCount = 1
-let isMonitor = false
-let isMonitorConnect = false
-
 const handleTextChange = (mutationsList) => {
   for (const mutation of mutationsList) {
     // console.log('mutation.type:', mutation.type)
@@ -56,6 +51,10 @@ const config = {
   characterData: true,
 }
 
+let INTERVAL_STEP = 1000
+let activerCount = 1
+let isMonitor = false
+let isMonitorConnect = false
 function checkContainerContent() {
   const intervalId = setInterval(() => {
     const containerElement = document.querySelector(
@@ -76,7 +75,7 @@ function checkContainerContent() {
         // checkTextElement()
       }
     }
-    console.log(` ${activerCount * INTERVAL_STEP} ms....`)
+    // console.log(` ${activerCount * INTERVAL_STEP} ms....`)
     activerCount++
   }, INTERVAL_STEP)
 }
@@ -86,12 +85,24 @@ function checkTextElement() {
   const textElement = document.querySelector(
     '.captions-display--captions-cue-text--1W4Ia'
   )
-  const mysubtitleElement = document.querySelector('#my-subtitle')
+  let mysubtitleElement = document.querySelector('#my-subtitle')
   let tempSubtitle = ''
 
   // check for jump to next video
   if (!mysubtitleElement) {
     addMysubtitle()
+    mysubtitleElement = document.querySelector('#my-subtitle')
+  }
+
+  // alignment my-subtitle font-size
+  if (document.fullscreenElement) {
+    if (!mysubtitleElement.classList.contains('fullscreen')) {
+      mysubtitleElement.classList.add('fullscreen')
+    }
+  } else {
+    if (mysubtitleElement.classList.contains('fullscreen')) {
+      mysubtitleElement.classList.remove('fullscreen')
+    }
   }
 
   if (subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_OFF]) {
@@ -133,11 +144,11 @@ function checkTextElement() {
         mysubtitleElement.textContent = lastSubtitle
       }
 
-      console.log('Text content:', mysubtitleElement.textContent)
+      // console.log('Text content:', mysubtitleElement.textContent)
     } else {
       lastSubtitle = tempSubtitle
       mysubtitleElement.textContent = lastSubtitle
-      console.log('Text element not found')
+      // console.log('Text element not found')
     }
   }
 }
@@ -157,7 +168,7 @@ function addMysubtitle() {
 // Function to handle page load
 function handlePageLoad() {
   // Perform actions when the page is loaded
-  console.log('Page loaded!')
+  // console.log('Page loaded!')
 
   if (isMonitorConnect) {
     isMonitorConnect = false
