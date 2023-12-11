@@ -88,8 +88,8 @@ const App: React.FC<{}> = () => {
 
   return (
     <Box>
-      <Typography variant="h5">{subtitleMode}</Typography>
-      <Typography variant="h5">{secondLanguage}</Typography>
+      {/* <Typography variant="h5">{subtitleMode}</Typography>
+      <Typography variant="h5">{secondLanguage}</Typography> */}
       <Box my={'16px'}>
         <FormControl fullWidth>
           <InputLabel id="subtitle-mode-select-label">Subtitle Mode</InputLabel>

@@ -37,49 +37,6 @@ let INTERVAL_STEP = 1000
 let activerCount = 1
 let isMonitor = false
 let isMonitorConnect = false
-function checkIntervalContent() {
-  const intervalId = setInterval(() => {
-    const containertElement = document.querySelector(
-      '.captions-display--captions-container--1SP58'
-    )
-
-    if (containertElement) {
-      if (!isMonitor) {
-        const handleTextChange = () => {
-          const textElement = document.querySelector(
-            '.captions-display--captions-cue-text--1W4Ia'
-          )
-          console.log('textElementx:', textElement)
-          if (textElement) {
-            console.log('Text content changed:', textElement.textContent)
-          } else {
-            console.log('textElement1:', textElement)
-          }
-        }
-
-        console.log('add listen ....', containertElement)
-
-        if (containertElement) {
-          containertElement.addEventListener('change', handleTextChange)
-        }
-
-        isMonitor = true
-      } else {
-        const textElement = document.querySelector(
-          '.captions-display--captions-cue-text--1W4Ia'
-        )
-        if (textElement) {
-          console.log('check content value:', textElement.textContent)
-        } else {
-          console.log('textElement2:', textElement)
-        }
-      }
-    }
-
-    console.log(` ${activerCount * INTERVAL_STEP} ms....`)
-    activerCount++
-  }, INTERVAL_STEP)
-}
 
 const handleTextChange = (mutationsList) => {
   for (const mutation of mutationsList) {
