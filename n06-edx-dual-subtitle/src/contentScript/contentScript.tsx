@@ -174,6 +174,12 @@ function NewVideo() {
           if (tempSubtitle.includes('%')) {
             tempSubtitle = tempSubtitle.replace(/%/g, 'percent')
           }
+          if (tempSubtitle.includes(';')) {
+            tempSubtitle = tempSubtitle.replace(/&gt;/g, '>')
+            tempSubtitle = tempSubtitle.replace(/&#39;/g, "'")
+            currentSubtitle = currentSubtitle.replace(/&gt;/g, '>')
+            currentSubtitle = currentSubtitle.replace(/&#39;/g, "'")
+          }
 
           let xhr = new XMLHttpRequest()
           xhr.open(
@@ -195,6 +201,11 @@ function NewVideo() {
           } else {
             throw new Error('Network response was not ok')
           }
+        }
+      } else {
+        if (currentSubtitle.includes(';')) {
+          currentSubtitle = currentSubtitle.replace(/&gt;/g, '>')
+          currentSubtitle = currentSubtitle.replace(/&#39;/g, "'")
         }
       }
 
@@ -301,7 +312,6 @@ window.addEventListener('load', function () {
   })
 
   checkInterval()
-  // initFullScreen()
 })
 
 function checkInterval() {
@@ -310,69 +320,6 @@ function checkInterval() {
   const intervalId = setInterval(() => {
     let iframeElement = document.querySelector('iframe#unit-iframe')
     if (iframeElement) {
-      // console.log('enter course ....')
-
-      // let preButton = document.querySelector(
-      //   '.previous-btn.btn.btn-link'
-      // ) as HTMLButtonElement
-      // let titleIndex = 1
-      // let btnlinkElements = document.querySelectorAll(
-      //   'a.btn.btn-link'
-      // ) as NodeListOf<SVGElement>
-      // let titleLabel = 'none@@'
-
-      // if (preButton) {
-      //   if (preButton.disabled) {
-      //     titleIndex = 0
-      //   }
-      // }
-      // if (btnlinkElements.length >= titleIndex + 1) {
-      //   titleLabel = btnlinkElements[titleIndex].getAttribute('title')
-      // }
-      // // console.log('title:', iframeElement.getAttribute('title'))
-
-      // if (iframeElement.getAttribute('title') !== titleLabel) {
-      //   console.log('enter course ....')
-
-      //   // clear all
-      //   let lectureIconSvgElements = document.querySelectorAll(
-      //     'a.btn.btn-link>svg'
-      //   ) as NodeListOf<SVGElement>
-      //   lectureIconSvgElements.forEach((element) => {
-      //     if (element.style.color !== undefined) {
-      //       element.style.removeProperty('color')
-      //     }
-      //     if (element.style.height !== undefined) {
-      //       element.style.removeProperty('height')
-      //     }
-      //   })
-
-      //   // set more bigger
-      //   let lectureSvgElement = document.querySelector(
-      //     'a.active.btn svg'
-      //   ) as HTMLElement
-      //   // console.log('lectureSvgElement:', lectureSvgElement)
-      //   lectureSvgElement.style.height = '32px'
-      //   // lectureSvgElement.style.color = 'red'
-
-      //   addNewVideo()
-      //   initFullScreen()
-      // } else {
-      //   console.log('no video ....')
-
-      //   let lectureIconSvgElements = document.querySelectorAll(
-      //     'a.btn.btn-link>svg'
-      //   ) as NodeListOf<SVGElement>
-      //   lectureIconSvgElements.forEach((element) => {
-      //     if (element.style.color !== undefined) {
-      //       element.style.removeProperty('color')
-      //     }
-      //     if (element.style.height !== undefined) {
-      //       element.style.removeProperty('height')
-      //     }
-      //   })
-      // }
-
       addNewVideo()
       initFullScreen()
 
@@ -419,11 +366,6 @@ function initFullScreen() {
     if (videoShow) {
       const myVideo = document.getElementById('my-video')
 
-      // myVideo.addEventListener('click', function (event) {
-      //   // video click fullscreen
-      //   // videoShowFullScreen()
-      // })
-
       document.addEventListener('fullscreenchange', function () {
         // The fullscreenchange event can sometimes fire more than once in certain browsers when requesting fullscreen.
         // 	1. First when fullscreen is requested
@@ -459,7 +401,6 @@ function initFullScreen() {
 function videoShowFullScreen() {
   const videoShow = document.getElementById('video-show')
   // console.log('videoShowFullScreen')
-  // if (videoShow.classList.contains('fullscreen')) {
   videoShow.classList.add('fullscreen')
 
   if (videoShow.requestFullscreen) {
@@ -480,7 +421,6 @@ function videoShowFullScreen() {
     // @ts-ignore
     videoShow.msRequestFullscreen()
   }
-  // }
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
