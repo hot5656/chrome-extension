@@ -141,11 +141,22 @@ xhook.after(function (request, response) {
     let tlang = (params.get('tlang') || '').toLocaleLowerCase()
 
     // lang 原語言, tlang 翻譯語言
-    // console.log('lang:', lang, 'tlang:', tlang)
+    console.log('lang:', lang, 'tlang:', tlang)
     // Robert(2023/10/30) : support original language, not only english
     if (lang != '' && tlang === '') {
-      let map = setMap(undefined, url)
-      response.text = getResult(response, map)
+      console.log("response.text:", typeof response.text, JSON.parse(response.text))
+      response.text = linkSubtitlePart(response)
+      console.log("response.text2:", typeof response.text, JSON.parse(response.text))
+
+      // let map = setMap(undefined, url)
+      // console.log("map:", map)
+      // response.text = getResult(response, map)
     }
   }
 })
+
+let linkSubtitlePart = function (response) {
+  let resJson = JSON.parse(response.text)
+  resJson.events = processEvents(resJson.events)
+  return JSON.stringify(resJson)
+}
