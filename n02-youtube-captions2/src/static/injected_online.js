@@ -104,15 +104,16 @@ xhook.after(function (request, response) {
 
   // console.log('url:', url)
   if (url.includes(url_subtitle)) {
-    const params = new URLSearchParams(url)
-    let lang = (params.get('lang') || '').toLocaleLowerCase()
-    let tlang = (params.get('tlang') || '').toLocaleLowerCase()
+    console.log('response.text', response.text)
+    // const params = new URLSearchParams(url)
+    // let lang = (params.get('lang') || '').toLocaleLowerCase()
+    // let tlang = (params.get('tlang') || '').toLocaleLowerCase()
 
-    // lang 原語言, tlang 翻譯語言
-    // console.log('lang:', lang, 'tlang:', tlang)
-    if (lang != '') {
-      // let map = setMap(undefined, url)
-      response.text = getResult(response)
-    }
+    // // lang 原語言, tlang 翻譯語言
+    // // console.log('lang:', lang, 'tlang:', tlang)
+    // if (lang != '') {
+    //   // let map = setMap(undefined, url)
+    //   response.text = getResult(response)
+    // }
   }
 })

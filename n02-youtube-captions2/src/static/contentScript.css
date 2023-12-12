@@ -1,0 +1,13 @@
+#my-subtitle {
+  touch-action: none;
+  text-align: center;
+  left: 50%;
+  width: 344px;
+  margin-left: -172px;
+  bottom: 2%;
+  position: absolute;
+  /* line-height: normal; */
+  z-index: 50;
+  background-color: red;
+  margin-bottom: 61px;
+}

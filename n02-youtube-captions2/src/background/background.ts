@@ -1,7 +1,7 @@
 chrome.runtime.onInstalled.addListener(() => {
   console.log('background installed')
   chrome.storage.sync.set({
-    doubleTitleYoutube: true,
+    doubleTitleYoutube: false,
     languageTypeYoutube: 'zh-Hans',
     translateMode: 'Youtube', // OnLine
   })
