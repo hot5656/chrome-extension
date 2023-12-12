@@ -94,16 +94,16 @@ function checkTextElement() {
     mysubtitleElement = document.querySelector('#my-subtitle')
   }
 
-  // alignment my-subtitle font-size
-  if (document.fullscreenElement) {
-    if (!mysubtitleElement.classList.contains('fullscreen')) {
-      mysubtitleElement.classList.add('fullscreen')
-    }
-  } else {
-    if (mysubtitleElement.classList.contains('fullscreen')) {
-      mysubtitleElement.classList.remove('fullscreen')
-    }
-  }
+  // // alignment my-subtitle font-size
+  // if (document.fullscreenElement) {
+  //   if (!mysubtitleElement.classList.contains('fullscreen')) {
+  //     mysubtitleElement.classList.add('fullscreen')
+  //   }
+  // } else {
+  //   if (mysubtitleElement.classList.contains('fullscreen')) {
+  //     mysubtitleElement.classList.remove('fullscreen')
+  //   }
+  // }
 
   if (subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_OFF]) {
     tempSubtitle = ''
@@ -219,3 +219,18 @@ function subtitleOffControl(subtitleMode) {
   }
   return isOff
 }
+
+document.addEventListener('fullscreenchange', function () {
+  let mysubtitleElement = document.querySelector('#my-subtitle')
+
+  // alignment my-subtitle font-size
+  if (document.fullscreenElement) {
+    if (!mysubtitleElement.classList.contains('fullscreen')) {
+      mysubtitleElement.classList.add('fullscreen')
+    }
+  } else {
+    if (mysubtitleElement.classList.contains('fullscreen')) {
+      mysubtitleElement.classList.remove('fullscreen')
+    }
+  }
+})
