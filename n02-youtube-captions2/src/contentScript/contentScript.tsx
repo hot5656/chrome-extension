@@ -135,7 +135,7 @@ function checkContainerContent() {
       '.ytp-caption-window-container'
     )
     if (containerElement) {
-      addMysubtitle()
+      // addMysubtitle()
       clearInterval(intervalId)
       console.log('stop interval ...')
     } else {
