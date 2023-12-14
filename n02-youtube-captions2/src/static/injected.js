@@ -112,7 +112,7 @@ const processEvents = function (events) {
   // let eFirst = map.values().next().value
   // console.log('eTemp-0:', eFirst)
 
-  events = []
+  let tempEvents = []
   let nexTimestamp = 0
   let temSeg = map.forEach((e) => {
     // console.log('e:', e)
@@ -128,31 +128,31 @@ const processEvents = function (events) {
       eTemp.segs[0].utf8 = ''
       // console.log('eTemp:', eTemp)
       if (eTemp.hasOwnProperty('wWinId')) {
-        events.push(
+        tempEvents.push(
           Object.fromEntries(
             Object.entries(eTemp).filter(([key]) => key !== 'wWinId')
           )
         )
       } else {
-        events.push(eTemp)
+        tempEvents.push(eTemp)
       }
     }
     // console.log('e:', e)
     if (e.hasOwnProperty('wWinId')) {
-      events.push(
+      tempEvents.push(
         Object.fromEntries(
           Object.entries(e).filter(([key]) => key !== 'wWinId')
         )
       )
     } else {
-      events.push(e)
+      tempEvents.push(e)
     }
     // events.push(e)
     // events.push(Object.assign({}, e))
 
     nexTimestamp = e.tStartMs + e.dDurationMs
 
-    // events.push(
+    // tempEvents.push(
     //   Object.assign({}, e[0], {
     //     segs: [
     //       {
@@ -165,7 +165,26 @@ const processEvents = function (events) {
     //   })
     // )
   })
-  console.log('event:', events)
+  console.log('tempEvents:', tempEvents)
+
+  let dataLength = tempEvents.length
+  // let data = []
+  events = []
+  for (let i = 0; i < dataLength - 2; i++) {
+    if (
+      tempEvents[i + 1].tStartMs <
+      tempEvents[i].tStartMs + tempEvents[i].dDurationMs
+    ) {
+      tempEvents[i].segs[0].utf8 =
+        tempEvents[i].segs[0].utf8 + ' ' + tempEvents[i + 1].segs[0].utf8
+      events.push(tempEvents[i])
+      i++
+    } else {
+      events.push(tempEvents[i])
+    }
+  }
+  console.log('events:', events)
+
   return events
 }
 

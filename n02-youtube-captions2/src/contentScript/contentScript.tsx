@@ -129,13 +129,14 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 
 let INTERVAL_STEP = 1000
 let activerCount = 1
+let currentTubTitle = ''
 function checkContainerContent() {
   const intervalId = setInterval(() => {
     const containerElement = document.querySelector(
       '.ytp-caption-window-container'
     )
     if (containerElement) {
-      // addMysubtitle()
+      addMysubtitle()
       clearInterval(intervalId)
       console.log('stop interval ...')
     } else {
@@ -150,14 +151,81 @@ function addMysubtitle() {
   const containertElement = document.querySelector(
     '.ytp-caption-window-container'
   )
+  const subOrigionElement = document.querySelector(
+    'caption-window.ytp-caption-window-bottom'
+  )
   let mysubtitleElement = document.querySelector('#my-subtitle')
   console.log('mysubtitleElement', mysubtitleElement)
   if (!mysubtitleElement) {
     mysubtitleElement = document.createElement('div')
     mysubtitleElement.id = 'my-subtitle'
     mysubtitleElement.textContent = 'ABC...'
-    containertElement.appendChild(mysubtitleElement)
+    if (subOrigionElement) {
+      subOrigionElement.appendChild(mysubtitleElement)
+    }
     console.log('mysubtitleElement2', mysubtitleElement)
   }
   console.log('addMysubtitle end')
+
+  {
+    // const textElement = document.querySelector(
+    // 	'.captions-display--captions-cue-text--1W4Ia'
+    // )
+
+    // Callback function to execute when mutations are observed
+    const callback = function (mutationsList, observer) {
+      for (const mutation of mutationsList) {
+        if (
+          mutation.type === 'childList' ||
+          mutation.type === 'characterData'
+        ) {
+          // console.log('Text content changed:', textElement.textContent)
+          const textElements = document.querySelectorAll('.ytp-caption-segment')
+          let combinedText = ''
+
+          textElements.forEach((textElement) => {
+            combinedText += textElement.textContent + ' '
+          })
+
+          combinedText = combinedText.trim()
+          if (currentTubTitle !== combinedText) {
+            let mysubtitleElement = document.querySelector('#my-subtitle')
+            mysubtitleElement.textContent = combinedText
+            console.log('Text content changed:', combinedText)
+            currentTubTitle = combinedText
+          }
+        }
+
+        // if (textElement) {
+        //   if (currentTubTitle !== textElement.textContent) {
+        //     let mysubtitleElement = document.querySelector('#my-subtitle')
+        //     if (mysubtitleElement) {
+        //       mysubtitleElement.textContent = textElement.textContent
+        //     }
+        //     console.log('Text content changed:', textElement.textContent)
+        //     currentTubTitle = textElement.textContent
+        //   }
+        // } else {
+        //   console.log('no data....')
+        // }
+        // }
+      }
+    }
+
+    // Create an observer instance linked to the callback function
+    const observer = new MutationObserver(callback)
+
+    // Configuration of the observer:
+    const config = {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    }
+
+    // Start observing the target node for configured mutations
+    observer.observe(containertElement, config)
+  }
 }
+
+// .ytp-caption-window-container
+// .ytp-caption-segment
