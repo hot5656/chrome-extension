@@ -6,13 +6,17 @@ const mergerSegs = function (segs, event, map) {
     if (val) {
       utf8 = `${val[0].utf8}\n${utf8}`
     }
-    return [{
-      utf8,
-    }, ]
+    return [
+      {
+        utf8,
+      },
+    ]
   } else {
-    return [{
-      utf8: '',
-    }, ]
+    return [
+      {
+        utf8: '',
+      },
+    ]
   }
 }
 
@@ -82,12 +86,15 @@ const processEvents = function (events) {
       //   e.segs[0].utf8 !== '\n',
       //   e.segs.length !== 1 && e.segs[0].utf8 !== '\n'
       // )
-      const languageDiv = document.getElementById('language-show')
-      console.log(languageDiv.textContent)
-      if (e.segs.length === 1 && e.segs[0].utf8 === '\n') {} else {
-        e.segs = [{
-          utf8: e.segs.map((seg) => seg.utf8).join(''),
-        }, ]
+      // const languageDiv = document.getElementById('language-show')
+      // console.log(languageDiv.textContent)
+      if (e.segs.length === 1 && e.segs[0].utf8 === '\n') {
+      } else {
+        e.segs = [
+          {
+            utf8: e.segs.map((seg) => seg.utf8).join(''),
+          },
+        ]
         map.set(e.tStartMs, e)
       }
       // let cc = map.get(pre.tStartMs)
@@ -113,18 +120,35 @@ const processEvents = function (events) {
       // let eTemp = {
       //   ...e
       // }
-      let eTemp = JSON.parse(JSON.stringify(e))
       // let eTemp = Object.assign({}, e)
       // const eTemp = Object.assign({}, e)
+      let eTemp = JSON.parse(JSON.stringify(e))
       eTemp.tStartMs = nexTimestamp
       eTemp.dDurationMs = e.tStartMs - eTemp.tStartMs
       eTemp.segs[0].utf8 = ''
-      console.log('eTemp:', eTemp)
-      events.push(eTemp)
+      // console.log('eTemp:', eTemp)
+      if (eTemp.hasOwnProperty('wWinId')) {
+        events.push(
+          Object.fromEntries(
+            Object.entries(eTemp).filter(([key]) => key !== 'wWinId')
+          )
+        )
+      } else {
+        events.push(eTemp)
+      }
     }
-    console.log('e:', e)
+    // console.log('e:', e)
+    if (e.hasOwnProperty('wWinId')) {
+      events.push(
+        Object.fromEntries(
+          Object.entries(e).filter(([key]) => key !== 'wWinId')
+        )
+      )
+    } else {
+      events.push(e)
+    }
     // events.push(e)
-    events.push(Object.assign({}, e))
+    // events.push(Object.assign({}, e))
 
     nexTimestamp = e.tStartMs + e.dDurationMs
 
@@ -154,9 +178,11 @@ const processEvents_default = function (events) {
       if (!e.aAppend && e.tStartMs >= pre.tStartMs + pre.dDurationMs) {
         pre = e
       }
-      e.segs = [{
-        utf8: e.segs.map((seg) => seg.utf8).join(''),
-      }, ]
+      e.segs = [
+        {
+          utf8: e.segs.map((seg) => seg.utf8).join(''),
+        },
+      ]
       let cc = map.get(pre.tStartMs)
       if (!cc) {
         cc = []
@@ -172,12 +198,14 @@ const processEvents_default = function (events) {
   map.forEach((e) => {
     events.push(
       Object.assign({}, e[0], {
-        segs: [{
-          utf8: e
-            .map((c) => c.segs[0].utf8)
-            .join('')
-            .replace(/\n/g, ' '),
-        }, ],
+        segs: [
+          {
+            utf8: e
+              .map((c) => c.segs[0].utf8)
+              .join('')
+              .replace(/\n/g, ' '),
+          },
+        ],
       })
     )
   })
@@ -234,8 +262,11 @@ xhook.after(function (request, response) {
       // response.text = linkSubtitlePart(response)
       // response.text = linkSubtitlePart(response)
 
-      let process_text = linkSubtitlePart(response)
-      console.log('response.text2:', JSON.parse(process_text))
+      response.text = linkSubtitlePart(response)
+      console.log('response.text2:', JSON.parse(response.text))
+
+      // let process_text = linkSubtitlePart(response)
+      // console.log('response.text2:', JSON.parse(process_text))
 
       // let map = setMap(undefined, url)
       // console.log('map:', map)
