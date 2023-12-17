@@ -6,17 +6,13 @@ const mergerSegs = function (segs, event, map) {
     if (val) {
       utf8 = `${val[0].utf8}\n${utf8}`
     }
-    return [
-      {
-        utf8,
-      },
-    ]
+    return [{
+      utf8,
+    }, ]
   } else {
-    return [
-      {
-        utf8: '',
-      },
-    ]
+    return [{
+      utf8: '',
+    }, ]
   }
 }
 
@@ -73,60 +69,45 @@ const setMap = function (userLang, url) {
 const processEvents = function (events) {
   let map = new Map()
   let pre = null
+
   events.forEach((e) => {
     if (e.segs && e.segs.length > 0) {
-      // if (!pre) pre = e
-      // if (!e.aAppend && e.tStartMs >= pre.tStartMs + pre.dDurationMs) {
-      //   pre = e
-      // }
-      // console.log(
-      //   '(e.segs[0]',
-      //   e.segs[0],
-      //   e.segs.length !== 1,
-      //   e.segs[0].utf8 !== '\n',
-      //   e.segs.length !== 1 && e.segs[0].utf8 !== '\n'
-      // )
-      // const languageDiv = document.getElementById('language-show')
-      // console.log(languageDiv.textContent)
       if (e.segs.length === 1 && e.segs[0].utf8 === '\n') {
+        // console.log("not data.. ")
       } else {
-        e.segs = [
-          {
-            utf8: e.segs.map((seg) => seg.utf8).join(''),
-          },
-        ]
+        // let st = ''
+        // e.segs.forEach(seg => {
+        //   if (st !== '') {
+        //     st = st + ' '
+        //   }
+        //   st = st + seg.utf8
+        // })
+        // console.log("st:", st)
+        // e.segs = [{
+        //   utf8: st
+        // }]
+
+        e.segs = [{
+          utf8: e.segs.map((seg) => seg.utf8).join(''),
+        }, ]
+        // console.log(" e.segs: ", e.segs)
         map.set(e.tStartMs, e)
       }
-      // let cc = map.get(pre.tStartMs)
-      // if (!cc) {
-      //   cc = []
-      // }
-      // cc.push(e)
-      // map.set(e.tStartMs, e)
     }
   })
 
-  console.log('map:', map)
-
-  // Get the first value from the map
-  // let eFirst = map.values().next().value
-  // console.log('eTemp-0:', eFirst)
+  // console.log('map:', map)
 
   let tempEvents = []
   let nexTimestamp = 0
   let temSeg = map.forEach((e) => {
-    // console.log('e:', e)
     if (e.tStartMs > nexTimestamp && nexTimestamp !== 0) {
-      // let eTemp = {
-      //   ...e
-      // }
-      // let eTemp = Object.assign({}, e)
-      // const eTemp = Object.assign({}, e)
       let eTemp = JSON.parse(JSON.stringify(e))
       eTemp.tStartMs = nexTimestamp
       eTemp.dDurationMs = e.tStartMs - eTemp.tStartMs
       eTemp.segs[0].utf8 = ''
-      // console.log('eTemp:', eTemp)
+      eTemp.next = eTemp.tStartMs + eTemp.dDurationMs
+
       if (eTemp.hasOwnProperty('wWinId')) {
         tempEvents.push(
           Object.fromEntries(
@@ -137,8 +118,9 @@ const processEvents = function (events) {
         tempEvents.push(eTemp)
       }
     }
-    // console.log('e:', e)
+
     if (e.hasOwnProperty('wWinId')) {
+      e.next = e.tStartMs + e.dDurationMs
       tempEvents.push(
         Object.fromEntries(
           Object.entries(e).filter(([key]) => key !== 'wWinId')
@@ -147,31 +129,17 @@ const processEvents = function (events) {
     } else {
       tempEvents.push(e)
     }
-    // events.push(e)
-    // events.push(Object.assign({}, e))
 
     nexTimestamp = e.tStartMs + e.dDurationMs
-
-    // tempEvents.push(
-    //   Object.assign({}, e[0], {
-    //     segs: [
-    //       {
-    //         utf8: e
-    //           .map((c) => c.segs[0].utf8)
-    //           .join('')
-    //           .replace(/\n/g, ' '),
-    //       },
-    //     ],
-    //   })
-    // )
   })
-  console.log('tempEvents:', tempEvents)
+  // console.log('tempEvents:', tempEvents)
 
   let dataLength = tempEvents.length
-  // let data = []
   events = []
-  for (let i = 0; i < dataLength - 2; i++) {
-    if (
+  for (let i = 0; i < dataLength; i++) {
+    if ((i + 1) === dataLength) {
+      events.push(tempEvents[i])
+    } else if (
       tempEvents[i + 1].tStartMs <
       tempEvents[i].tStartMs + tempEvents[i].dDurationMs
     ) {
@@ -183,7 +151,7 @@ const processEvents = function (events) {
       events.push(tempEvents[i])
     }
   }
-  console.log('events:', events)
+  // console.log('events:', events)
 
   return events
 }
@@ -197,11 +165,9 @@ const processEvents_default = function (events) {
       if (!e.aAppend && e.tStartMs >= pre.tStartMs + pre.dDurationMs) {
         pre = e
       }
-      e.segs = [
-        {
-          utf8: e.segs.map((seg) => seg.utf8).join(''),
-        },
-      ]
+      e.segs = [{
+        utf8: e.segs.map((seg) => seg.utf8).join(''),
+      }, ]
       let cc = map.get(pre.tStartMs)
       if (!cc) {
         cc = []
@@ -217,14 +183,12 @@ const processEvents_default = function (events) {
   map.forEach((e) => {
     events.push(
       Object.assign({}, e[0], {
-        segs: [
-          {
-            utf8: e
-              .map((c) => c.segs[0].utf8)
-              .join('')
-              .replace(/\n/g, ' '),
-          },
-        ],
+        segs: [{
+          utf8: e
+            .map((c) => c.segs[0].utf8)
+            .join('')
+            .replace(/\n/g, ' '),
+        }, ],
       })
     )
   })

@@ -130,6 +130,7 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 let INTERVAL_STEP = 1000
 let activerCount = 1
 let currentTubTitle = ''
+let currentStyle: string = ''
 function checkContainerContent() {
   const intervalId = setInterval(() => {
     const containerElement = document.querySelector(
@@ -146,23 +147,25 @@ function checkContainerContent() {
     activerCount++
   }, INTERVAL_STEP)
 }
+
 function addMysubtitle() {
   console.log('addMysubtitle')
   const containertElement = document.querySelector(
     '.ytp-caption-window-container'
   )
-  const subOrigionElement = document.querySelector(
-    'caption-window.ytp-caption-window-bottom'
-  )
+  // const subOrigionElement = document.querySelector(
+  //   'caption-window.ytp-caption-window-bottom'
+  // )
   let mysubtitleElement = document.querySelector('#my-subtitle')
   console.log('mysubtitleElement', mysubtitleElement)
   if (!mysubtitleElement) {
     mysubtitleElement = document.createElement('div')
     mysubtitleElement.id = 'my-subtitle'
     mysubtitleElement.textContent = 'ABC...'
-    if (subOrigionElement) {
-      subOrigionElement.appendChild(mysubtitleElement)
-    }
+    // if (subOrigionElement) {
+    //   subOrigionElement.appendChild(mysubtitleElement)
+    // }
+    containertElement.appendChild(mysubtitleElement)
     console.log('mysubtitleElement2', mysubtitleElement)
   }
   console.log('addMysubtitle end')
@@ -183,6 +186,11 @@ function addMysubtitle() {
           const textElements = document.querySelectorAll('.ytp-caption-segment')
           let combinedText = ''
 
+          // if (textElements) {
+          //   // @ts-ignore
+          //   console.log('textElements[0].style:', textElements[0].style)
+          // }
+
           textElements.forEach((textElement) => {
             combinedText += textElement.textContent + ' '
           })
@@ -193,6 +201,29 @@ function addMysubtitle() {
             mysubtitleElement.textContent = combinedText
             console.log('Text content changed:', combinedText)
             currentTubTitle = combinedText
+
+            const text1stElement = document.querySelector(
+              '.ytp-caption-segment'
+            ) as HTMLElement
+            if (text1stElement) {
+              if (text1stElement.style) {
+                // @ts-ignore
+                mysubtitleElement.style.cssText = text1stElement.style
+                currentStyle = text1stElement.style.cssText
+              }
+            }
+            // if (textElements) {
+            //   // @ts-ignore
+            //   if (textElements[0].style) {
+            //     // @ts-ignore
+            //     if (currentStyle != textElements[0].style) {
+            //       // @ts-ignore
+            //       mysubtitleElement.style.cssText = textElements[0].style
+            //       // @ts-ignore
+            //       currentStyle = textElements[0].style
+            //     }
+            //   }
+            // }
           }
         }
 
