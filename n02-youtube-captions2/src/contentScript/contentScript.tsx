@@ -101,16 +101,17 @@ function addLabel(label) {
 window.addEventListener('load', function () {
   checkContainerContent()
 
-  let languageDiv = document.createElement('div')
-  languageDiv.setAttribute('data-language', 'zh-Hans')
-  languageDiv.id = 'language-show'
-  // console.log('languageDiv', languageDiv)
-  // console.log('document.body', document.body)
-  document.body.appendChild(languageDiv)
-  chrome.storage.sync.get(['languageTypeYoutube'], (res) => {
-    const languageTypeYoutube = res.languageTypeYoutube ?? 'zh-Hans'
-    languageDiv.setAttribute('data-language', languageTypeYoutube)
-  })
+  // let languageDiv = document.createElement('div')
+  // languageDiv.setAttribute('data-language', 'zh-Hans')
+  // languageDiv.id = 'language-show'
+  // // console.log('languageDiv', languageDiv)
+  // // console.log('document.body', document.body)
+  // document.body.appendChild(languageDiv)
+  // chrome.storage.sync.get(['languageTypeYoutube'], (res) => {
+  //   const languageTypeYoutube = res.languageTypeYoutube ?? 'zh-Hans'
+  //   languageDiv.setAttribute('data-language', languageTypeYoutube)
+  // })
+
   // load hook
   // loadHook()
 })
@@ -208,10 +209,37 @@ function addMysubtitle() {
             if (text1stElement) {
               if (text1stElement.style) {
                 // @ts-ignore
-                mysubtitleElement.style.cssText = text1stElement.style
+                // mysubtitleElement.style.cssText = text1stElement.style
+                // currentStyle = text1stElement.style.cssText
+                // @ts-ignore
+                mysubtitleElement.style.cssText = text1stElement.style.cssText
                 currentStyle = text1stElement.style.cssText
+                console.log('currentStyle:', currentStyle)
               }
             }
+            const textHeadElement = document.querySelector(
+              '.caption-window'
+            ) as HTMLElement
+            if (textHeadElement) {
+              if (textHeadElement.style) {
+                console.log('textHeadElement:', textHeadElement.style.cssText)
+                console.log(
+                  'textHeadElement.style.width:',
+                  textHeadElement.style.width,
+                  textHeadElement.style.marginLeft
+                )
+                if (textHeadElement.style.width) {
+                  // @ts-ignore
+                  mysubtitleElement.style.width = textHeadElement.style.width
+                }
+                if (textHeadElement.style.marginLeft) {
+                  // @ts-ignore
+                  mysubtitleElement.style.marginLeft =
+                    textHeadElement.style.marginLeft
+                }
+              }
+            }
+
             // if (textElements) {
             //   // @ts-ignore
             //   if (textElements[0].style) {
