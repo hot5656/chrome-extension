@@ -8,7 +8,7 @@
   bottom: 2%;
   position: absolute;
   z-index: 50;
-  background-color: red;
+  /* background-color: red; */
   margin-bottom: 61px;
   /* margin-bottom: 200px; */
 
@@ -41,8 +41,13 @@
   .ytp-caption-window-container
   .caption-window.ytp-caption-window-bottom {
   margin-bottom: 200px;
+  opacity: 0;
 }
 
 /* .caption-window.ytp-caption-window-bottom {
   margin-bottom: 1;
 } */
+
+#my-subtitle.no-display {
+  opacity: 0;
+}

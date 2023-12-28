@@ -1,13 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import {
   Box,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  Switch,
-  TextField,
   Typography,
   FormControl,
   InputLabel,
@@ -15,128 +9,127 @@ import {
   MenuItem,
   SelectChangeEvent,
 } from '@mui/material'
+import {
+  MESSAGE_SUBTITLE_MODE,
+  MESSAGE_2ND_LANGUAGE,
+  SUBTITLE_MODE,
+  SUBTITLE_MODE_DUAL,
+  SECOND_LANGUES_TRADITIONAL,
+  SECOND_LANGUES,
+} from '../utils/messageType'
 import './popup.css'
 
-const TRANSLATE_OFF = 'Off'
-
 const App: React.FC<{}> = () => {
-  const [languageTypeYoutube, setlanguageTypeYoutube] =
-    useState<string>('zh-Hans')
-  const [translateMode, setTranslateMode] = useState<string>('Youtube')
+  const [subtitleMode, setSubtitleMode] = useState<string>(
+    SUBTITLE_MODE[SUBTITLE_MODE_DUAL]
+  )
+  const [secondLanguage, setSecondLanguage] = useState<string>(
+    SECOND_LANGUES[SECOND_LANGUES_TRADITIONAL].value
+  )
+  const [responseMessage, setResponseMessage] = useState<string>('')
+
+  function sendMessageToContentScript(messageType, messages) {
+    chrome.tabs.query(
+      {
+        active: true,
+        currentWindow: true,
+      },
+      (tabs) => {
+        if (tabs.length > 0) {
+          if (tabs[0].url.match('https://www.youtube.com/watch*')) {
+            chrome.tabs.sendMessage(tabs[0].id, messages, (response) => {
+              if (chrome.runtime.lastError) {
+                console.error(chrome.runtime.lastError)
+              }
+            })
+          }
+        }
+      }
+    )
+  }
 
   // when open popup show
   chrome.storage.sync.get(
-    ['languageTypeYoutube', 'translateMode', 'doubleTitleYoutube'],
+    ['subtitleModeYoutube', 'language2ndYoutube'],
     (res) => {
-      const languageTypeYoutube = res.languageTypeYoutube ?? 'zh-Hans'
-      setlanguageTypeYoutube(res.languageTypeYoutube)
-
-      if (res.doubleTitleYoutube) {
-        setTranslateMode(res.translateMode)
-      } else {
-        setTranslateMode(TRANSLATE_OFF)
-      }
-
-      // send to background.js
-      const newIconPath = `${res.doubleTitleYoutube ? 'icon' : 'icon_off'}.png` // Specify the path to the new icon
-      chrome.runtime.sendMessage({ changeIcon: true, newIconPath: newIconPath })
-
-      // send message from current tab %?%
-      chrome.tabs.query(
-        {
-          active: true,
-          currentWindow: true,
-        },
-        (tabs) => {
-          // Robert(2023/10/06) : popup send message to content script for change language
-          if (tabs.length > 0) {
-            // console.log('tabs =>', tabs)
-            // send when url = https://* %?%
-            // 若未設定 在 chrome://extensions/ 或 blank tab 會有問題
-            // need set tabs at "permissions" %?%
-            // 未設定抓不到 url
-            // Robert(2023/10/30) : change to just care https://www.youtube.com/watch
-            if (tabs[0].url.match('https://www.youtube.com/watch*')) {
-              // console.log('languageTypeYoutube match: ', languageTypeYoutube)
-              chrome.tabs.sendMessage(tabs[0].id, {
-                languageTypeYoutube: languageTypeYoutube,
-              })
-            }
-          }
-        }
+      setSubtitleMode(
+        res.subtitleModeYoutube
+          ? res.subtitleModeYoutube
+          : SUBTITLE_MODE[SUBTITLE_MODE_DUAL]
+      )
+      setSecondLanguage(
+        res.language2ndYoutube
+          ? res.language2ndYoutube
+          : SECOND_LANGUES[SECOND_LANGUES_TRADITIONAL].value
       )
     }
   )
 
-  // useEffect(() => {
-  //   chrome.storage.sync.get(['languageTypeYoutube'], (res) => {
-  //     console.log('storage languageTypeYoutube:', res.languageTypeYoutube)
-  //   })
-  // }, [])
+  const handleSubtitleModeClick = (event: SelectChangeEvent) => {
+    setSubtitleMode(event.target.value)
+    chrome.storage.sync.set({
+      subtitleModeYoutube: event.target.value,
+    })
 
-  const handleSelectTranslateModeClick = (event: SelectChangeEvent) => {
-    if (event.target.value === TRANSLATE_OFF) {
-      chrome.storage.sync.set({
-        doubleTitleYoutube: false,
-      })
-    } else {
-      chrome.storage.sync.set({
-        doubleTitleYoutube: true,
-        translateMode: event.target.value,
-      })
-    }
-    setTranslateMode(event.target.value)
-    // console.log('translateMode :', event.target.value)
+    sendMessageToContentScript(MESSAGE_SUBTITLE_MODE, {
+      message: MESSAGE_SUBTITLE_MODE,
+      subtitleMode: event.target.value,
+    })
   }
 
-  const handleSelectLanguageClick = (event: SelectChangeEvent) => {
+  const handleSecondLanguageClick = (event: SelectChangeEvent) => {
+    setSecondLanguage(event.target.value)
     chrome.storage.sync.set({
-      languageTypeYoutube: event.target.value,
+      language2ndYoutube: event.target.value,
     })
-    setlanguageTypeYoutube(event.target.value)
-    // console.log('languageTypeYoutube :', event.target.value)
+
+    sendMessageToContentScript(MESSAGE_2ND_LANGUAGE, {
+      message: MESSAGE_2ND_LANGUAGE,
+      secondLanguage: event.target.value,
+    })
   }
 
   return (
     <Box>
-      {/* <Typography variant="h4">Youtube Double Title</Typography>
-      <Typography variant="h5">{translateMode}</Typography>
-      <Typography variant="h5">{showLanguage(languageTypeYoutube)}</Typography> */}
+      {/* <Typography variant="h5">{subtitleMode}</Typography>
+      <Typography variant="h5">{secondLanguage}</Typography> */}
       <Box my={'16px'}>
         <FormControl fullWidth>
-          <InputLabel id="translate-mode-select-label">
-            Translate Mode
-          </InputLabel>
+          <InputLabel id="subtitle-mode-select-label">Subtitle Mode</InputLabel>
           <Select
-            labelId="translate-mode-select-label"
-            id="translate-mode-select"
-            value={translateMode}
-            label="Translate Mode"
-            onChange={handleSelectTranslateModeClick}
+            labelId="subtitle-mode-select-label"
+            id="subtitle-select"
+            value={subtitleMode}
+            label="Second Language"
+            onChange={handleSubtitleModeClick}
           >
-            <MenuItem value={TRANSLATE_OFF}>{TRANSLATE_OFF}</MenuItem>
-            <MenuItem value={'Youtube'}>Youtube</MenuItem>
-            <MenuItem value={'OnLine'}>OnLine</MenuItem>
+            {SUBTITLE_MODE.map((option, index) => (
+              <MenuItem key={index} value={option}>
+                {option}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Box>
       <Box my={'16px'}>
         <FormControl fullWidth>
-          <InputLabel id="language-select-label">Language</InputLabel>
+          <InputLabel id="language-select-label">Second Language</InputLabel>
           <Select
             labelId="language-select-label"
             id="language-select"
-            value={languageTypeYoutube}
-            label="Language"
-            onChange={handleSelectLanguageClick}
+            value={secondLanguage}
+            label="Second Language"
+            onChange={handleSecondLanguageClick}
           >
-            <MenuItem value={'zh-Hant'}>Chinese Traditional</MenuItem>
-            <MenuItem value={'zh-Hans'}>Chinese Simplified</MenuItem>
-            <MenuItem value={'ja'}>Japanese</MenuItem>
-            <MenuItem value={'ko'}>Korean</MenuItem>
+            {SECOND_LANGUES.map((option, index) => (
+              <MenuItem key={index} value={option.value}>
+                {option.language}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Box>
+      <Typography variant="body1">{responseMessage}</Typography>
     </Box>
   )
 }
@@ -146,18 +139,3 @@ document.body.appendChild(rootElement)
 const root = ReactDOM.createRoot(rootElement)
 
 root.render(<App />)
-
-function showLanguage(type) {
-  let languageName = 'Chinese Simplified'
-  if (type === 'zh-Hans') {
-    languageName = 'Chinese Simplified'
-  } else if (type === 'zh-Hant') {
-    languageName = 'Chinese Traditional'
-  } else if (type === 'ja') {
-    languageName = 'Japanese'
-  } else if (type === 'ko') {
-    languageName = 'Korean'
-  }
-
-  return languageName
-}

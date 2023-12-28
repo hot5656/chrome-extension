@@ -1,12 +1,125 @@
+import {
+  MESSAGE_SUBTITLE_MODE,
+  MESSAGE_2ND_LANGUAGE,
+  SUBTITLE_MODE,
+  SUBTITLE_MODE_OFF,
+  SUBTITLE_MODE_DUAL,
+  SECOND_LANGUES_TRADITIONAL,
+  SECOND_LANGUES,
+} from '../utils/messageType'
+
+let secondLanguage = SECOND_LANGUES[SECOND_LANGUES_TRADITIONAL].value
+let subtitleMode = SUBTITLE_MODE[SUBTITLE_MODE_DUAL]
+
+function loadHook() {
+  chrome.storage.sync.get(
+    ['subtitleModeYoutube', 'language2ndYoutube'],
+    (res) => {
+      if (res.subtitleModeYoutube) {
+        subtitleMode = res.subtitleModeYoutube
+      }
+
+      if (res.language2ndYoutube) {
+        secondLanguage = res.language2ndYoutube
+      }
+      // console.log('window.location.host', window.location.host)
+      // console.log(storage)
+      // console.log('storage.doubleTitleYoutube:', storage.doubleTitleYoutube)
+      // console.log('window.location.host:', window.location.host)
+
+      // change document.domain to window.location.host %?%
+
+      // if (
+      //   storage.doubleTitleYoutube &&
+      //   ['www.youtube.com'].includes(window.location.host)
+      // ) {
+      console.log('found youtube.....')
+
+      // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
+      // set path
+      let xHook = chrome.runtime.getURL('xhook.js')
+      let injectFile = 'injected.js'
+
+      // not inject JS
+      if (!document.head.querySelector(`script[src='${xHook}']`)) {
+        function injectJs(src) {
+          let script = document.createElement('script')
+          script.src = src
+          document.head.appendChild(script)
+          return script
+        }
+
+        // load xHook
+        injectJs(xHook).onload = function () {
+          // console.log('injectJs : ', injectFile)
+
+          // 防止再次載入相同的腳本時重複執行該事件處理程序
+          this.onload = null
+          // load injected.js
+          injectJs(chrome.runtime.getURL(injectFile))
+        }
+      }
+
+      // if (storage.doubleTitleYoutube) {
+      //   let injectFile = 'injected.js'
+
+      //   // add run chrome extension label
+      //   addLabel(storage.translateMode + 'Translate')
+
+      //   if (storage.translateMode != 'Youtube') {
+      //     injectFile = 'injected_online.js'
+      //   }
+
+      //   // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
+      //   // set path
+      //   let xHook = chrome.runtime.getURL('xhook.js')
+
+      //   // not inject JS
+      //   if (!document.head.querySelector(`script[src='${xHook}']`)) {
+      //     function injectJs(src) {
+      //       let script = document.createElement('script')
+      //       script.src = src
+      //       document.head.appendChild(script)
+      //       return script
+      //     }
+
+      //     // load xHook
+      //     injectJs(xHook).onload = function () {
+      //       // console.log('injectJs : ', injectFile)
+
+      //       // 防止再次載入相同的腳本時重複執行該事件處理程序
+      //       this.onload = null
+      //       // load injected.js
+      //       injectJs(chrome.runtime.getURL(injectFile))
+      //     }
+      //   }
+      // }
+      // }
+    }
+  )
+}
+
 // when all page load complete, set data-language, and get langeage from chrome storge
 window.addEventListener('load', function () {
   checkContainerContent()
+
+  // load hook
+  loadHook()
 })
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'pageLoaded') {
     handlePageLoad()
     console.log('pageLoaded.....')
+  } else if (request.message === MESSAGE_SUBTITLE_MODE) {
+    sendResponse({ message: MESSAGE_SUBTITLE_MODE })
+    subtitleMode = request.subtitleMode
+    subtitleOffControl(subtitleMode)
+    console.log('MESSAGE_SUBTITLE_MODE')
+  } else if (request.message === MESSAGE_2ND_LANGUAGE) {
+    sendResponse({ message: MESSAGE_2ND_LANGUAGE })
+    secondLanguage = request.secondLanguage
+    console.log('MESSAGE_2ND_LANGUAGE')
   }
 })
 
@@ -25,7 +138,31 @@ const callback = function (mutationsList, observer) {
       combinedText = combinedText.trim()
       if (currentTubTitle !== combinedText) {
         let mysubtitleElement = document.querySelector('#my-subtitle')
-        mysubtitleElement.textContent = combinedText
+        let tempSubtitle = combinedText.replace(/%/g, 'percent')
+        if (
+          combinedText.length != 0 &&
+          subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_DUAL]
+        ) {
+          let xhr = new XMLHttpRequest()
+          xhr.open(
+            'GET',
+            `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${secondLanguage}&dt=t&q=${tempSubtitle}`,
+            false
+          )
+          xhr.send()
+
+          if (xhr.status === 200) {
+            let data = JSON.parse(xhr.responseText)
+            let newWords = data[0][0][0]
+            // console.log('newWords', newWords)
+            mysubtitleElement.textContent = newWords + '\n' + combinedText
+          } else {
+            mysubtitleElement.textContent = combinedText
+            throw new Error('Network response was not ok')
+          }
+        } else {
+          mysubtitleElement.textContent = combinedText
+        }
         console.log('Text content changed:', combinedText)
         currentTubTitle = combinedText
 
@@ -130,11 +267,12 @@ function addMysubtitle() {
   if (!mysubtitleElement) {
     mysubtitleElement = document.createElement('div')
     mysubtitleElement.id = 'my-subtitle'
-    mysubtitleElement.textContent = 'ABC...'
+    // mysubtitleElement.textContent = 'ABC...'
     // if (subOrigionElement) {
     //   subOrigionElement.appendChild(mysubtitleElement)
     // }
     containertElement.appendChild(mysubtitleElement)
+    subtitleOffControl(subtitleMode)
     console.log('mysubtitleElement2', mysubtitleElement)
   }
   console.log('addMysubtitle end')
@@ -156,6 +294,19 @@ function handlePageLoad() {
     isMonitor = false
     activerCount = 1
     checkContainerContent()
+  }
+}
+
+function subtitleOffControl(subtitleMode) {
+  const mySubtitleElement = document.getElementById(
+    'my-subtitle'
+  ) as HTMLElement
+  if (mySubtitleElement) {
+    if (subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_OFF]) {
+      mySubtitleElement.classList.add('no-display')
+    } else {
+      mySubtitleElement.classList.remove('no-display')
+    }
   }
 }
 

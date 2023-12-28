@@ -1,10 +1,18 @@
 chrome.runtime.onInstalled.addListener(() => {
   console.log('background installed')
-  chrome.storage.sync.set({
-    doubleTitleYoutube: false,
-    languageTypeYoutube: 'zh-Hans',
-    translateMode: 'Youtube', // OnLine
-  })
+  chrome.storage.sync.set(
+    {
+      subtitleModeYoutube: 'Dual',
+      language2ndYoutube: 'zh-Hant',
+    },
+    function () {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError)
+        // } else {
+        //   console.log('Data successfully saved')
+      }
+    }
+  )
 })
 
 // chrome.action.onClicked.addListener(() => {
