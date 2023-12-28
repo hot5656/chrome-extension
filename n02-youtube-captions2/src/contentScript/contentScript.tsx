@@ -62,6 +62,16 @@ const callback = function (mutationsList, observer) {
             }
           }
         }
+
+        const textLeftlement = document.querySelector(
+          '.caption-window'
+        ) as HTMLElement
+        if (textLeftlement) {
+          if (textLeftlement.style.left) {
+            // @ts-ignore
+            mysubtitleElement.style.left = textLeftlement.style.left
+          }
+        }
       }
     }
   }
