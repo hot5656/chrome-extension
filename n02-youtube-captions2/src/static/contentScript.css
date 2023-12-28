@@ -2,40 +2,15 @@
   touch-action: none;
   text-align: center;
   left: 50%;
-  /* transform: translateX(-50%); */
-  /* width: 344px; */
-  /* margin-left: -172px; */
   bottom: 2%;
   position: absolute;
   z-index: 50;
-  /* background-color: red; */
   margin-bottom: 61px;
-  /* margin-bottom: 200px; */
-
-  /* width: 623px; */
-  /* margin-left: -311.5px; */
-
-  /* display: inline-block;
-  white-space: pre-wrap;
-  background: rgba(8, 8, 8, 0.75);
-  font-size: 16px;
-  color: rgb(255, 255, 255);
-  fill: rgb(255, 255, 255);
-  font-family: 'YouTube Noto', Roboto, 'Arial Unicode Ms', Arial, Helvetica,
-    Verdana, 'PT Sans Caption', sans-serif; */
 }
 
 .ytp-autohide #my-subtitle {
   margin-bottom: 0;
 }
-
-/* #my-subtitle:hover {
-  margin-bottom: 200px;
-} */
-
-/* .caption-window {
-  margin-bottom: 200px;
-} */
 
 .ytp-transparent
   .ytp-caption-window-container
@@ -43,10 +18,6 @@
   margin-bottom: 200px;
   opacity: 0;
 }
-
-/* .caption-window.ytp-caption-window-bottom {
-  margin-bottom: 1;
-} */
 
 #my-subtitle.no-display {
   opacity: 0;

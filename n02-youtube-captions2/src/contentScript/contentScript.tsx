@@ -22,17 +22,6 @@ function loadHook() {
       if (res.language2ndYoutube) {
         secondLanguage = res.language2ndYoutube
       }
-      // console.log('window.location.host', window.location.host)
-      // console.log(storage)
-      // console.log('storage.doubleTitleYoutube:', storage.doubleTitleYoutube)
-      // console.log('window.location.host:', window.location.host)
-
-      // change document.domain to window.location.host %?%
-
-      // if (
-      //   storage.doubleTitleYoutube &&
-      //   ['www.youtube.com'].includes(window.location.host)
-      // ) {
       console.log('found youtube.....')
 
       // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
@@ -59,42 +48,6 @@ function loadHook() {
           injectJs(chrome.runtime.getURL(injectFile))
         }
       }
-
-      // if (storage.doubleTitleYoutube) {
-      //   let injectFile = 'injected.js'
-
-      //   // add run chrome extension label
-      //   addLabel(storage.translateMode + 'Translate')
-
-      //   if (storage.translateMode != 'Youtube') {
-      //     injectFile = 'injected_online.js'
-      //   }
-
-      //   // v3 for chrome.extension.getURL - chrome.runtime.getURL %?%
-      //   // set path
-      //   let xHook = chrome.runtime.getURL('xhook.js')
-
-      //   // not inject JS
-      //   if (!document.head.querySelector(`script[src='${xHook}']`)) {
-      //     function injectJs(src) {
-      //       let script = document.createElement('script')
-      //       script.src = src
-      //       document.head.appendChild(script)
-      //       return script
-      //     }
-
-      //     // load xHook
-      //     injectJs(xHook).onload = function () {
-      //       // console.log('injectJs : ', injectFile)
-
-      //       // 防止再次載入相同的腳本時重複執行該事件處理程序
-      //       this.onload = null
-      //       // load injected.js
-      //       injectJs(chrome.runtime.getURL(injectFile))
-      //     }
-      //   }
-      // }
-      // }
     }
   )
 }
@@ -242,15 +195,7 @@ function checkContainerContent() {
 
         isMonitor = true
         clearInterval(intervalId)
-      } else {
-        // console.log('Checking container content...')
-        // checkTextElement()
       }
-
-      //   clearInterval(intervalId)
-      //   console.log('stop interval ...')
-      // } else {
-      //   console.log('no containerElement ...')
     }
     console.log(` ${activerCount * INTERVAL_STEP} ms....`)
     activerCount++
@@ -268,9 +213,6 @@ function addMysubtitle() {
     mysubtitleElement = document.createElement('div')
     mysubtitleElement.id = 'my-subtitle'
     // mysubtitleElement.textContent = 'ABC...'
-    // if (subOrigionElement) {
-    //   subOrigionElement.appendChild(mysubtitleElement)
-    // }
     containertElement.appendChild(mysubtitleElement)
     subtitleOffControl(subtitleMode)
     console.log('mysubtitleElement2', mysubtitleElement)
@@ -309,7 +251,3 @@ function subtitleOffControl(subtitleMode) {
     }
   }
 }
-
-// .ytp-caption-window-container - up
-// xx .caption-window - all up
-// .ytp-caption-segment - one
