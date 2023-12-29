@@ -63,16 +63,27 @@ window.addEventListener('load', function () {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'pageLoaded') {
     handlePageLoad()
-    console.log('pageLoaded.....')
+    // console.log('pageLoaded.....')
   } else if (request.message === MESSAGE_SUBTITLE_MODE) {
     sendResponse({ message: MESSAGE_SUBTITLE_MODE })
     subtitleMode = request.subtitleMode
     subtitleOffControl(subtitleMode)
-    console.log('MESSAGE_SUBTITLE_MODE')
+    // console.log('MESSAGE_SUBTITLE_MODE')
   } else if (request.message === MESSAGE_2ND_LANGUAGE) {
     sendResponse({ message: MESSAGE_2ND_LANGUAGE })
     secondLanguage = request.secondLanguage
-    console.log('MESSAGE_2ND_LANGUAGE')
+    // console.log('MESSAGE_2ND_LANGUAGE')
+  }
+})
+
+window.addEventListener('message', (event) => {
+  if (event.source === window && event.data.type === 'FROM_INJECTED') {
+    // console.log(event.data.message)
+
+    let mysubtitleElement = document.querySelector('#my-subtitle')
+    if (!mysubtitleElement) {
+      handlePageLoad()
+    }
   }
 })
 
@@ -91,75 +102,78 @@ const callback = function (mutationsList, observer) {
       combinedText = combinedText.trim()
       if (currentTubTitle !== combinedText) {
         let mysubtitleElement = document.querySelector('#my-subtitle')
-        let tempSubtitle = combinedText.replace(/%/g, 'percent')
-        if (
-          combinedText.length != 0 &&
-          subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_DUAL]
-        ) {
-          let xhr = new XMLHttpRequest()
-          xhr.open(
-            'GET',
-            `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${secondLanguage}&dt=t&q=${tempSubtitle}`,
-            false
-          )
-          xhr.send()
+        if (mysubtitleElement) {
+          let tempSubtitle = combinedText.replace(/%/g, 'percent')
 
-          if (xhr.status === 200) {
-            let data = JSON.parse(xhr.responseText)
-            let newWords = data[0][0][0]
-            // console.log('newWords', newWords)
-            mysubtitleElement.textContent = newWords + '\n' + combinedText
+          if (
+            combinedText.length != 0 &&
+            subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_DUAL]
+          ) {
+            let xhr = new XMLHttpRequest()
+            xhr.open(
+              'GET',
+              `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${secondLanguage}&dt=t&q=${tempSubtitle}`,
+              false
+            )
+            xhr.send()
+
+            if (xhr.status === 200) {
+              let data = JSON.parse(xhr.responseText)
+              let newWords = data[0][0][0]
+              // console.log('newWords', newWords)
+              mysubtitleElement.textContent = newWords + '\n' + combinedText
+            } else {
+              mysubtitleElement.textContent = combinedText
+              throw new Error('Network response was not ok')
+            }
           } else {
             mysubtitleElement.textContent = combinedText
-            throw new Error('Network response was not ok')
           }
-        } else {
-          mysubtitleElement.textContent = combinedText
-        }
-        console.log('Text content changed:', combinedText)
-        currentTubTitle = combinedText
+          // console.log('Text content changed:', combinedText)
+          currentTubTitle = combinedText
 
-        const text1stElement = document.querySelector(
-          '.ytp-caption-segment'
-        ) as HTMLElement
-        if (text1stElement) {
-          if (text1stElement.style) {
-            // @ts-ignore
-            mysubtitleElement.style.cssText = text1stElement.style.cssText
-            currentStyle = text1stElement.style.cssText
-            console.log('currentStyle:', currentStyle)
-          }
-        }
-        const textHeadElement = document.querySelector(
-          '.caption-window'
-        ) as HTMLElement
-        if (textHeadElement) {
-          if (textHeadElement.style) {
-            console.log('textHeadElement:', textHeadElement.style.cssText)
-            console.log(
-              'textHeadElement.style.width:',
-              textHeadElement.style.width,
-              textHeadElement.style.marginLeft
-            )
-            if (textHeadElement.style.width) {
+          const text1stElement = document.querySelector(
+            '.ytp-caption-segment'
+          ) as HTMLElement
+          if (text1stElement) {
+            if (text1stElement.style) {
               // @ts-ignore
-              mysubtitleElement.style.width = textHeadElement.style.width
-            }
-            if (textHeadElement.style.marginLeft) {
-              // @ts-ignore
-              mysubtitleElement.style.marginLeft =
-                textHeadElement.style.marginLeft
+              mysubtitleElement.style.cssText = text1stElement.style.cssText
+              currentStyle = text1stElement.style.cssText
+              // console.log('currentStyle:', currentStyle)
             }
           }
-        }
+          const textHeadElement = document.querySelector(
+            '.caption-window'
+          ) as HTMLElement
+          if (textHeadElement) {
+            if (textHeadElement.style) {
+              // console.log('textHeadElement:', textHeadElement.style.cssText)
+              // console.log(
+              //   'textHeadElement.style.width:',
+              //   textHeadElement.style.width,
+              //   textHeadElement.style.marginLeft
+              // )
+              if (textHeadElement.style.width) {
+                // @ts-ignore
+                mysubtitleElement.style.width = textHeadElement.style.width
+              }
+              if (textHeadElement.style.marginLeft) {
+                // @ts-ignore
+                mysubtitleElement.style.marginLeft =
+                  textHeadElement.style.marginLeft
+              }
+            }
+          }
 
-        const textLeftlement = document.querySelector(
-          '.caption-window'
-        ) as HTMLElement
-        if (textLeftlement) {
-          if (textLeftlement.style.left) {
-            // @ts-ignore
-            mysubtitleElement.style.left = textLeftlement.style.left
+          const textLeftlement = document.querySelector(
+            '.caption-window'
+          ) as HTMLElement
+          if (textLeftlement) {
+            if (textLeftlement.style.left) {
+              // @ts-ignore
+              mysubtitleElement.style.left = textLeftlement.style.left
+            }
           }
         }
       }
@@ -191,38 +205,35 @@ function checkContainerContent() {
 
       if (!isMonitor) {
         observer.observe(containerElement, config)
+        // console.log('2nd observer... ')
+
         isMonitorConnect = true
 
         isMonitor = true
         clearInterval(intervalId)
       }
     }
-    console.log(` ${activerCount * INTERVAL_STEP} ms....`)
+    // console.log(` ${activerCount * INTERVAL_STEP} ms....`)
     activerCount++
   }, INTERVAL_STEP)
 }
 
 function addMysubtitle() {
-  console.log('addMysubtitle')
+  // console.log('addMysubtitle')
   const containertElement = document.querySelector(
     '.ytp-caption-window-container'
   )
   let mysubtitleElement = document.querySelector('#my-subtitle')
-  console.log('mysubtitleElement', mysubtitleElement)
+  // console.log('mysubtitleElement', mysubtitleElement)
   if (!mysubtitleElement) {
     mysubtitleElement = document.createElement('div')
     mysubtitleElement.id = 'my-subtitle'
     // mysubtitleElement.textContent = 'ABC...'
     containertElement.appendChild(mysubtitleElement)
     subtitleOffControl(subtitleMode)
-    console.log('mysubtitleElement2', mysubtitleElement)
+    // console.log('mysubtitleElement2', mysubtitleElement)
   }
-  console.log('addMysubtitle end')
-
-  {
-    // Start observing the target node for configured mutations
-    observer.observe(containertElement, config)
-  }
+  // console.log('addMysubtitle end')
 }
 
 let isMonitor = false
@@ -233,6 +244,8 @@ function handlePageLoad() {
   if (isMonitorConnect) {
     isMonitorConnect = false
     observer.disconnect()
+
+    // console.log('discoonnect observer... ')
     isMonitor = false
     activerCount = 1
     checkContainerContent()

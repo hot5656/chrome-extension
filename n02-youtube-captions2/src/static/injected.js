@@ -6,13 +6,17 @@ const mergerSegs = function (segs, event, map) {
     if (val) {
       utf8 = `${val[0].utf8}\n${utf8}`
     }
-    return [{
-      utf8,
-    }, ]
+    return [
+      {
+        utf8,
+      },
+    ]
   } else {
-    return [{
-      utf8: '',
-    }, ]
+    return [
+      {
+        utf8: '',
+      },
+    ]
   }
 }
 
@@ -87,9 +91,11 @@ const processEvents = function (events) {
         //   utf8: st
         // }]
 
-        e.segs = [{
-          utf8: e.segs.map((seg) => seg.utf8).join(''),
-        }, ]
+        e.segs = [
+          {
+            utf8: e.segs.map((seg) => seg.utf8).join(''),
+          },
+        ]
         // console.log(" e.segs: ", e.segs)
         map.set(e.tStartMs, e)
       }
@@ -137,7 +143,7 @@ const processEvents = function (events) {
   let dataLength = tempEvents.length
   events = []
   for (let i = 0; i < dataLength; i++) {
-    if ((i + 1) === dataLength) {
+    if (i + 1 === dataLength) {
       events.push(tempEvents[i])
     } else if (
       tempEvents[i + 1].tStartMs <
@@ -165,9 +171,11 @@ const processEvents_default = function (events) {
       if (!e.aAppend && e.tStartMs >= pre.tStartMs + pre.dDurationMs) {
         pre = e
       }
-      e.segs = [{
-        utf8: e.segs.map((seg) => seg.utf8).join(''),
-      }, ]
+      e.segs = [
+        {
+          utf8: e.segs.map((seg) => seg.utf8).join(''),
+        },
+      ]
       let cc = map.get(pre.tStartMs)
       if (!cc) {
         cc = []
@@ -183,12 +191,14 @@ const processEvents_default = function (events) {
   map.forEach((e) => {
     events.push(
       Object.assign({}, e[0], {
-        segs: [{
-          utf8: e
-            .map((c) => c.segs[0].utf8)
-            .join('')
-            .replace(/\n/g, ' '),
-        }, ],
+        segs: [
+          {
+            utf8: e
+              .map((c) => c.segs[0].utf8)
+              .join('')
+              .replace(/\n/g, ' '),
+          },
+        ],
       })
     )
   })
@@ -234,26 +244,24 @@ xhook.after(function (request, response) {
     let tlang = (params.get('tlang') || '').toLocaleLowerCase()
 
     // lang 原語言, tlang 翻譯語言
-    console.log('lang:', lang, 'tlang:', tlang)
+    // console.log('lang:', lang, 'tlang:', tlang)
+
     // Robert(2023/10/30) : support original language, not only english
     if (lang != '' && tlang === '') {
-      console.log(
-        'response.text:',
-        typeof response.text,
-        JSON.parse(response.text)
-      )
-      // response.text = linkSubtitlePart(response)
-      // response.text = linkSubtitlePart(response)
+      // console.log(
+      //   'response.text:',
+      //   typeof response.text,
+      //   JSON.parse(response.text)
+      // )
 
       response.text = linkSubtitlePart(response)
-      console.log('response.text2:', JSON.parse(response.text))
+      // console.log('response.text2:', JSON.parse(response.text))
 
-      // let process_text = linkSubtitlePart(response)
-      // console.log('response.text2:', JSON.parse(process_text))
-
-      // let map = setMap(undefined, url)
-      // console.log('map:', map)
-      // response.text = getResult(response, map)
+      // notice after ad...
+      window.postMessage(
+        { type: 'FROM_INJECTED', message: 'update subtitle!' },
+        '*'
+      )
     }
   }
 })
