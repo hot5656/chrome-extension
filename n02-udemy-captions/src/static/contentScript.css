@@ -24,7 +24,13 @@
 #my-subtitle.fullscreen {
   font-size: 2.4rem;
 }
-.captions-display--captions-container--1SP58
+
+/* Robert(2024/03/06) : fix for udemy change subtitle class */
+/* .captions-display--captions-container--1SP58
   .captions-display--captions-cue-text--1W4Ia {
+  display: none;
+} */
+.captions-display--captions-container--PqdGQ
+  .captions-display--captions-cue-text--TQ0DQ {
   display: none;
 }

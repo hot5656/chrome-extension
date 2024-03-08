@@ -1,4 +1,12 @@
-# YouTube Double Subtitle
+# Udemy Double Subtitle
+
+# build
+
+- debug version
+  npm start
+
+- release version
+  npm run build
 
 # Reference
 

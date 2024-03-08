@@ -35,7 +35,7 @@ window.addEventListener('load', function () {
 
 const handleTextChange = (mutationsList) => {
   for (const mutation of mutationsList) {
-    // console.log('mutation.type:', mutation.type)
+    // console.log(`mutation.type : ${mutation.type}`)
     if (mutation.type === 'childList' || mutation.type === 'characterData') {
       // console.log('Container content changed...')
       checkTextElement()
@@ -58,7 +58,9 @@ let isMonitorConnect = false
 function checkContainerContent() {
   const intervalId = setInterval(() => {
     const containerElement = document.querySelector(
-      '.captions-display--captions-container--1SP58'
+      // Robert(2024/03/06) : fix for udemy change subtitle class
+      // '.captions-display--captions-container--1SP58'
+      '.captions-display--captions-container--PqdGQ'
     )
 
     if (containerElement) {
@@ -83,7 +85,9 @@ function checkContainerContent() {
 let lastSubtitle = ''
 function checkTextElement() {
   const textElement = document.querySelector(
-    '.captions-display--captions-cue-text--1W4Ia'
+    // Robert(2024/03/06) : fix for udemy change subtitle class
+    // '.captions-display--captions-cue-text--1W4Ia'
+    '.captions-display--captions-cue-text--TQ0DQ'
   )
   let mysubtitleElement = document.querySelector('#my-subtitle')
   let tempSubtitle = ''
@@ -118,6 +122,7 @@ function checkTextElement() {
   if (lastSubtitle !== tempSubtitle) {
     lastSubtitle = tempSubtitle
 
+    // console.log(`lastSubtitle: ${lastSubtitle}`)
     if (lastSubtitle.length != 0) {
       if (subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_DUAL]) {
         tempSubtitle = tempSubtitle.replace(/%/g, 'percent')
@@ -132,7 +137,14 @@ function checkTextElement() {
 
         if (xhr.status === 200) {
           let data = JSON.parse(xhr.responseText)
-          let newWords = data[0][0][0]
+          // Robert(2024/03/06) : fix some translate data not show
+          let newWords = ''
+          // console.log(`data[0].length : ${data[0].length}`)
+          for (let i = 0; i < data[0].length; i++) {
+            // console.log(`data[0][${i}][0] ${data[0][i][0]}`)
+            newWords += data[0][i][0]
+          }
+
           // console.log('newWords', newWords)
           mysubtitleElement.textContent = newWords + '\n' + lastSubtitle
         } else {
@@ -155,13 +167,18 @@ function checkTextElement() {
 
 function addMysubtitle() {
   const containertElement = document.querySelector(
-    '.captions-display--captions-container--1SP58'
+    // Robert(2024/03/06) : fix for udemy change subtitle class
+    // '.captions-display--captions-container--1SP58'
+    '.captions-display--captions-container--PqdGQ'
   )
-  let mysubtitleElement = document.querySelector('#my-subtitle')
-  if (!mysubtitleElement) {
-    mysubtitleElement = document.createElement('div')
-    mysubtitleElement.id = 'my-subtitle'
-    containertElement.appendChild(mysubtitleElement)
+  // console.log('containertElement:', containertElement)
+  if (containertElement) {
+    let mysubtitleElement = document.querySelector('#my-subtitle')
+    if (!mysubtitleElement) {
+      mysubtitleElement = document.createElement('div')
+      mysubtitleElement.id = 'my-subtitle'
+      containertElement.appendChild(mysubtitleElement)
+    }
   }
 }
 
@@ -201,7 +218,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 function subtitleOffControl(subtitleMode) {
   let isOff = false
-  const videoTitle = document.getElementById('subtitle-text') as HTMLElement
+  // Robert(2024/03/06) : fix for subtitle off immediately
+  // const videoTitle = document.getElementById('subtitle-text') as HTMLElement
+  const videoTitle = document.getElementById('my-subtitle') as HTMLElement
   if (videoTitle) {
     const videoTitletyle = window.getComputedStyle(videoTitle)
     if (subtitleMode === SUBTITLE_MODE[SUBTITLE_MODE_OFF]) {

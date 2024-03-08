@@ -2,3 +2,8 @@
 	udemy-double_subtitle-extension-v1.0.0.zip
 // Robert(2023/11/06) :  送錯更新,重送
 	udemy-double_subtitle-extension-v1.1.1.zip
+// Robert(2024/03/06) : fix for udemy change subtitle class
+// Robert(2024/03/06) : fix for subtitle off immediately
+// Robert(2024/03/06) : fix some translate data not show
+// Robert(2024/03/06) : change version to 1.1.1
+// Robert(2024/03/07) : remove activeTab
