@@ -119,7 +119,15 @@ const callback = function (mutationsList, observer) {
 
             if (xhr.status === 200) {
               let data = JSON.parse(xhr.responseText)
-              let newWords = data[0][0][0]
+              //   let newWords = data[0][0][0]
+			  // Robert(2024/04/22) : fix some translate data not show
+			  let newWords = ''
+			  // console.log(`data[0].length : ${data[0].length}`)
+			  for (let i = 0; i < data[0].length; i++) {
+			  	  // console.log(`data[0][${i}][0] ${data[0][i][0]}`)
+				  newWords += data[0][i][0]
+			  }
+
               // console.log('newWords', newWords)
               mysubtitleElement.textContent = newWords + '\n' + combinedText
             } else {
