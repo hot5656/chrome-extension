@@ -12,9 +12,14 @@
   margin-bottom: 0;
 }
 
-.ytp-transparent
+/* Robert(2024/04/24) : fix sometimes show 2 subtitle */
+/* .ytp-transparent
   .ytp-caption-window-container
   .caption-window.ytp-caption-window-bottom {
+  margin-bottom: 200px;
+  opacity: 0;
+} */
+.ytp-transparent .ytp-caption-window-container .caption-window {
   margin-bottom: 200px;
   opacity: 0;
 }

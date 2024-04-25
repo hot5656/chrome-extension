@@ -8,4 +8,5 @@
 	-- ajax-hook run at Brave have seome problem(Youtube)
 // Robert(2023/11/16) : version 1.1.0
 	youtube-double_subtitle-extension-v1.1.0.zip
-Robert(2024/04/22) : fix some translate data not show
+// Robert(2024/04/22) : fix some translate data not show
+// Robert(2024/04/24) : fix sometimes show 2 subtitle
